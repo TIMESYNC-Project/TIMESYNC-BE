@@ -9,8 +9,6 @@ info:
     name: Apache 2.0
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
 tags:
-  - name: register
-    description: Endpoint for user registration
   - name: login
     description: Endpoint for verifying who a user is
   - name: Admin
@@ -467,6 +465,138 @@ paths:
           $ref: "#/components/responses/400"
         500:
           $ref: "#/components/responses/500"
+  /schedules:
+    post:
+      tags:
+        - "Admin"
+      description: schedule feature for admin to set working hour
+      summary: schedule feature for admin to set working hour
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                check_in:
+                  type: string
+                  example: "08:00"
+                leave_off:
+                  type: string
+                  example: "17:00"
+                tollerance:
+                  type: string
+                  example: "30:00"
+      responses:
+        200:
+          description: "success post working hour schedule"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseObject"
+              example:
+                data:
+                  check_in: "08:00"
+                  leave_off: "17:00"
+                message: "post working hour schedule success"
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+  /broadcasts:
+    post:
+      tags:
+        - "Admin"
+      description: broadcast feature for admin to send message to employee
+      summary: broadcast feature for admin to send message to employee
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                broadcast_title:
+                  type: string
+                  example: "Libur"
+                broadcast_description:
+                  type: string
+                  example: "Karena besok ada rapat atasan mendadak, jadi kantor diliburkan"
+      responses:
+        200:
+          description: "success send broadcast message to employee"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseObject"
+              example:
+                data:
+                  id: 1
+                  broadcast_title: "Libur"
+                  broadcast_description: "Karena besok ada rapat atasan mendadak, jadi kantor diliburkan"
+                message: "send broadcast message to employee success"
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+    get:
+      tags:
+        - "Admin"
+      description: get all broadcast message for admin
+      summary: get all broadcast message for admin
+      security:
+        - JWTAuth: []
+      responses:
+        200:
+          description: "success get all broadcast message for admin"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseObject"
+              example:
+                data:
+                  [
+                    {
+                      id: 1,
+                      broadcast_title: "Libur",
+                      broadcast_description: "Karena besok ada rapat atasan mendadak, jadi kantor diliburkan",
+                    },
+                    {
+                      id: 2,
+                      broadcast_title: "Wajib Masuk",
+                      broadcast_description: "Karena sabtu nanti ada agenda kerja bakti, jadi semua karyawan diharapkan untuk hadir",
+                    },
+                  ]
+                message: "get all broadcast message for admin success"
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+  /presences:
+    get:
+      tags:
+        - "Admin"
+      description: total employee precences in a day
+      summary: total employee precences in a day
+      security:
+        - JWTAuth: []
+      responses:
+        200:
+          description: "success get total employee precences"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseObject"
+              example:
+                data:
+                  total_employee_presences: 9
+                message: "get total employee precences success"
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
   /employees/attendance:
     post:
       tags:
@@ -711,6 +841,43 @@ paths:
           $ref: "#/components/responses/400"
         500:
           $ref: "#/components/responses/500"
+  /employees/inbox:
+    get:
+      tags:
+        - "Employee"
+      description: get inbox message from admin for employee
+      summary: get inbox message from admin for employee
+      security:
+        - JWTAuth: []
+      responses:
+        200:
+          description: success show message from admin for employee
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  [
+                    {
+                      id: 1,
+                      inbox_date: "01/02/2023",
+                      inbox_title: "Libur",
+                      inbox_description: "Karena besok ada rapat atasan mendadak, jadi kantor diliburkan",
+                    },
+                    {
+                      id: 2,
+                      inbox_date: "03/02/2023",
+                      inbox_title: "Wajib Masuk",
+                      inbox_description: "Karena sabtu nanti ada agenda kerja bakti, jadi semua karyawan diharapkan untuk hadir",
+                    },
+                  ]
+                message: success show employee inbox message
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+
 components:
   securitySchemes:
     JWTAuth:
