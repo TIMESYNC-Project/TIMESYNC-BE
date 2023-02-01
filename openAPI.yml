@@ -1,0 +1,555 @@
+openapi: 3.0.3
+info:
+  title: TIMESYNC
+  description: This is API for Group Project By Alterra Academy
+  version: "1.0.0"
+  contact:
+    email: fauzilax@gmail.com
+  license:
+    name: Apache 2.0
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+tags:
+  - name: register
+    description: Endpoint for user registration
+  - name: login
+    description: Endpoint for verifying who a user is
+  - name: Admin
+  - name: Employee
+
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/fauzilax/kurabsent/1.0.0
+  - url: https://shirayuki.site
+    description: primarry link
+
+paths:
+  /register:
+    post:
+      tags:
+        - "Admin"
+      description: feature for admin registration new employee
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                profile_picture:
+                  type: string
+                name:
+                  type: string
+                birth_of_date:
+                  type: string
+                nip:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                gender:
+                  type: string
+                position:
+                  type: string
+                phone:
+                  type: string
+                address:
+                  type: string
+                password:
+                  type: string
+                  format: password
+                salary:
+                  type: integer
+            example:
+              profile_picture: "https://cdn.pixabay.com/photo/2012/04/26/19/43/profile-42914__340.png"
+              name: "Fauzi Sofyan"
+              birth_of_date: "31 january 2000"
+              nip: "21"
+              email: "fauzilax@gmail.com"
+              gender: "male"
+              postion: "backend engineer"
+              phone: "0813456"
+              address: bdg
+              password: "123"
+              salary: 8000000
+      responses:
+        201:
+          description: "success insert data"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              example:
+                message: "Success create account"
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+  /login:
+    post:
+      tags:
+        - login
+      description: login feature for admin and employee
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nip:
+                  type: string
+                password:
+                  type: string
+                  format: password
+            example:
+              nip: "21"
+              password: "123"
+      responses:
+        200:
+          description: "login success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseObject"
+              example:
+                data:
+                  id: 1
+                  name: "Fauzi Sofyan"
+                  nip: 21
+                  gender: "male"
+                  postion: "backend engineer"
+                  role: "employee"
+                  token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJ1c2VySUQiOjR9.QTZxERh4CwC_UnL_eJvTi_A_qdLeBZ-IjR4nqoxjodk"
+                message: "login success"
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+  /companies:
+    get:
+      tags:
+        - "Admin"
+      description: get company profile information
+      summary: get company profile information
+      responses:
+        200:
+          description: success show company profile
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 1
+                  company_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+                  company_name: "Time Sync"
+                  company_email: "timesync@company.co.id"
+                  description: "Time Sync is a company that make a digital product"
+                  company_adress: "Jl. Raya Tidar No.23, Karangbesuki, Kec. Sukun, Kota Malang, Jawa Timur 65146"
+                  company_phone: "0813456"
+                  sosmed: "@timesync"
+                message: success show company profile
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+    put:
+      tags:
+        - Admin
+      description: update company information
+      summary: update company information
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                company_name:
+                  type: string
+                company_email:
+                  type: string
+                  format: email
+                description:
+                  type: string
+                company_adress:
+                  type: string
+                company_phone:
+                  type: string
+                sosmed:
+                  type: object
+            example:
+              company_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+              company_name: "Time Sync"
+              company_email: "timesync@company.co.id"
+              description: "Time Sync is a company that make a digital product"
+              company_adress: "Jl. Raya Tidar No.23, Karangbesuki, Kec. Sukun, Kota Malang, Jawa Timur 65146"
+              company_phone: "0813456"
+              sosmed: "@timesync"
+      responses:
+        200:
+          description: success update profile
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 1
+                  company_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+                  company_name: "Time Sync"
+                  company_email: "timesync@company.co.id"
+                  description: "Time Sync is a company that make a digital product"
+                  company_adress: "Jl. Raya Tidar No.23, Karangbesuki, Kec. Sukun, Kota Malang, Jawa Timur 65146"
+                  company_phone: "0813456"
+                  sosmed: "@timesync"
+                message: Succes Update Company Profile
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+  /employees:
+    put:
+      tags:
+        - "Employee"
+      description: edit employee profile
+      summary: edit employee profile
+      security:
+        - JWTAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                image:
+                  type: string
+                  format: binary
+          application/json:
+            schema:
+              type: object
+              example:
+                profile_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+      responses:
+        200:
+          description: success update profile
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 1
+                  profile_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+                message: Succes Update Employee Profile
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+    get:
+      tags:
+        - "Admin"
+      description: get employee data
+      summary: get employee data
+      security:
+        - JWTAuth: []
+      responses:
+        200:
+          description: success show employee profile
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  [
+                    {
+                      id: 1,
+                      profile_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg",
+                      name: "Fauzi Sofyan",
+                      birth_of_date: "31 january 2000",
+                      nip: "21",
+                      email: "fauzilax@gmail.com",
+                      gender: "male",
+                      postion: "backend engineer",
+                      phone: "0813456",
+                      address: bdg,
+                      password: "123",
+                      salary: 8000000,
+                    },
+                    {
+                      id: 2,
+                      profile_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg",
+                      name: "Aryo Yudhanto",
+                      birth_of_date: "11 februari 2000",
+                      nip: "22",
+                      email: "aryudhanto@gmail.com",
+                      gender: "male",
+                      postion: "frontend engineer",
+                      phone: "08134567",
+                      address: bdg,
+                      password: "123",
+                      salary: 8000000,
+                    },
+                  ]
+
+                message: success show employee profile
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+    delete:
+      tags:
+        - "Admin"
+      description: deactivate employee account
+      summary: deactivate employee account
+      security:
+        - JWTAuth: []
+      responses:
+        200:
+          description: success deactivate
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              example:
+                message: "succes deactivate"
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+  /employees/{id}:
+    put:
+      tags:
+        - "Admin"
+      description: edit employee profile
+      summary: edit employee profile
+      security:
+        - JWTAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                image:
+                  type: string
+                  format: binary
+          application/json:
+            schema:
+              type: object
+              example:
+                profile_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+                name: "Fauzi Sofyan"
+                birth_of_date: "31 january 2000"
+                nip: "21"
+                email: "fauzilax@gmail.com"
+                gender: "male"
+                postion: "backend engineer"
+                phone: "0813456"
+                address: bdg
+                password: "123"
+                salary: 8000000
+      responses:
+        200:
+          description: success update profile
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 1
+                  profile_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+                  name: "Fauzi Sofyan"
+                  birth_of_date: "31 january 2000"
+                  nip: "21"
+                  email: "fauzilax@gmail.com"
+                  gender: "male"
+                  postion: "backend engineer"
+                  phone: "0813456"
+                  address: bdg
+                  password: "123"
+                message: Succes Update Employee Profile
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+  /employees/attendance:
+    post:
+      tags:
+        - "Employee"
+      description: clock in for employee attendance at start of working hour
+      summary: clock in for employee attendance at start of working hour
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                latitude:
+                  type: string
+                  example: -6.4096
+                longitude:
+                  type: string
+                  example: 106.8185
+      responses:
+        200:
+          description: "clock in success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseObject"
+              example:
+                data:
+                  id: 1
+                  user_id: 2
+                  clock_in_location: "Jalan Cagar Alam,Depok,Jawa Barat,10550"
+                  clock_out_location: ""
+                  clock_in_map_location: "https://www.openstreetmap.org/#map=16/-6.4096/106.8185"
+                  clock_out_map_location: ""
+                  clock_in: "07:50"
+                  clock_out: ""
+                message: "clock in success"
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+    put:
+      tags:
+        - "Employee"
+      description: clock out for employee attendance after working hour
+      summary: clock out for employee attendance after working hour
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                latitude:
+                  type: string
+                  example: -6.4096
+                longitude:
+                  type: string
+                  example: 106.8185
+      responses:
+        200:
+          description: "clock out success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseObject"
+              example:
+                data:
+                  id: 1
+                  user_id: 2
+                  clock_in_location: "Jalan Cagar Alam,Depok,Jawa Barat,10550"
+                  clock_out_location: "Jalan Cagar Alam,Depok,Jawa Barat,10550"
+                  clock_in_map_location: "https://www.openstreetmap.org/#map=16/-6.4096/106.8185"
+                  clock_out_map_location: "https://www.openstreetmap.org/#map=16/-6.4096/106.8185"
+                  clock_in: "07:50"
+                  clock_out: "17:00"
+                message: "clock out success"
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+  /employees/approval:
+    post:
+      tags:
+        - "Employee"
+      description: employee can propose for permission to be absent
+      summary: employee can propose for permission to be absent
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                permit_title:
+                  type: object
+                  example: ["sick", "leave", "late"]
+                permit_date:
+                  type: string
+                  example: "01/02/2023"
+                permit_description:
+                  type: string
+                  example: "i am going to hospital today, my body didn't feel so good for work"
+                permit_image:
+                  type: string
+                  example: "https://1.bp.blogspot.com/-e8s4FEI8wKs/WgpNDkIWdhI/AAAAAAAAAyQ/SUryjPXhJ28zqb32zPCyGZLjXCT0khK2wCLcBGAs/s1600/Contoh%2BSurat%2BKeterangan%2BSakit.png"
+      responses:
+        200:
+          description: "success send an approval"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseObject"
+              example:
+                data:
+                  permit_title: "sick"
+                  permit_date: "01/02/2023"
+                  permit_description: "i am going to hospital today, my body didn't feel so good for work"
+                  permit_image: "https://1.bp.blogspot.com/-e8s4FEI8wKs/WgpNDkIWdhI/AAAAAAAAAyQ/SUryjPXhJ28zqb32zPCyGZLjXCT0khK2wCLcBGAs/s1600/Contoh%2BSurat%2BKeterangan%2BSakit.png"
+                message: "clock in success"
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+components:
+  securitySchemes:
+    JWTAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    responseObject:
+      type: object
+      properties:
+        data:
+          type: object
+        message:
+          type: string
+  responses:
+    400:
+      description: "error from user"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+          example:
+            message: "Bad request"
+    500:
+      description: "error from server"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+          example:
+            message: "Internal server error"
