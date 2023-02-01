@@ -59,8 +59,6 @@ paths:
                 password:
                   type: string
                   format: password
-                salary:
-                  type: integer
             example:
               profile_picture: "https://cdn.pixabay.com/photo/2012/04/26/19/43/profile-42914__340.png"
               name: "Fauzi Sofyan"
@@ -68,11 +66,10 @@ paths:
               nip: "21"
               email: "fauzilax@gmail.com"
               gender: "male"
-              postion: "backend engineer"
+              position: "backend engineer"
               phone: "0813456"
               address: bdg
               password: "123"
-              salary: 8000000
       responses:
         201:
           description: "success insert data"
@@ -170,6 +167,8 @@ paths:
             schema:
               type: object
               properties:
+                company_picture:
+                  type: string
                 company_name:
                   type: string
                 company_email:
@@ -252,6 +251,17 @@ paths:
                 message: Succes Update Employee Profile
         400:
           $ref: "#/components/responses/400"
+        404:
+          description: data not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  message: "data not found"
         500:
           $ref: "#/components/responses/500"
     get:
@@ -283,7 +293,7 @@ paths:
                       phone: "0813456",
                       address: bdg,
                       password: "123",
-                      salary: 8000000,
+                      annual_leave: 14,
                     },
                     {
                       id: 2,
@@ -297,7 +307,7 @@ paths:
                       phone: "08134567",
                       address: bdg,
                       password: "123",
-                      salary: 8000000,
+                      annual_leave: 14,
                     },
                   ]
 
@@ -327,6 +337,17 @@ paths:
                 message: "succes deactivate"
         400:
           $ref: "#/components/responses/400"
+        404:
+          description: data not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  message: "data not found"
         500:
           $ref: "#/components/responses/500"
   /employees/{id}:
@@ -337,6 +358,12 @@ paths:
       summary: edit employee profile
       security:
         - JWTAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         required: true
         content:
@@ -363,7 +390,7 @@ paths:
                 phone: "0813456"
                 address: bdg
                 password: "123"
-                salary: 8000000
+                annual_leave: 14
       responses:
         200:
           description: success update profile
@@ -384,7 +411,58 @@ paths:
                   phone: "0813456"
                   address: bdg
                   password: "123"
+                  annual_leave: 14
                 message: Succes Update Employee Profile
+        400:
+          $ref: "#/components/responses/400"
+        404:
+          description: data not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  message: "data not found"
+        500:
+          $ref: "#/components/responses/500"
+    get:
+      tags:
+        - "Employee"
+      description: get employee profile
+      summary: get employee profile
+      security:
+        - JWTAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: success show employee profile
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 1,
+                  profile_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+                  name: "Fauzi Sofyan"
+                  birth_of_date: "31 january 2000"
+                  nip: "21"
+                  email: "fauzilax@gmail.com"
+                  gender: "male"
+                  postion: "backend engineer"
+                  phone: "0813456"
+                  address: bdg,
+                  password: "123"
+                  annual_leave: 14
+                message: success show employee profile
         400:
           $ref: "#/components/responses/400"
         500:
@@ -404,10 +482,10 @@ paths:
               type: object
               properties:
                 latitude:
-                  type: string
+                  type: number
                   example: -6.4096
                 longitude:
-                  type: string
+                  type: number
                   example: 106.8185
       responses:
         200:
@@ -445,10 +523,10 @@ paths:
               type: object
               properties:
                 latitude:
-                  type: string
+                  type: number
                   example: -6.4096
                 longitude:
-                  type: string
+                  type: number
                   example: 106.8185
       responses:
         200:
@@ -470,6 +548,17 @@ paths:
                 message: "clock out success"
         400:
           $ref: "#/components/responses/400"
+        404:
+          description: data not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  message: "data not found"
         500:
           $ref: "#/components/responses/500"
   /employees/approval:
@@ -512,6 +601,112 @@ paths:
                   permit_description: "i am going to hospital today, my body didn't feel so good for work"
                   permit_image: "https://1.bp.blogspot.com/-e8s4FEI8wKs/WgpNDkIWdhI/AAAAAAAAAyQ/SUryjPXhJ28zqb32zPCyGZLjXCT0khK2wCLcBGAs/s1600/Contoh%2BSurat%2BKeterangan%2BSakit.png"
                 message: "clock in success"
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+    get:
+      tags:
+        - "Employee"
+      description: get employee approval record
+      summary: get employee approval record
+      security:
+        - JWTAuth: []
+      responses:
+        200:
+          description: success show employee approval record
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  [
+                    {
+                      id: 1,
+                      approval_date: "01/02/2023",
+                      leave: "1 Day annual leave",
+                      approval_status: "Pending",
+                    },
+                    {
+                      id: 2,
+                      approval_date: "02/02/2023",
+                      leave: "1 Day sick leave",
+                      approval_status: "Approved",
+                    },
+                    {
+                      id: 3,
+                      approval_date: "03/02/2023",
+                      leave: "1 Day annual leave",
+                      approval_status: "Rejected",
+                    },
+                    {
+                      id: 4,
+                      approval_date: "04/02/2023",
+                      leave: "1 Day annual leave",
+                      approval_status: "Approved",
+                    },
+                  ]
+                message: success show employee approval record
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+  /employees/records:
+    get:
+      tags:
+        - "Employee"
+      description: get employee attendance record
+      summary: get employee attendance record
+      security:
+        - JWTAuth: []
+      responses:
+        200:
+          description: success show employee attendance record
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  [
+                    {
+                      id: 1,
+                      attendace_date: "01/02/2023",
+                      clock_in: "07:50",
+                      clock_out: "17:00",
+                      attendace_status: "Attend",
+                    },
+                    {
+                      id: 2,
+                      attendace_date: "02/02/2023",
+                      clock_in: "08:00",
+                      clock_out: "17:20",
+                      attendace_status: "Attend",
+                    },
+                    {
+                      id: 3,
+                      attendace_date: "03/02/2023",
+                      clock_in: "",
+                      clock_out: "",
+                      attendace_status: "Not Attend",
+                    },
+                    {
+                      id: 4,
+                      attendace_date: "04/02/2023",
+                      clock_in: "",
+                      clock_out: "",
+                      attendace_status: "On Leave",
+                    },
+                    {
+                      id: 5,
+                      attendace_date: "05/02/2023",
+                      clock_in: "",
+                      clock_out: "",
+                      attendace_status: "Absent",
+                    },
+                  ]
+                message: success show employee attendance record
         400:
           $ref: "#/components/responses/400"
         500:
