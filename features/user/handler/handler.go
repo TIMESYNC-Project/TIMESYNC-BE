@@ -55,3 +55,17 @@ func (uc *userControll) Login() echo.HandlerFunc {
 		return c.JSON(PrintSuccessReponse(http.StatusOK, "success login", ToResponse(res), token))
 	}
 }
+
+func (uc *userControll) Delete() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		err := uc.srv.Delete(c.Get("user"))
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"message": "internal server error, account fail to delete",
+			})
+		}
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"message": "success delete profile",
+		})
+	}
+}
