@@ -34,3 +34,24 @@ func (uc *userControll) Register() echo.HandlerFunc {
 		return c.JSON(http.StatusCreated, map[string]interface{}{"message": "success create account"})
 	}
 }
+
+func (uc *userControll) Login() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		input := LoginRequest{}
+		if err := c.Bind(&input); err != nil {
+			return c.JSON(http.StatusBadRequest, "input format incorrect")
+		}
+		if input.Nip == "" {
+			return c.JSON(http.StatusBadRequest, "nip not allowed empty")
+		} else if input.Password == "" {
+			return c.JSON(http.StatusBadRequest, "password not allowed empty")
+		}
+
+		token, res, err := uc.srv.Login(input.Nip, input.Password)
+		if err != nil {
+			return c.JSON(PrintErrorResponse(err.Error()))
+		}
+
+		return c.JSON(PrintSuccessReponse(http.StatusOK, "success login", ToResponse(res), token))
+	}
+}

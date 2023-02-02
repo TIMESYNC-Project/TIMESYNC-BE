@@ -14,6 +14,11 @@ type RegisterRequest struct {
 	Password    string `json:"password" form:"password"`
 }
 
+type LoginRequest struct {
+	Nip      string `json:"nip" form:"nip"`
+	Password string `json:"password" form:"password"`
+}
+
 func ReqToCore(data interface{}) *user.Core {
 	res := user.Core{}
 
@@ -24,6 +29,10 @@ func ReqToCore(data interface{}) *user.Core {
 		res.Email = cnv.Email
 		res.Phone = cnv.Phone
 		res.Address = cnv.Address
+		res.Password = cnv.Password
+	case LoginRequest:
+		cnv := data.(LoginRequest)
+		res.Nip = cnv.Nip
 		res.Password = cnv.Password
 	default:
 		return nil
