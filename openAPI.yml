@@ -1096,15 +1096,6 @@ paths:
       summary: graph data for employee weekly working hour
       security:
         - JWTAuth: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                wwh_month:
-                  type: string
-                  example: "2023/02"
       responses:
         200:
           description: success show graph data for employee weekly working hour
@@ -1132,15 +1123,6 @@ paths:
       summary: graph data for weekly late employee
       security:
         - JWTAuth: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                wle_month:
-                  type: string
-                  example: "2023/02"
       responses:
         200:
           description: success show graph data for weekly late employee
