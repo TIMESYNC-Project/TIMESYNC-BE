@@ -375,40 +375,6 @@ paths:
           $ref: "#/components/responses/400"
         500:
           $ref: "#/components/responses/500"
-    delete:
-      tags:
-        - "Admin"
-      description: deactivate employee account
-      summary: deactivate employee account
-      security:
-        - JWTAuth: []
-      responses:
-        200:
-          description: success deactivate
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-              example:
-                message: "succes deactivate"
-        400:
-          $ref: "#/components/responses/400"
-        404:
-          description: data not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                example:
-                  message: "data not found"
-        500:
-          $ref: "#/components/responses/500"
   /employees/{id}:
     put:
       tags:
@@ -524,6 +490,46 @@ paths:
                 message: success show employee profile
         400:
           $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+    delete:
+      tags:
+        - "Admin"
+      description: deactivate employee account
+      summary: deactivate employee account
+      security:
+        - JWTAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: success deactivate
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              example:
+                message: "succes deactivate"
+        400:
+          $ref: "#/components/responses/400"
+        404:
+          description: data not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  message: "data not found"
         500:
           $ref: "#/components/responses/500"
   /settings:
@@ -643,6 +649,7 @@ paths:
           $ref: "#/components/responses/400"
         500:
           $ref: "#/components/responses/500"
+  /announcements/{id}:
     delete:
       tags:
         - "Admin"
@@ -650,6 +657,12 @@ paths:
       summary: delete announcement message
       security:
         - JWTAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         200:
           description: success delete announcement message
