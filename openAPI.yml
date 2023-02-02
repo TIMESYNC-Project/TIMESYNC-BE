@@ -57,7 +57,7 @@ paths:
                   format: password
             example:
               name: "Fauzi Sofyan"
-              birth_of_date: "31 january 2000"
+              birth_of_date: "2000-01-31"
               nip: "21"
               email: "fauzilax@gmail.com"
               gender: "male"
@@ -120,7 +120,7 @@ paths:
                   format: password
             example:
               name: "Fauzi Sofyan"
-              birth_of_date: "31 january 2000"
+              birth_of_date: "2000-01-31"
               nip: "21"
               email: "fauzilax@gmail.com"
               gender: "male"
@@ -345,7 +345,7 @@ paths:
                       id: 1,
                       profile_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg",
                       name: "Fauzi Sofyan",
-                      birth_of_date: "31 january 2000",
+                      birth_of_date: "2000-01-31",
                       nip: "21",
                       email: "fauzilax@gmail.com",
                       gender: "male",
@@ -359,7 +359,7 @@ paths:
                       id: 2,
                       profile_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg",
                       name: "Aryo Yudhanto",
-                      birth_of_date: "11 februari 2000",
+                      birth_of_date: "2000-02-11",
                       nip: "22",
                       email: "aryudhanto@gmail.com",
                       gender: "male",
@@ -442,7 +442,7 @@ paths:
               example:
                 profile_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
                 name: "Fauzi Sofyan"
-                birth_of_date: "31 january 2000"
+                birth_of_date: "2000-01-31"
                 nip: "21"
                 email: "fauzilax@gmail.com"
                 gender: "male"
@@ -463,7 +463,7 @@ paths:
                   id: 1
                   profile_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
                   name: "Fauzi Sofyan"
-                  birth_of_date: "31 january 2000"
+                  birth_of_date: "2000-01-31"
                   nip: "21"
                   email: "fauzilax@gmail.com"
                   gender: "male"
@@ -513,7 +513,7 @@ paths:
                   id: 1,
                   profile_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
                   name: "Fauzi Sofyan"
-                  birth_of_date: "31 january 2000"
+                  birth_of_date: "2000-01-31"
                   nip: "21"
                   email: "fauzilax@gmail.com"
                   gender: "male"
@@ -527,12 +527,12 @@ paths:
           $ref: "#/components/responses/400"
         500:
           $ref: "#/components/responses/500"
-  /schedules:
+  /settings:
     put:
       tags:
         - "Admin"
-      description: schedule feature for admin to set working hour
-      summary: schedule feature for admin to set working hour
+      description: settings feature for admin to set working hour and annual leave for employee
+      summary: settings feature for admin to set working hour and annual leave for employee
       security:
         - JWTAuth: []
       requestBody:
@@ -550,9 +550,12 @@ paths:
                 tollerance:
                   type: string
                   example: "30:00"
+                annual_leave_settings:
+                  type: integer
+                  example: 14
       responses:
         200:
-          description: "success update working hour schedule"
+          description: "success update working hour schedule and annual leave for employee"
           content:
             application/json:
               schema:
@@ -561,7 +564,8 @@ paths:
                 data:
                   check_in: "08:00"
                   leave_off: "17:00"
-                message: "update working hour schedule success"
+                  annual_leave_settings: 14
+                message: "update working hour schedule and annual leave for employee success"
         400:
           $ref: "#/components/responses/400"
         500:
@@ -580,6 +584,9 @@ paths:
             schema:
               type: object
               properties:
+                to:
+                  type: string
+                  example: "2303"
                 announcement_title:
                   type: string
                   example: "Libur"
@@ -596,6 +603,7 @@ paths:
               example:
                 data:
                   id: 1
+                  to: "2303"
                   announcement_title: "Libur"
                   announcement_description: "Karena besok ada rapat atasan mendadak, jadi kantor diliburkan"
                 message: "send announcement message to employee success"
@@ -863,10 +871,10 @@ paths:
                   example: ["sick", "leave", "late"]
                 approval_start_date:
                   type: string
-                  example: "01/02/2023"
+                  example: "2023-02-01"
                 approval_end_date:
                   type: string
-                  example: "02/02/2023"
+                  example: "2023-02-02"
                 approval_description:
                   type: string
                   example: "i am going to hospital today, my body didn't feel so good for work"
@@ -886,8 +894,8 @@ paths:
               example:
                 data:
                   approval_title: "sick"
-                  approval_start_date: "01/02/2023"
-                  approval_end_date: "02/02/2023"
+                  approval_start_date: "2023-02-01"
+                  approval_end_date: "2023-02-02"
                   approval_description: "i am going to hospital today, my body didn't feel so good for work"
                   approval_image: "https://1.bp.blogspot.com/-e8s4FEI8wKs/WgpNDkIWdhI/AAAAAAAAAyQ/SUryjPXhJ28zqb32zPCyGZLjXCT0khK2wCLcBGAs/s1600/Contoh%2BSurat%2BKeterangan%2BSakit.png"
                   approval_status: "pending"
@@ -914,7 +922,7 @@ paths:
                   example: ["sick", "leave", "late"]
                 approval_date:
                   type: string
-                  example: "01/02/2023"
+                  example: "2023-02-01"
                 approval_description:
                   type: string
                   example: "i am going to hospital today, my body didn't feel so good for work"
@@ -934,7 +942,7 @@ paths:
               example:
                 data:
                   approval_title: "sick"
-                  approval_date: "01/02/2023"
+                  approval_date: "2023-02-01"
                   approval_description: "i am going to hospital today, my body didn't feel so good for work"
                   approval_image: "https://1.bp.blogspot.com/-e8s4FEI8wKs/WgpNDkIWdhI/AAAAAAAAAyQ/SUryjPXhJ28zqb32zPCyGZLjXCT0khK2wCLcBGAs/s1600/Contoh%2BSurat%2BKeterangan%2BSakit.png"
                   approval_status: "approved"
@@ -963,25 +971,25 @@ paths:
                   [
                     {
                       id: 1,
-                      approval_date: "01/02/2023",
+                      approval_date: "2023-02-01",
                       leave: "1 Day annual leave",
                       approval_status: "Pending",
                     },
                     {
                       id: 2,
-                      approval_date: "02/02/2023",
+                      approval_date: "2023-02-02",
                       leave: "1 Day sick leave",
                       approval_status: "Approved",
                     },
                     {
                       id: 3,
-                      approval_date: "03/02/2023",
+                      approval_date: "2023-02-03",
                       leave: "1 Day annual leave",
                       approval_status: "Rejected",
                     },
                     {
                       id: 4,
-                      approval_date: "04/02/2023",
+                      approval_date: "2023-02-04",
                       leave: "1 Day annual leave",
                       approval_status: "Approved",
                     },
@@ -1011,35 +1019,35 @@ paths:
                   [
                     {
                       id: 1,
-                      attendace_date: "01/02/2023",
+                      attendace_date: "2023-02-01",
                       clock_in: "07:50",
                       clock_out: "17:00",
                       attendace_status: "Presence",
                     },
                     {
                       id: 2,
-                      attendace_date: "02/02/2023",
+                      attendace_date: "2023-02-02",
                       clock_in: "08:00",
                       clock_out: "17:20",
                       attendace_status: "Presence",
                     },
                     {
                       id: 3,
-                      attendace_date: "03/02/2023",
+                      attendace_date: "2023-02-03",
                       clock_in: "",
                       clock_out: "",
                       attendace_status: "Absence",
                     },
                     {
                       id: 4,
-                      attendace_date: "04/02/2023",
+                      attendace_date: "2023-02-04",
                       clock_in: "",
                       clock_out: "",
                       attendace_status: "On Leave",
                     },
                     {
                       id: 5,
-                      attendace_date: "05/02/2023",
+                      attendace_date: "2023-02-05",
                       clock_in: "",
                       clock_out: "",
                       attendace_status: "Absence",
@@ -1070,13 +1078,13 @@ paths:
                   [
                     {
                       id: 1,
-                      inbox_date: "01/02/2023",
+                      inbox_date: "2023-02-01",
                       inbox_title: "Libur",
                       inbox_description: "Karena besok ada rapat atasan mendadak, jadi kantor diliburkan",
                     },
                     {
                       id: 2,
-                      inbox_date: "03/02/2023",
+                      inbox_date: "2023-02-03",
                       inbox_title: "Wajib Masuk",
                       inbox_description: "Karena sabtu nanti ada agenda kerja bakti, jadi semua karyawan diharapkan untuk hadir",
                     },
