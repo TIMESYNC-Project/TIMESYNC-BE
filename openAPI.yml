@@ -31,6 +31,68 @@ paths:
         - JWTAuth: []
       requestBody:
         content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                profile_picture:
+                  type: string
+                name:
+                  type: string
+                birth_of_date:
+                  type: string
+                nip:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                gender:
+                  type: string
+                position:
+                  type: string
+                phone:
+                  type: string
+                address:
+                  type: string
+                password:
+                  type: string
+                  format: password
+            example:
+              profile_picture: "https://cdn.pixabay.com/photo/2012/04/26/19/43/profile-42914__340.png"
+              name: "Fauzi Sofyan"
+              birth_of_date: "31 january 2000"
+              nip: "21"
+              email: "fauzilax@gmail.com"
+              gender: "male"
+              position: "backend engineer"
+              phone: "0813456"
+              address: bdg
+              password: "123"
+      responses:
+        201:
+          description: "success insert data"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              example:
+                message: "Success create account"
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+  /register/csv:
+    post:
+      tags:
+        - "Admin"
+      description: feature for admin registration new employee
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
           application/octet-stream:
             schema:
               type: string
