@@ -370,7 +370,6 @@ paths:
                       annual_leave: 14,
                     },
                   ]
-
                 message: success show employee profile
         400:
           $ref: "#/components/responses/400"
@@ -1144,6 +1143,55 @@ paths:
                   w3: 10,
                   w4: 5,
                 message: success show graph data for weekly late employee
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+  /search:
+    get:
+      tags:
+        - "Admin"
+      summary: find employee
+      description: searching employee by their name,nip or position
+      parameters:
+        - in: query
+          name: offset
+          schema:
+            type: string
+          description: the numbers of result user
+        - in: query
+          name: q
+          schema:
+            example: "fauzi"
+            type: string
+          required: true
+          description: the keyword used to find employee_name
+      responses:
+        200:
+          description: success show employee profile
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  [
+                    {
+                      id: 1,
+                      profile_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg",
+                      name: "Fauzi Sofyan",
+                      birth_of_date: "2000-01-31",
+                      nip: "21",
+                      email: "fauzilax@gmail.com",
+                      gender: "male",
+                      postion: "backend engineer",
+                      phone: "0813456",
+                      address: bdg,
+                      password: "123",
+                      annual_leave: 14,
+                    },
+                  ]
+                message: success show employee profile
         400:
           $ref: "#/components/responses/400"
         500:
