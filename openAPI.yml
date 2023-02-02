@@ -707,6 +707,12 @@ paths:
       summary: total precences in a day per employee
       security:
         - JWTAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         200:
           description: "success get total precences in a day per employee"
