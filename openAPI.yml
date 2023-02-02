@@ -31,6 +31,10 @@ paths:
         - JWTAuth: []
       requestBody:
         content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: base64
           application/json:
             schema:
               type: object
@@ -235,6 +239,7 @@ paths:
               type: object
               example:
                 profile_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+                password: "test123"
       responses:
         200:
           description: success update profile
@@ -246,6 +251,7 @@ paths:
                 data:
                   id: 1
                   profile_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+                  password: "test123"
                 message: Succes Update Employee Profile
         400:
           $ref: "#/components/responses/400"
@@ -466,7 +472,7 @@ paths:
         500:
           $ref: "#/components/responses/500"
   /schedules:
-    post:
+    put:
       tags:
         - "Admin"
       description: schedule feature for admin to set working hour
@@ -490,7 +496,7 @@ paths:
                   example: "30:00"
       responses:
         200:
-          description: "success post working hour schedule"
+          description: "success update working hour schedule"
           content:
             application/json:
               schema:
@@ -499,17 +505,17 @@ paths:
                 data:
                   check_in: "08:00"
                   leave_off: "17:00"
-                message: "post working hour schedule success"
+                message: "update working hour schedule success"
         400:
           $ref: "#/components/responses/400"
         500:
           $ref: "#/components/responses/500"
-  /broadcasts:
+  /announcements:
     post:
       tags:
         - "Admin"
-      description: broadcast feature for admin to send message to employee
-      summary: broadcast feature for admin to send message to employee
+      description: announcement feature for admin to send message to employee
+      summary: announcement feature for admin to send message to employee
       security:
         - JWTAuth: []
       requestBody:
@@ -518,15 +524,15 @@ paths:
             schema:
               type: object
               properties:
-                broadcast_title:
+                announcement_title:
                   type: string
                   example: "Libur"
-                broadcast_description:
+                announcement_description:
                   type: string
                   example: "Karena besok ada rapat atasan mendadak, jadi kantor diliburkan"
       responses:
         200:
-          description: "success send broadcast message to employee"
+          description: "success send announcement message to employee"
           content:
             application/json:
               schema:
@@ -534,9 +540,9 @@ paths:
               example:
                 data:
                   id: 1
-                  broadcast_title: "Libur"
-                  broadcast_description: "Karena besok ada rapat atasan mendadak, jadi kantor diliburkan"
-                message: "send broadcast message to employee success"
+                  announcement_title: "Libur"
+                  announcement_description: "Karena besok ada rapat atasan mendadak, jadi kantor diliburkan"
+                message: "send announcement message to employee success"
         400:
           $ref: "#/components/responses/400"
         500:
@@ -544,13 +550,13 @@ paths:
     get:
       tags:
         - "Admin"
-      description: get all broadcast message for admin
-      summary: get all broadcast message for admin
+      description: get all announcement message for admin
+      summary: get all announcement message for admin
       security:
         - JWTAuth: []
       responses:
         200:
-          description: "success get all broadcast message for admin"
+          description: "success get all announcement message for admin"
           content:
             application/json:
               schema:
@@ -560,18 +566,52 @@ paths:
                   [
                     {
                       id: 1,
-                      broadcast_title: "Libur",
-                      broadcast_description: "Karena besok ada rapat atasan mendadak, jadi kantor diliburkan",
+                      announcement_title: "Libur",
+                      announcement_description: "Karena besok ada rapat atasan mendadak, jadi kantor diliburkan",
                     },
                     {
                       id: 2,
-                      broadcast_title: "Wajib Masuk",
-                      broadcast_description: "Karena sabtu nanti ada agenda kerja bakti, jadi semua karyawan diharapkan untuk hadir",
+                      announcement_title: "Wajib Masuk",
+                      announcement_description: "Karena sabtu nanti ada agenda kerja bakti, jadi semua karyawan diharapkan untuk hadir",
                     },
                   ]
-                message: "get all broadcast message for admin success"
+                message: "get all announcement message for admin success"
         400:
           $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+    delete:
+      tags:
+        - "Admin"
+      description: delete announcement message
+      summary: delete announcement message
+      security:
+        - JWTAuth: []
+      responses:
+        200:
+          description: success delete announcement message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              example:
+                message: "succes delete announcement message"
+        400:
+          $ref: "#/components/responses/400"
+        404:
+          description: data not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  message: "data not found"
         500:
           $ref: "#/components/responses/500"
   /presences:
@@ -597,6 +637,29 @@ paths:
           $ref: "#/components/responses/400"
         500:
           $ref: "#/components/responses/500"
+  /presences/{id}:
+    get:
+      tags:
+        - "Employee"
+      description: total precences in a day per employee
+      summary: total precences in a day per employee
+      security:
+        - JWTAuth: []
+      responses:
+        200:
+          description: "success get total precences in a day per employee"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseObject"
+              example:
+                data:
+                  employee_presences: 1
+                message: "get total precences in a day per employee success"
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
   /employees/attendance:
     post:
       tags:
@@ -613,9 +676,11 @@ paths:
               properties:
                 latitude:
                   type: number
+                  format: double
                   example: -6.4096
                 longitude:
                   type: number
+                  format: double
                   example: 106.8185
       responses:
         200:
@@ -654,9 +719,11 @@ paths:
               properties:
                 latitude:
                   type: number
+                  format: double
                   example: -6.4096
                 longitude:
                   type: number
+                  format: double
                   example: 106.8185
       responses:
         200:
@@ -691,7 +758,31 @@ paths:
                   message: "data not found"
         500:
           $ref: "#/components/responses/500"
-  /employees/approval:
+    get:
+      tags:
+        - "Employee"
+      description: employee attendance menu
+      summary: employee attendance menu
+      security:
+        - JWTAuth: []
+      responses:
+        200:
+          description: success show employee attendance menu
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 1,
+                  latitude: -6.4096
+                longitude: 106.8185
+                message: success show employee attendance menu
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+  /approvals:
     post:
       tags:
         - "Employee"
@@ -705,18 +796,21 @@ paths:
             schema:
               type: object
               properties:
-                permit_title:
+                approval_title:
                   type: object
                   example: ["sick", "leave", "late"]
-                permit_date:
+                approval_date:
                   type: string
                   example: "01/02/2023"
-                permit_description:
+                approval_description:
                   type: string
                   example: "i am going to hospital today, my body didn't feel so good for work"
-                permit_image:
+                approval_image:
                   type: string
                   example: "https://1.bp.blogspot.com/-e8s4FEI8wKs/WgpNDkIWdhI/AAAAAAAAAyQ/SUryjPXhJ28zqb32zPCyGZLjXCT0khK2wCLcBGAs/s1600/Contoh%2BSurat%2BKeterangan%2BSakit.png"
+                approval_status:
+                  type: string
+                  example: "pending"
       responses:
         200:
           description: "success send an approval"
@@ -726,15 +820,64 @@ paths:
                 $ref: "#/components/schemas/responseObject"
               example:
                 data:
-                  permit_title: "sick"
-                  permit_date: "01/02/2023"
-                  permit_description: "i am going to hospital today, my body didn't feel so good for work"
-                  permit_image: "https://1.bp.blogspot.com/-e8s4FEI8wKs/WgpNDkIWdhI/AAAAAAAAAyQ/SUryjPXhJ28zqb32zPCyGZLjXCT0khK2wCLcBGAs/s1600/Contoh%2BSurat%2BKeterangan%2BSakit.png"
-                message: "clock in success"
+                  approval_title: "sick"
+                  approval_date: "01/02/2023"
+                  approval_description: "i am going to hospital today, my body didn't feel so good for work"
+                  approval_image: "https://1.bp.blogspot.com/-e8s4FEI8wKs/WgpNDkIWdhI/AAAAAAAAAyQ/SUryjPXhJ28zqb32zPCyGZLjXCT0khK2wCLcBGAs/s1600/Contoh%2BSurat%2BKeterangan%2BSakit.png"
+                  approval_status: "pending"
+                message: "send an approval success"
         400:
           $ref: "#/components/responses/400"
         500:
           $ref: "#/components/responses/500"
+    put:
+      tags:
+        - "Admin"
+      description: Approval for Admin
+      summary: Approval for Admin
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                approval_title:
+                  type: object
+                  example: ["sick", "leave", "late"]
+                approval_date:
+                  type: string
+                  example: "01/02/2023"
+                approval_description:
+                  type: string
+                  example: "i am going to hospital today, my body didn't feel so good for work"
+                approval_image:
+                  type: string
+                  example: "https://1.bp.blogspot.com/-e8s4FEI8wKs/WgpNDkIWdhI/AAAAAAAAAyQ/SUryjPXhJ28zqb32zPCyGZLjXCT0khK2wCLcBGAs/s1600/Contoh%2BSurat%2BKeterangan%2BSakit.png"
+                approval_status:
+                  type: string
+                  example: "approved"
+      responses:
+        200:
+          description: "success approve employee permission"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseObject"
+              example:
+                data:
+                  approval_title: "sick"
+                  approval_date: "01/02/2023"
+                  approval_description: "i am going to hospital today, my body didn't feel so good for work"
+                  approval_image: "https://1.bp.blogspot.com/-e8s4FEI8wKs/WgpNDkIWdhI/AAAAAAAAAyQ/SUryjPXhJ28zqb32zPCyGZLjXCT0khK2wCLcBGAs/s1600/Contoh%2BSurat%2BKeterangan%2BSakit.png"
+                  approval_status: "approved"
+                message: "success approve employee permission success"
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+  /approvals/records:
     get:
       tags:
         - "Employee"
@@ -805,21 +948,21 @@ paths:
                       attendace_date: "01/02/2023",
                       clock_in: "07:50",
                       clock_out: "17:00",
-                      attendace_status: "Attend",
+                      attendace_status: "Presence",
                     },
                     {
                       id: 2,
                       attendace_date: "02/02/2023",
                       clock_in: "08:00",
                       clock_out: "17:20",
-                      attendace_status: "Attend",
+                      attendace_status: "Presence",
                     },
                     {
                       id: 3,
                       attendace_date: "03/02/2023",
                       clock_in: "",
                       clock_out: "",
-                      attendace_status: "Not Attend",
+                      attendace_status: "Absence",
                     },
                     {
                       id: 4,
@@ -833,7 +976,7 @@ paths:
                       attendace_date: "05/02/2023",
                       clock_in: "",
                       clock_out: "",
-                      attendace_status: "Absent",
+                      attendace_status: "Absence",
                     },
                   ]
                 message: success show employee attendance record
