@@ -35,8 +35,6 @@ paths:
             schema:
               type: object
               properties:
-                profile_picture:
-                  type: string
                 name:
                   type: string
                 birth_of_date:
@@ -58,7 +56,6 @@ paths:
                   type: string
                   format: password
             example:
-              profile_picture: "https://cdn.pixabay.com/photo/2012/04/26/19/43/profile-42914__340.png"
               name: "Fauzi Sofyan"
               birth_of_date: "31 january 2000"
               nip: "21"
@@ -101,8 +98,6 @@ paths:
             schema:
               type: object
               properties:
-                profile_picture:
-                  type: string
                 name:
                   type: string
                 birth_of_date:
@@ -124,7 +119,6 @@ paths:
                   type: string
                   format: password
             example:
-              profile_picture: "https://cdn.pixabay.com/photo/2012/04/26/19/43/profile-42914__340.png"
               name: "Fauzi Sofyan"
               birth_of_date: "31 january 2000"
               nip: "21"
@@ -867,9 +861,12 @@ paths:
                 approval_title:
                   type: object
                   example: ["sick", "leave", "late"]
-                approval_date:
+                approval_start_date:
                   type: string
                   example: "01/02/2023"
+                approval_end_date:
+                  type: string
+                  example: "02/02/2023"
                 approval_description:
                   type: string
                   example: "i am going to hospital today, my body didn't feel so good for work"
@@ -889,7 +886,8 @@ paths:
               example:
                 data:
                   approval_title: "sick"
-                  approval_date: "01/02/2023"
+                  approval_start_date: "01/02/2023"
+                  approval_end_date: "02/02/2023"
                   approval_description: "i am going to hospital today, my body didn't feel so good for work"
                   approval_image: "https://1.bp.blogspot.com/-e8s4FEI8wKs/WgpNDkIWdhI/AAAAAAAAAyQ/SUryjPXhJ28zqb32zPCyGZLjXCT0khK2wCLcBGAs/s1600/Contoh%2BSurat%2BKeterangan%2BSakit.png"
                   approval_status: "pending"
