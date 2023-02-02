@@ -406,7 +406,6 @@ paths:
                 birth_of_date: "2000-01-31"
                 nip: "21"
                 email: "fauzilax@gmail.com"
-                gender: "male"
                 postion: "backend engineer"
                 phone: "0813456"
                 address: bdg
@@ -426,9 +425,10 @@ paths:
                   name: "Fauzi Sofyan"
                   nip: "21"
                   email: "fauzilax@gmail.com"
-                  gender: "male"
                   postion: "backend engineer"
+                  phone: "0813456"
                   address: bdg
+                  password: "123"
                   annual_leave: 14
                 message: Succes Update Employee Profile
         400:
