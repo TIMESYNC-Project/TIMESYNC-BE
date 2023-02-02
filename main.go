@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"timesync-be/config"
 	usrData "timesync-be/features/user/data"
 	usrHdl "timesync-be/features/user/handler"
@@ -26,4 +27,12 @@ func main() {
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: "method=${method}, uri=${uri}, status=${status}, error=${error}\n",
 	}))
+	//User
+	e.POST("/register", uHdl.Register(), middleware.JWT([]byte(config.JWTKey)))
+	e.POST("/login", uHdl.Login())
+	e.DELETE("/employees/:id", uHdl.Delete(), middleware.JWT([]byte(config.JWTKey)))
+
+	if err := e.Start(":8000"); err != nil {
+		log.Println(err.Error())
+	}
 }
