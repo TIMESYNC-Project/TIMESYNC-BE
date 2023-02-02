@@ -1088,6 +1088,78 @@ paths:
           $ref: "#/components/responses/400"
         500:
           $ref: "#/components/responses/500"
+  /graph/wwh:
+    get:
+      tags:
+        - "Admin"
+      description: graph data for employee weekly working hour
+      summary: graph data for employee weekly working hour
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                wwh_month:
+                  type: string
+                  example: "2023/02"
+      responses:
+        200:
+          description: success show graph data for employee weekly working hour
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 1,
+                  w1: 300,
+                  w2: 320,
+                  w3: 290,
+                  w4: 340,
+                message: success show graph data for employee weekly working hour
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+  /graph/wle:
+    get:
+      tags:
+        - "Admin"
+      description: graph data for weekly late employee
+      summary: graph data for weekly late employee
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                wle_month:
+                  type: string
+                  example: "2023/02"
+      responses:
+        200:
+          description: success show graph data for weekly late employee
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 1,
+                  w1: 3,
+                  w2: 4,
+                  w3: 10,
+                  w4: 5,
+                message: success show graph data for weekly late employee
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
 
 components:
   securitySchemes:
