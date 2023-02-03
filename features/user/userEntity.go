@@ -35,18 +35,19 @@ type UserHandler interface {
 
 type UserService interface {
 	Register(newUser Core) (Core, error)
+	Csv(fileHeader multipart.FileHeader) ([]Core, error)
 	Login(nip, password string) (string, Core, error)
 	Delete(token interface{}, employeeID uint) error
-	Profile(token interface{}) (interface{}, error)
-	ProfileEmployee(userID uint) (interface{}, error)
-	Update(employeeID uint, fileData multipart.FileHeader, updateData Core) (Core, error)
-	Csv(fileHeader multipart.FileHeader) ([]Core, error)
+	Profile(token interface{}) (Core, error)
+	ProfileEmployee(userID uint) (Core, error)
+	Update(token interface{}, fileData multipart.FileHeader, updateData Core) (Core, error)
+	AdminEditEmployee(employeeID uint, fileData multipart.FileHeader, updateData Core) (Core, error)
 }
 
 type UserData interface {
 	Register(newUser Core) (Core, error)
 	Login(nip string) (Core, error)
-	Profile(userID uint) (interface{}, error)
+	Profile(userID uint) (Core, error)
 	Update(employeeID uint, updateData Core) (Core, error)
 	Delete(adminID uint, employeeID uint) error
 	Csv(newUserBatch []Core) error

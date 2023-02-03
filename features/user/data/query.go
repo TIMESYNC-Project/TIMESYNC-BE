@@ -40,6 +40,7 @@ func (uq *userQuery) Register(newUser user.Core) (user.Core, error) {
 
 	if nipField.Nip != "admin" {
 		temp, _ := strconv.Atoi(nipField.Nip)
+		log.Println(temp)
 		temp += 1
 		newUser.Nip = strconv.Itoa(temp)
 	} else {
@@ -120,7 +121,9 @@ func (uq *userQuery) Update(employeeID uint, updateData user.Core) (user.Core, e
 		log.Println("update user query error", err.Error())
 		return user.Core{}, err
 	}
-	return ToCore(cnv), nil
+	result := ToCore(cnv)
+	result.ID = employeeID
+	return result, nil
 }
 
 // Csv implements user.UserData
@@ -174,7 +177,7 @@ func (uq *userQuery) Csv(newUserBatch []user.Core) error {
 }
 
 // Profile implements user.UserData
-func (uq *userQuery) Profile(userID uint) (interface{}, error) {
+func (uq *userQuery) Profile(userID uint) (user.Core, error) {
 	res := User{}
 	err := uq.db.Where("id = ?", userID).First(&res).Error
 	if err != nil {

@@ -31,7 +31,11 @@ func main() {
 	e.POST("/register", uHdl.Register(), middleware.JWT([]byte(config.JWTKey)))
 	e.POST("/login", uHdl.Login())
 	e.DELETE("/employees/:id", uHdl.Delete(), middleware.JWT([]byte(config.JWTKey)))
-	e.POST("/register/csv", uHdl.Csv())
+	e.POST("/register/csv", uHdl.Csv(), middleware.JWT([]byte(config.JWTKey)))
+	e.GET("/employees/profile", uHdl.Profile(), middleware.JWT([]byte(config.JWTKey)))
+	e.GET("/employees/:id", uHdl.ProfileEmployee(), middleware.JWT([]byte(config.JWTKey)))
+	e.PUT("/employees/:id", uHdl.AdminEditEmployee(), middleware.JWT([]byte(config.JWTKey)))
+	e.PUT("/employees", uHdl.Update(), middleware.JWT([]byte(config.JWTKey)))
 
 	if err := e.Start(":8000"); err != nil {
 		log.Println(err.Error())

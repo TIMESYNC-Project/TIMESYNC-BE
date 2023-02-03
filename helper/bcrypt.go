@@ -19,7 +19,7 @@ func GeneratePassword(password string) (string, error) {
 func ComparePassword(hashed, password string) error {
 	if err := bcrypt.CompareHashAndPassword([]byte(hashed), []byte(password)); err != nil {
 		log.Println("login compare", err.Error())
-		return errors.New("password tidak sesuai ")
+		return errors.New("password not match")
 	}
 	return nil
 }

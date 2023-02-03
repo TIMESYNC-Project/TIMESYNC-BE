@@ -16,8 +16,9 @@ tags:
 
 servers:
   # Added by API Auto Mocking Plugin
+  # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/fauzilax/kurabsent/1.0.0
+    url: https://virtserver.swaggerhub.com/fauzilax/TIMESYNC/1.0.0
   - url: https://shirayuki.site
     description: primarry link
 
@@ -58,11 +59,12 @@ paths:
             example:
               name: "Fauzi Sofyan"
               birth_of_date: "2000-01-31"
+              nip: "21"
               email: "fauzilax@gmail.com"
               gender: "male"
               position: "backend engineer"
               phone: "0813456"
-              address: bdg
+              address: "bandung"
               password: "123"
       responses:
         201:
@@ -75,7 +77,7 @@ paths:
                   message:
                     type: string
               example:
-                message: "Success create account"
+                message: "success create account"
         400:
           $ref: "#/components/responses/400"
         500:
@@ -104,6 +106,8 @@ paths:
                   type: string
                 birth_of_date:
                   type: string
+                nip:
+                  type: string
                 email:
                   type: string
                   format: email
@@ -121,6 +125,7 @@ paths:
             example:
               name: "Fauzi Sofyan"
               birth_of_date: "2000-01-31"
+              nip: "21"
               email: "fauzilax@gmail.com"
               gender: "male"
               position: "backend engineer"
@@ -138,7 +143,7 @@ paths:
                   message:
                     type: string
               example:
-                message: "Success create account"
+                message: "success create account from csv"
         400:
           $ref: "#/components/responses/400"
         500:
@@ -400,11 +405,10 @@ paths:
               example:
                 name: "Fauzi Sofyan"
                 birth_of_date: "2000-01-31"
-                nip: "21"
                 email: "fauzilax@gmail.com"
                 postion: "backend engineer"
                 phone: "0813456"
-                address: bdg
+                address: "bandung"
                 password: "123"
                 annual_leave: 14
       responses:
@@ -419,11 +423,10 @@ paths:
                   id: 1
                   profile_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
                   name: "Fauzi Sofyan"
-                  nip: "21"
                   email: "fauzilax@gmail.com"
                   postion: "backend engineer"
                   phone: "0813456"
-                  address: bdg
+                  address: "bandung"
                   password: "123"
                   annual_leave: 14
                 message: Succes Update Employee Profile
@@ -444,7 +447,7 @@ paths:
           $ref: "#/components/responses/500"
     get:
       tags:
-        - "Employee"
+        - "Admin"
       description: get employee profile
       summary: get employee profile
       security:
@@ -464,7 +467,7 @@ paths:
                 $ref: "#/components/schemas/responseObject"
               example:
                 data:
-                  id: 1,
+                  id: 1
                   profile_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
                   name: "Fauzi Sofyan"
                   birth_of_date: "2000-01-31"
@@ -473,7 +476,7 @@ paths:
                   gender: "male"
                   postion: "backend engineer"
                   phone: "0813456"
-                  address: bdg,
+                  address: "bandung"
                   annual_leave: 14
                 message: success show employee profile
         400:
@@ -495,7 +498,7 @@ paths:
             type: integer
       responses:
         200:
-          description: success deactivate
+          description: success deactivate employee profile
           content:
             application/json:
               schema:
@@ -884,6 +887,33 @@ paths:
           $ref: "#/components/responses/400"
         500:
           $ref: "#/components/responses/500"
+          
+  /attendance/location:
+    get:
+      tags:
+        - "Employee"
+      description: employee attendance menu
+      summary: employee attendance & home menu
+      security:
+        - JWTAuth: []
+      responses:
+        200:
+          description: success show employee attendance menu
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 1,
+                  latitude: -6.4096
+                longitude: 106.8185
+                message: success show employee attendance menu
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+          
   /approvals:
     post:
       tags:
@@ -1074,14 +1104,27 @@ paths:
           $ref: "#/components/responses/400"
         500:
           $ref: "#/components/responses/500"
-  /graph/wwh:
+  /graph:
     get:
       tags:
         - "Admin"
-      description: graph data for employee weekly working hour
-      summary: graph data for employee weekly working hour
+      summary: find employee
+      description: searching employee by their name,nip or position
       security:
         - JWTAuth: []
+      parameters:
+        - in: query
+          name: wwh
+          schema:
+            example: "wwh"
+            type: string
+          description: the keyword used to find employee weekly working hour graph
+        - in: query
+          name: wle
+          schema:
+            example: "wle"
+            type: string
+          description: the keyword used to find weekly late employee graph
       responses:
         200:
           description: success show graph data for employee weekly working hour
@@ -1091,37 +1134,22 @@ paths:
                 $ref: "#/components/schemas/responseObject"
               example:
                 data:
-                  w1: 300
-                  w2: 320
-                  w3: 290
-                  w4: 340
-                message: success show graph data for employee weekly working hour
-        400:
-          $ref: "#/components/responses/400"
-        500:
-          $ref: "#/components/responses/500"
-  /graph/wle:
-    get:
-      tags:
-        - "Admin"
-      description: graph data for weekly late employee
-      summary: graph data for weekly late employee
-      security:
-        - JWTAuth: []
-      responses:
-        200:
-          description: success show graph data for weekly late employee
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/responseObject"
-              example:
-                data:
-                  w1: 3
-                  w2: 4
-                  w3: 10
+                  [{
+                  desc: "weekly working hour",
+                  w1: 300,
+                  w2: 320,
+                  w3: 290,
+                  w4: 340},
+                  {
+                  desc: "weekly late employee",
+                  w1: 3,
+                  w2: 4,
+                  w3: 10,
                   w4: 5
-                message: success show graph data for weekly late employee
+                  }
+                  ]
+
+                message: success show graph data for employee weekly working hour and weekly late employee
         400:
           $ref: "#/components/responses/400"
         500:
@@ -1194,7 +1222,7 @@ components:
               message:
                 type: string
           example:
-            message: "Bad request"
+            message: "bad request"
     500:
       description: "error from server"
       content:
@@ -1205,4 +1233,4 @@ components:
               message:
                 type: string
           example:
-            message: "Internal server error"
+            message: "internal server error"
