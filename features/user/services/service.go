@@ -67,12 +67,12 @@ func (uuc *userUseCase) Login(nip, password string) (string, user.Core, error) {
 
 }
 
-func (uuc *userUseCase) Delete(token interface{}) error {
+func (uuc *userUseCase) Delete(token interface{}, employeeID uint) error {
 	id := helper.ExtractToken(token)
-	// if id <= 0 {
-	// 	return errors.New("id not found, server error")
-	// }
-	err := uuc.qry.Delete(uint(id))
+	if id <= 0 {
+		return errors.New("data not found")
+	}
+	err := uuc.qry.Delete(uint(id), employeeID)
 	if err != nil {
 		log.Println("query error", err.Error())
 		return errors.New("query error, delete account fail")
