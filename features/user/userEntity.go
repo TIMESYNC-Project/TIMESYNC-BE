@@ -30,6 +30,7 @@ type UserHandler interface {
 	ProfileEmployee() echo.HandlerFunc
 	Update() echo.HandlerFunc
 	Csv() echo.HandlerFunc
+	AdminEditEmployee() echo.HandlerFunc
 }
 
 type UserService interface {
