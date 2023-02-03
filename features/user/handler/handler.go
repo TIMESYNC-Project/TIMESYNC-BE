@@ -60,14 +60,21 @@ func (uc *userControll) Login() echo.HandlerFunc {
 
 func (uc *userControll) Delete() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		err := uc.srv.Delete(c.Get("user"))
+		token := c.Get("user")
+		paramID := c.Param("id")
+		employeeID, err := strconv.Atoi(paramID)
+		if err != nil {
+			log.Println("convert id error", err.Error())
+			return c.JSON(http.StatusBadGateway, "Invalid input")
+		}
+		err = uc.srv.Delete(token, uint(employeeID))
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 				"message": "internal server error, account fail to delete",
 			})
 		}
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"message": "success delete profile",
+			"message": "success deactivate employee profile",
 		})
 	}
 }

@@ -31,6 +31,20 @@ func (uq *userQuery) Register(newUser user.Core) (user.Core, error) {
 		return user.Core{}, errors.New("email duplicated")
 	}
 
+	nipField := User{}
+	err = uq.db.Last(&nipField).Error
+	if err != nil {
+		log.Println("query error", err.Error())
+		return user.Core{}, errors.New("server error")
+	}
+
+	temp, _ := strconv.Atoi(nipField.Nip)
+	temp += 1
+	newUser.Nip = strconv.Itoa(temp)
+
+	newUser.ProfilePicture = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+	newUser.Role = "employee"
+
 	cnv := CoreToData(newUser)
 	err = uq.db.Create(&cnv).Error
 	if err != nil {
@@ -56,18 +70,26 @@ func (uq *userQuery) Login(nip string) (user.Core, error) {
 	return ToCore(res), nil
 }
 
-func (uq *userQuery) Delete(id uint) error {
-	qry := uq.db.Delete(&User{}, id)
-	rowAffect := qry.RowsAffected
-	if rowAffect <= 0 {
-		log.Println("no data processed")
-		return errors.New("no user has delete")
-	}
-	err := qry.Error
+func (uq *userQuery) Delete(AdminID uint, employeeID uint) error {
+	getID := User{}
+	err := uq.db.Where("id = ?", employeeID).First(&getID).Error
 	if err != nil {
-		log.Println("delete query error", err.Error())
-		return errors.New("delete account fail")
+		log.Println("get user error : ", err.Error())
+		return errors.New("failed to get user data")
 	}
+
+	if getID.ID != employeeID {
+		log.Println("unauthorized request")
+		return errors.New("unauthorized request")
+	}
+	qryDelete := uq.db.Delete(&User{}, employeeID)
+	affRow := qryDelete.RowsAffected
+
+	if affRow <= 0 {
+		log.Println("No rows affected")
+		return errors.New("failed to delete user content, data not found")
+	}
+
 	return nil
 }
 
