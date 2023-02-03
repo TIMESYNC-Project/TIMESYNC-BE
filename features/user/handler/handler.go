@@ -131,3 +131,37 @@ func (uc *userControll) Csv() echo.HandlerFunc {
 		return c.JSON(http.StatusCreated, map[string]interface{}{"message": "success create account from csv"})
 	}
 }
+
+// Profile implements user.UserHandler
+func (uc *userControll) Profile() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		// eID := c.Param("id")
+		// employeeID, _ := strconv.Atoi(eID)
+		res, err := uc.srv.Profile(c.Get("user"))
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
+		}
+
+		return c.JSON(http.StatusCreated, map[string]interface{}{
+			"data":    res,
+			"message": "success show profile",
+		})
+	}
+}
+
+// ProfileEmployee implements user.UserHandler
+func (uc *userControll) ProfileEmployee() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		eID := c.Param("id")
+		employeeID, _ := strconv.Atoi(eID)
+		res, err := uc.srv.ProfileEmployee(uint(employeeID))
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
+		}
+
+		return c.JSON(http.StatusCreated, map[string]interface{}{
+			"data":    res,
+			"message": "success show profile",
+		})
+	}
+}

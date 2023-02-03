@@ -137,3 +137,24 @@ func (uuc *userUseCase) Csv(fileData multipart.FileHeader) ([]user.Core, error) 
 	return []user.Core{}, nil
 
 }
+
+// Profile implements user.UserService
+func (uuc *userUseCase) Profile(token interface{}) (interface{}, error) {
+	userID := helper.ExtractToken(token)
+	res, err := uuc.qry.Profile(uint(userID))
+	if err != nil {
+		log.Println("data not found")
+		return user.Core{}, errors.New("query error, problem with server")
+	}
+	return res, nil
+}
+
+// ProfileEmployee implements user.UserService
+func (uuc *userUseCase) ProfileEmployee(userID uint) (interface{}, error) {
+	res, err := uuc.qry.Profile(uint(userID))
+	if err != nil {
+		log.Println("data not found")
+		return user.Core{}, errors.New("query error, problem with server")
+	}
+	return res, nil
+}
