@@ -138,7 +138,7 @@ func (uq *userQuery) Csv(newUserBatch []user.Core) error {
 			log.Println("query error")
 			return errors.New("server error")
 		}
-		if len(nipField) == 0 || nipField[0].Nip == "admin" {
+		if len(nipField) == 0 || len(nipField) == 1 && nipField[len(nipField)-1].Nip == "admin" {
 			if len(batch) <= 1 {
 				batch[i].Nip = "23001"
 			} else {
