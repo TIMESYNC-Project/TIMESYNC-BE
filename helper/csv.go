@@ -61,6 +61,7 @@ func ConvertCSV(data [][]string) []user.Core {
 			}
 			if j == 7 {
 				res[i-1].Password = data[i][j]
+				res[i-1].Password, _ = GeneratePassword(res[i-1].Password)
 			}
 		}
 	}
