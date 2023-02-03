@@ -29,7 +29,7 @@ func ToResponse(data user.Core) UserReponse {
 		Name:     data.Name,
 		Email:    data.Email,
 		Nip:      data.Nip,
-		Gender:   data.Nip,
+		Gender:   data.Gender,
 		Position: data.Position,
 		Role:     data.Role,
 	}
@@ -91,4 +91,76 @@ func PrintErrorResponse(msg string) (int, interface{}) {
 	}
 
 	return code, resp
+}
+
+type ProfileResponse struct {
+	ID             uint   `json:"id"`
+	ProfilePicture string `json:"profile_picture"`
+	Name           string `json:"name"`
+	BirthOfDate    string `json:"birth_of_date"`
+	Nip            string `json:"nip"`
+	Email          string `json:"email"`
+	Gender         string `json:"gender"`
+	Position       string `json:"position"`
+	Phone          string `json:"phone"`
+	Address        string `json:"address"`
+	AnnualLeave    int    `json:"annual_leave"`
+}
+
+func ToProfileResponse(data user.Core) ProfileResponse {
+	return ProfileResponse{
+		ID:             data.ID,
+		ProfilePicture: data.ProfilePicture,
+		Name:           data.Name,
+		BirthOfDate:    data.BirthOfDate,
+		Email:          data.Email,
+		Nip:            data.Nip,
+		Gender:         data.Gender,
+		Position:       data.Position,
+		Phone:          data.Phone,
+		Address:        data.Address,
+		AnnualLeave:    data.AnnualLeave,
+	}
+}
+
+type UpdateResponse struct {
+	ID             uint   `json:"id"`
+	ProfilePicture string `json:"profile_picture"`
+	Name           string `json:"name" form:"name"`
+	BirthOfDate    string `json:"birth_of_date" form:"birth_of_date"`
+	Email          string `json:"email" form:"email"`
+	Gender         string `json:"gender" form:"gender"`
+	Position       string `json:"position" form:"position"`
+	Phone          string `json:"phone" form:"phone"`
+	Address        string `json:"address" form:"address"`
+	Password       string `json:"password" form:"password"`
+}
+
+func ToUpdateResponse(data user.Core) UpdateResponse {
+	return UpdateResponse{
+		ID:             data.ID,
+		ProfilePicture: data.ProfilePicture,
+		Name:           data.Name,
+		BirthOfDate:    data.BirthOfDate,
+		Email:          data.Email,
+		Gender:         data.Gender,
+		Position:       data.Position,
+		Phone:          data.Phone,
+		Address:        data.Address,
+		Password:       data.Password,
+	}
+}
+
+type UpdateResponseEmployee struct {
+	ID             uint   `json:"id"`
+	ProfilePicture string `json:"profile_picture"`
+	Password       string `json:"password" form:"password"`
+}
+
+func ToUpdateResponseEmployee(data user.Core) UpdateResponseEmployee {
+	return UpdateResponseEmployee{
+		ID:             data.ID,
+		ProfilePicture: data.ProfilePicture,
+		Password:       data.Password,
+	}
 }

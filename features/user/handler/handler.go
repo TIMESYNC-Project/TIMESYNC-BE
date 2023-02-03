@@ -44,14 +44,18 @@ func (uc *userControll) Login() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, "input format incorrect")
 		}
 		if input.Nip == "" {
-			return c.JSON(http.StatusBadRequest, "nip not allowed empty")
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "nip not allowed empty"})
 		} else if input.Password == "" {
-			return c.JSON(http.StatusBadRequest, "password not allowed empty")
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "password not allowed empty"})
 		}
 
 		token, res, err := uc.srv.Login(input.Nip, input.Password)
 		if err != nil {
-			return c.JSON(PrintErrorResponse(err.Error()))
+			if strings.Contains(err.Error(), "password") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "password not match"})
+			} else {
+				return c.JSON(http.StatusNotFound, map[string]interface{}{"message": "account not registered"})
+			}
 		}
 
 		return c.JSON(PrintSuccessReponse(http.StatusOK, "success login", ToResponse(res), token))
@@ -82,8 +86,6 @@ func (uc *userControll) Delete() echo.HandlerFunc {
 // Update implements user.UserHandler
 func (uc *userControll) Update() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		eID := c.Param("id")
-		employeeID, _ := strconv.Atoi(eID)
 		input := RegisterRequest{}
 		err := c.Bind(&input)
 		if err != nil {
@@ -98,7 +100,7 @@ func (uc *userControll) Update() echo.HandlerFunc {
 			}
 			input.FileHeader = *formHeader
 		}
-		res, err := uc.srv.Update(uint(employeeID), input.FileHeader, *ReqToCore(input))
+		res, err := uc.srv.Update(c.Get("user"), input.FileHeader, *ReqToCore(input))
 		if err != nil {
 			if strings.Contains(err.Error(), "email") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "email already used"})
@@ -108,9 +110,9 @@ func (uc *userControll) Update() echo.HandlerFunc {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
 			}
 		}
-		log.Println(res)
+		// log.Println(res)
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			// "data":    res,
+			"data":    ToUpdateResponseEmployee(res),
 			"message": "update profile success",
 		})
 	}
@@ -143,7 +145,7 @@ func (uc *userControll) Profile() echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusCreated, map[string]interface{}{
-			"data":    res,
+			"data":    ToProfileResponse(res),
 			"message": "success show profile",
 		})
 	}
@@ -160,8 +162,45 @@ func (uc *userControll) ProfileEmployee() echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusCreated, map[string]interface{}{
-			"data":    res,
+			"data":    ToProfileResponse(res),
 			"message": "success show profile",
+		})
+	}
+}
+
+// AdminEditEmployee implements user.UserHandler
+func (uc *userControll) AdminEditEmployee() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		eID := c.Param("id")
+		employeeID, _ := strconv.Atoi(eID)
+		input := RegisterRequest{}
+		err := c.Bind(&input)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, "input format incorrect")
+		}
+		//proses cek apakah user input foto ?
+		checkFile, _, _ := c.Request().FormFile("file")
+		if checkFile != nil {
+			formHeader, err := c.FormFile("file")
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "Select a file to upload"})
+			}
+			input.FileHeader = *formHeader
+		}
+		res, err := uc.srv.AdminEditEmployee(uint(employeeID), input.FileHeader, *ReqToCore(input))
+		if err != nil {
+			if strings.Contains(err.Error(), "email") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "email already used"})
+			} else if strings.Contains(err.Error(), "not found") {
+				return c.JSON(http.StatusNotFound, map[string]interface{}{"message": "account not registered"})
+			} else {
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
+			}
+		}
+		// log.Println(res)
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"data":    ToUpdateResponse(res),
+			"message": "update profile success",
 		})
 	}
 }

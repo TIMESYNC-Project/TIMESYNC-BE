@@ -53,11 +53,9 @@ func (uuc *userUseCase) Login(nip, password string) (string, user.Core, error) {
 		}
 		return "", user.Core{}, errors.New(msg)
 	}
-	if err == nil && nip != "admin" && password != "admin" {
-		if err := helper.ComparePassword(res.Password, password); err != nil {
-			log.Println("login compare", err.Error())
-			return "", user.Core{}, errors.New("password not matched")
-		}
+	if err := helper.ComparePassword(res.Password, password); err != nil {
+		log.Println("login compare", err.Error())
+		return "", user.Core{}, errors.New("password not matched")
 	}
 
 	claims := jwt.MapClaims{}
@@ -83,7 +81,8 @@ func (uuc *userUseCase) Delete(token interface{}, employeeID uint) error {
 }
 
 // Update implements user.UserService
-func (uuc *userUseCase) Update(employeeID uint, fileData multipart.FileHeader, updateData user.Core) (user.Core, error) {
+func (uuc *userUseCase) Update(token interface{}, fileData multipart.FileHeader, updateData user.Core) (user.Core, error) {
+	employeeID := helper.ExtractToken(token)
 	if updateData.Password != "" {
 		hashed, _ := helper.GeneratePassword(updateData.Password)
 		updateData.Password = string(hashed)
@@ -105,7 +104,7 @@ func (uuc *userUseCase) Update(employeeID uint, fileData multipart.FileHeader, u
 		}
 		updateData.ProfilePicture = uploadURL
 	}
-	res, err := uuc.qry.Update(employeeID, updateData)
+	res, err := uuc.qry.Update(uint(employeeID), updateData)
 	if err != nil {
 		msg := ""
 		if strings.Contains(err.Error(), "not found") {
@@ -141,7 +140,7 @@ func (uuc *userUseCase) Csv(fileData multipart.FileHeader) ([]user.Core, error) 
 }
 
 // Profile implements user.UserService
-func (uuc *userUseCase) Profile(token interface{}) (interface{}, error) {
+func (uuc *userUseCase) Profile(token interface{}) (user.Core, error) {
 	userID := helper.ExtractToken(token)
 	res, err := uuc.qry.Profile(uint(userID))
 	if err != nil {
@@ -152,11 +151,47 @@ func (uuc *userUseCase) Profile(token interface{}) (interface{}, error) {
 }
 
 // ProfileEmployee implements user.UserService
-func (uuc *userUseCase) ProfileEmployee(userID uint) (interface{}, error) {
+func (uuc *userUseCase) ProfileEmployee(userID uint) (user.Core, error) {
 	res, err := uuc.qry.Profile(uint(userID))
 	if err != nil {
 		log.Println("data not found")
 		return user.Core{}, errors.New("query error, problem with server")
+	}
+	return res, nil
+}
+
+// AdminEditEmployee implements user.UserService
+func (uuc *userUseCase) AdminEditEmployee(employeeID uint, fileData multipart.FileHeader, updateData user.Core) (user.Core, error) {
+	if updateData.Password != "" {
+		hashed, _ := helper.GeneratePassword(updateData.Password)
+		updateData.Password = string(hashed)
+	}
+	if fileData.Size != 0 {
+		if fileData.Size > 500000 {
+			return user.Core{}, errors.New("size error")
+		}
+		fileName := uuid.NewV4().String()
+		fileData.Filename = fileName + fileData.Filename[(len(fileData.Filename)-5):len(fileData.Filename)]
+		src, err := fileData.Open()
+		if err != nil {
+			return user.Core{}, errors.New("error open fileData")
+		}
+		defer src.Close()
+		uploadURL, err := helper.UploadToS3(fileData.Filename, src)
+		if err != nil {
+			return user.Core{}, errors.New("cannot upload to s3 server error")
+		}
+		updateData.ProfilePicture = uploadURL
+	}
+	res, err := uuc.qry.Update(employeeID, updateData)
+	if err != nil {
+		msg := ""
+		if strings.Contains(err.Error(), "not found") {
+			msg = "data not found"
+		} else {
+			msg = "server error"
+		}
+		return user.Core{}, errors.New(msg)
 	}
 	return res, nil
 }
