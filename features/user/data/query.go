@@ -38,12 +38,17 @@ func (uq *userQuery) Register(newUser user.Core) (user.Core, error) {
 		return user.Core{}, errors.New("server error")
 	}
 
-	temp, _ := strconv.Atoi(nipField.Nip)
-	temp += 1
-	newUser.Nip = strconv.Itoa(temp)
+	if nipField.Nip != "admin" {
+		temp, _ := strconv.Atoi(nipField.Nip)
+		temp += 1
+		newUser.Nip = strconv.Itoa(temp)
+	} else {
+		newUser.Nip = "23001"
+	}
 
 	newUser.ProfilePicture = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
 	newUser.Role = "employee"
+	newUser.AnnualLeave = 14
 
 	cnv := CoreToData(newUser)
 	err = uq.db.Create(&cnv).Error
@@ -125,6 +130,7 @@ func (uq *userQuery) Csv(newUserBatch []user.Core) error {
 	for i := 0; i < len(newUserBatch); i++ {
 		batch = append(batch, CoreToData(newUserBatch[i]))
 		batch[i].Role = "employee"
+		batch[i].AnnualLeave = 14
 		batch[i].ProfilePicture = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
 		nipField := []User{}
 		err := uq.db.Find(&nipField).Error
