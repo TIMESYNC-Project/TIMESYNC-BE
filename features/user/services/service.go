@@ -1,14 +1,17 @@
-package service
+package services
 
 import (
+	"encoding/csv"
 	"errors"
 	"log"
+	"mime/multipart"
 	"strings"
 	"timesync-be/config"
 	"timesync-be/features/user"
 	"timesync-be/helper"
 
 	"github.com/golang-jwt/jwt"
+	uuid "github.com/satori/go.uuid"
 )
 
 type userUseCase struct {
@@ -75,4 +78,62 @@ func (uuc *userUseCase) Delete(token interface{}) error {
 		return errors.New("query error, delete account fail")
 	}
 	return nil
+}
+
+// Update implements user.UserService
+func (uuc *userUseCase) Update(employeeID uint, fileData multipart.FileHeader, updateData user.Core) (user.Core, error) {
+	if updateData.Password != "" {
+		hashed, _ := helper.GeneratePassword(updateData.Password)
+		updateData.Password = string(hashed)
+	}
+	if fileData.Size != 0 {
+		if fileData.Size > 500000 {
+			return user.Core{}, errors.New("size error")
+		}
+		fileName := uuid.NewV4().String()
+		fileData.Filename = fileName + fileData.Filename[(len(fileData.Filename)-5):len(fileData.Filename)]
+		src, err := fileData.Open()
+		if err != nil {
+			return user.Core{}, errors.New("error open fileData")
+		}
+		defer src.Close()
+		uploadURL, err := helper.UploadToS3(fileData.Filename, src)
+		if err != nil {
+			return user.Core{}, errors.New("cannot upload to s3 server error")
+		}
+		updateData.ProfilePicture = uploadURL
+	}
+	res, err := uuc.qry.Update(employeeID, updateData)
+	if err != nil {
+		msg := ""
+		if strings.Contains(err.Error(), "not found") {
+			msg = "data not found"
+		} else {
+			msg = "server error"
+		}
+		return user.Core{}, errors.New(msg)
+	}
+	return res, nil
+}
+
+// Csv implements user.UserService
+func (uuc *userUseCase) Csv(fileData multipart.FileHeader) ([]user.Core, error) {
+	src, err := fileData.Open()
+	if err != nil {
+		return []user.Core{}, err
+	}
+	csvReader := csv.NewReader(src)
+	data, err := csvReader.ReadAll()
+	if err != nil {
+		return []user.Core{}, err
+	}
+	result := helper.ConvertCSV(data)
+	err = uuc.qry.Csv(result)
+	if err != nil {
+		log.Println("query error")
+		return []user.Core{}, errors.New("server error")
+	}
+
+	return []user.Core{}, nil
+
 }

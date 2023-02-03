@@ -7,8 +7,8 @@ import (
 	usrHdl "timesync-be/features/user/handler"
 	usrSrv "timesync-be/features/user/services"
 
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
@@ -31,6 +31,7 @@ func main() {
 	e.POST("/register", uHdl.Register(), middleware.JWT([]byte(config.JWTKey)))
 	e.POST("/login", uHdl.Login())
 	e.DELETE("/employees/:id", uHdl.Delete(), middleware.JWT([]byte(config.JWTKey)))
+	e.POST("/register/csv", uHdl.Csv())
 
 	if err := e.Start(":8000"); err != nil {
 		log.Println(err.Error())

@@ -1,6 +1,10 @@
 package user
 
-import "github.com/labstack/echo"
+import (
+	"mime/multipart"
+
+	"github.com/labstack/echo/v4"
+)
 
 type Core struct {
 	ID             uint
@@ -21,23 +25,26 @@ type Core struct {
 type UserHandler interface {
 	Register() echo.HandlerFunc
 	Login() echo.HandlerFunc
-	// Profile() echo.HandlerFunc
-	// Update() echo.HandlerFunc
 	Delete() echo.HandlerFunc
+	// Profile() echo.HandlerFunc
+	Update() echo.HandlerFunc
+	Csv() echo.HandlerFunc
 }
 
 type UserService interface {
 	Register(newUser Core) (Core, error)
 	Login(nip, password string) (string, Core, error)
-	// Profile(token interface{}) (interface{}, error)
-	// Update(token interface{}, fileData multipart.FileHeader, updateData Core) (Core, error)
 	Delete(token interface{}) error
+	// Profile(token interface{}) (interface{}, error)
+	Update(employeeID uint, fileData multipart.FileHeader, updateData Core) (Core, error)
+	Csv(fileHeader multipart.FileHeader) ([]Core, error)
 }
 
 type UserData interface {
 	Register(newUser Core) (Core, error)
 	Login(nip string) (Core, error)
 	// Profile(userID uint) (interface{}, error)
-	// Update(id uint, updateData Core) (Core, error)
+	Update(employeeID uint, updateData Core) (Core, error)
 	Delete(id uint) error
+	Csv(newUserBatch []Core) error
 }

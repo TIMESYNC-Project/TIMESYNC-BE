@@ -11,8 +11,8 @@ type User struct {
 	ProfilePicture string
 	Name           string
 	BirthOfDate    string
-	Nip            string
-	Email          string
+	Nip            string `gorm:"unique;not null"`
+	Email          string `gorm:"unique"`
 	Gender         string
 	Position       string
 	Phone          string
