@@ -58,7 +58,6 @@ paths:
             example:
               name: "Fauzi Sofyan"
               birth_of_date: "2000-01-31"
-              nip: "21"
               email: "fauzilax@gmail.com"
               gender: "male"
               position: "backend engineer"
@@ -105,8 +104,6 @@ paths:
                   type: string
                 birth_of_date:
                   type: string
-                nip:
-                  type: string
                 email:
                   type: string
                   format: email
@@ -124,7 +121,6 @@ paths:
             example:
               name: "Fauzi Sofyan"
               birth_of_date: "2000-01-31"
-              nip: "21"
               email: "fauzilax@gmail.com"
               gender: "male"
               position: "backend engineer"

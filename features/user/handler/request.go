@@ -1,6 +1,9 @@
 package handler
 
-import "timesync-be/features/user"
+import (
+	"mime/multipart"
+	"timesync-be/features/user"
+)
 
 type RegisterRequest struct {
 	Name        string `json:"name" form:"name"`
@@ -12,6 +15,7 @@ type RegisterRequest struct {
 	Phone       string `json:"phone" form:"phone"`
 	Address     string `json:"address" form:"address"`
 	Password    string `json:"password" form:"password"`
+	FileHeader  multipart.FileHeader
 }
 
 type LoginRequest struct {
@@ -28,8 +32,11 @@ func ReqToCore(data interface{}) *user.Core {
 		res.Name = cnv.Name
 		res.Email = cnv.Email
 		res.Phone = cnv.Phone
+		res.Gender = cnv.Gender
 		res.Address = cnv.Address
 		res.Password = cnv.Password
+		res.Position = cnv.Position
+		res.BirthOfDate = cnv.BirthOfDate
 	case LoginRequest:
 		cnv := data.(LoginRequest)
 		res.Nip = cnv.Nip

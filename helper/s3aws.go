@@ -3,15 +3,12 @@ package helper
 import (
 	"fmt"
 	"mime/multipart"
-	"net/http"
 	"timesync-be/config"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"github.com/labstack/echo/v4"
-	uuid "github.com/satori/go.uuid"
 )
 
 var theSession *session.Session
@@ -56,26 +53,26 @@ func UploadToS3(fileName string, src multipart.File) (string, error) {
 }
 
 // Handler Controller
-func UploadController(c echo.Context) error {
-	file, err := c.FormFile("file")
-	if err != nil {
-		return err
-	}
-	// karena saat upload file aws tidak generate nama file secara manual, sehingga harus generate nama filenya secara manual
-	// gunakan package github.com/satori/go.uuid lalu panggil fungsinya uuid.NewV4().String()
-	fileName := uuid.NewV4().String()
-	file.Filename = fileName + file.Filename[(len(file.Filename)-5):len(file.Filename)]
-	src, err := file.Open()
-	if err != nil {
-		return err
-	}
-	defer src.Close()
-	uploadURL, err := UploadToS3(file.Filename, src)
-	if err != nil {
-		return err
-	}
-	responseJson := &UploadResult{
-		Path: uploadURL,
-	}
-	return c.JSON(http.StatusOK, responseJson)
-}
+// func UploadController(c echo.Context) error {
+// 	file, err := c.FormFile("file")
+// 	if err != nil {
+// 		return err
+// 	}
+// 	// karena saat upload file aws tidak generate nama file secara manual, sehingga harus generate nama filenya secara manual
+// 	// gunakan package github.com/satori/go.uuid lalu panggil fungsinya uuid.NewV4().String()
+// 	fileName := uuid.NewV4().String()
+// 	file.Filename = fileName + file.Filename[(len(file.Filename)-5):len(file.Filename)]
+// 	src, err := file.Open()
+// 	if err != nil {
+// 		return err
+// 	}
+// 	defer src.Close()
+// 	uploadURL, err := UploadToS3(file.Filename, src)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	responseJson := &UploadResult{
+// 		Path: uploadURL,
+// 	}
+// 	return c.JSON(http.StatusOK, responseJson)
+// }
