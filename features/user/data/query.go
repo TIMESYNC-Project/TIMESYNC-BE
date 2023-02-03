@@ -121,7 +121,6 @@ func (uq *userQuery) Update(employeeID uint, updateData user.Core) (user.Core, e
 // Csv implements user.UserData
 func (uq *userQuery) Csv(newUserBatch []user.Core) error {
 	//prepare to make auto increment role
-
 	batch := []User{}
 	for i := 0; i < len(newUserBatch); i++ {
 		batch = append(batch, CoreToData(newUserBatch[i]))
@@ -133,7 +132,7 @@ func (uq *userQuery) Csv(newUserBatch []user.Core) error {
 			log.Println("query error")
 			return errors.New("server error")
 		}
-		if len(nipField) == 0 {
+		if len(nipField) == 0 || nipField[0].Nip == "admin" {
 			if len(batch) <= 1 {
 				batch[i].Nip = "23001"
 			} else {
