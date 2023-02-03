@@ -167,3 +167,14 @@ func (uq *userQuery) Csv(newUserBatch []user.Core) error {
 	}
 	return nil
 }
+
+// Profile implements user.UserData
+func (uq *userQuery) Profile(userID uint) (interface{}, error) {
+	res := User{}
+	err := uq.db.Where("id = ?", userID).First(&res).Error
+	if err != nil {
+		log.Println("query err", err.Error())
+		return user.Core{}, errors.New("account not found")
+	}
+	return ToCore(res), nil
+}
