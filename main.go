@@ -3,6 +3,9 @@ package main
 import (
 	"log"
 	"timesync-be/config"
+	attData "timesync-be/features/attendance/data"
+	attHdl "timesync-be/features/attendance/handler"
+	attSrv "timesync-be/features/attendance/services"
 	usrData "timesync-be/features/user/data"
 	usrHdl "timesync-be/features/user/handler"
 	usrSrv "timesync-be/features/user/services"
@@ -21,6 +24,9 @@ func main() {
 	uData := usrData.New(db)
 	uSrv := usrSrv.New(uData)
 	uHdl := usrHdl.New(uSrv)
+	attendData := attData.New(db)
+	attendSrv := attSrv.New(attendData)
+	attendHdl := attHdl.New(attendSrv)
 
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.CORS())
@@ -37,6 +43,9 @@ func main() {
 	e.PUT("/employees/:id", uHdl.AdminEditEmployee(), middleware.JWT([]byte(config.JWTKey)))
 	e.PUT("/employees", uHdl.Update(), middleware.JWT([]byte(config.JWTKey)))
 	e.GET("/employees", uHdl.GetAllEmployee())
+
+	//attendance
+	e.GET("/attendance/location", attendHdl.GetLL())
 
 	if err := e.Start(":8000"); err != nil {
 		log.Println(err.Error())
