@@ -9,7 +9,7 @@ import (
 
 type PostAnnouncementReponse struct {
 	ID        uint      `json:"id"`
-	UserID    uint      `json:"user_id"`
+	Nip       string    `json:"nip"`
 	Type      string    `json:"type"`
 	Title     string    `json:"announcement_title"`
 	Message   string    `json:"announcement_description"`
@@ -19,6 +19,8 @@ type PostAnnouncementReponse struct {
 func ToPostAnnouncementReponse(data announcement.Core) PostAnnouncementReponse {
 	return PostAnnouncementReponse{
 		ID:        data.ID,
+		Nip:       data.Nip,
+		Type:      data.Type,
 		Title:     data.Title,
 		Message:   data.Message,
 		CreatedAt: time.Now(),

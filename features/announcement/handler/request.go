@@ -3,7 +3,7 @@ package handler
 import "timesync-be/features/announcement"
 
 type PostAnnouncementRequest struct {
-	UserID  uint   `json:"user_id" form:"user_id"`
+	Nip     string `json:"nip" form:"nip"`
 	Type    string `json:"type" form:"type"`
 	Title   string `json:"title" form:"title"`
 	Message string `json:"message" form:"message"`
@@ -15,8 +15,7 @@ func ReqToCore(data interface{}) *announcement.Core {
 	switch data.(type) {
 	case PostAnnouncementRequest:
 		cnv := data.(PostAnnouncementRequest)
-		res.UserID = cnv.UserID
-		res.Type = cnv.Type
+		res.Nip = cnv.Nip
 		res.Title = cnv.Title
 		res.Message = cnv.Message
 	default:

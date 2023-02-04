@@ -14,10 +14,18 @@ type Announcement struct {
 	Message string
 }
 
+type User struct {
+	gorm.Model
+	ProfilePicture string
+	Name           string
+	Nip            string
+	Position       string
+	Role           string
+}
+
 func ToCore(data Announcement) announcement.Core {
 	return announcement.Core{
 		ID:      data.ID,
-		UserID:  data.UserID,
 		Type:    data.Type,
 		Title:   data.Title,
 		Message: data.Message,
@@ -27,7 +35,6 @@ func ToCore(data Announcement) announcement.Core {
 func CoreToData(data announcement.Core) Announcement {
 	return Announcement{
 		Model:   gorm.Model{ID: data.ID},
-		UserID:  data.UserID,
 		Type:    data.Type,
 		Title:   data.Title,
 		Message: data.Message,

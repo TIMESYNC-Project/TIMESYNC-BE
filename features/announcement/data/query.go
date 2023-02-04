@@ -19,14 +19,32 @@ func New(db *gorm.DB) announcement.AnnouncementData {
 }
 
 func (aq *announcementQuery) PostAnnouncement(adminID uint, newAnnouncement announcement.Core) (announcement.Core, error) {
-	cnv := CoreToData(newAnnouncement)
-	cnv.UserID = uint(adminID)
-	err := aq.db.Create(&cnv).Error
+	data := CoreToData(newAnnouncement)
+	if newAnnouncement.Nip != "" {
+		//query untuk mencari userID berdasarkan NIP
+		userData := User{}
+		err := aq.db.Where("nip = ?", newAnnouncement.Nip).First(&userData).Error
+		if err != nil {
+			log.Println("find nip query error")
+			return announcement.Core{}, errors.New("employee not found")
+		}
+		data.UserID = userData.ID
+	}
+
+	//logic untuk menentukan type pada saat post announcement
+	if newAnnouncement.Nip == "" {
+		data.Type = "public"
+	} else {
+		data.Type = "personal"
+	}
+
+	err := aq.db.Create(&data).Error
 	if err != nil {
 		return announcement.Core{}, err
 	}
 
-	newAnnouncement.ID = cnv.ID
+	newAnnouncement.ID = data.ID
+	newAnnouncement.Type = data.Type
 
 	return newAnnouncement, nil
 }

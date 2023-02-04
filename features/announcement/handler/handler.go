@@ -22,13 +22,11 @@ func New(as announcement.AnnouncementService) announcement.AnnouncementHandler {
 
 func (ac *announcementControll) PostAnnouncement() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		token := c.Get("user")
 		input := PostAnnouncementRequest{}
 		if err := c.Bind(&input); err != nil {
 			return c.JSON(http.StatusBadRequest, "invalid input")
 		}
-		cnv := ReqToCore(input)
-		res, err := ac.srv.PostAnnouncement(token, *cnv)
+		res, err := ac.srv.PostAnnouncement(c.Get("user"), *ReqToCore(input))
 
 		if err != nil {
 			log.Println("error post content : ", err.Error())

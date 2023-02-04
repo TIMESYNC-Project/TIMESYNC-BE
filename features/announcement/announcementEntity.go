@@ -4,7 +4,7 @@ import "github.com/labstack/echo/v4"
 
 type Core struct {
 	ID      uint
-	UserID  uint
+	Nip     string
 	Type    string
 	Title   string
 	Message string
