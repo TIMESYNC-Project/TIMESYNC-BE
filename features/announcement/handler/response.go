@@ -26,16 +26,18 @@ func ToPostAnnouncementReponse(data announcement.Core) PostAnnouncementReponse {
 }
 
 type ShowAllAnnouncement struct {
-	ID      uint   `json:"id"`
-	Title   string `json:"title"`
-	Message string `json:"message"`
+	ID        uint      `json:"id"`
+	Title     string    `json:"title"`
+	Message   string    `json:"message"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 func ShowAllAnnouncementJson(data announcement.Core) ShowAllAnnouncement {
 	return ShowAllAnnouncement{
-		ID:      data.ID,
-		Title:   data.Title,
-		Message: data.Message,
+		ID:        data.ID,
+		Title:     data.Title,
+		Message:   data.Message,
+		CreatedAt: time.Now(),
 	}
 }
 
