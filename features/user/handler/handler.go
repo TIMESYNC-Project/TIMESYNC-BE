@@ -30,7 +30,11 @@ func (uc *userControll) Register() echo.HandlerFunc {
 
 		res, err := uc.srv.Register(*ReqToCore(input))
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
+			if strings.Contains(err.Error(), "used") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "email already registered"})
+			} else {
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
+			}
 		}
 		log.Println(res)
 		return c.JSON(http.StatusCreated, map[string]interface{}{"message": "success create account"})
@@ -212,9 +216,13 @@ func (uc *userControll) GetAllEmployee() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
 		}
+		result := []ShowAllEmployee{}
+		for _, val := range res {
+			result = append(result, ShowAllEmployeeJson(val))
+		}
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"data":    res,
-			"message": "update profile success",
+			"data":    result,
+			"message": "success show all employee",
 		})
 	}
 }

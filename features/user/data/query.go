@@ -188,6 +188,16 @@ func (uq *userQuery) Profile(userID uint) (user.Core, error) {
 }
 
 // GetAllEmployee implements user.UserData
-func (*userQuery) GetAllEmployee() ([]user.Core, error) {
-	panic("unimplemented")
+func (uq *userQuery) GetAllEmployee() ([]user.Core, error) {
+	getall := []User{}
+	err := uq.db.Where("role = ?", "employee").Find(&getall).Error
+	if err != nil {
+		log.Println("data not found")
+		return []user.Core{}, errors.New("data not found")
+	}
+	result := []user.Core{}
+	for _, val := range getall {
+		result = append(result, ToCore(val))
+	}
+	return result, nil
 }

@@ -36,6 +36,7 @@ func main() {
 	e.GET("/employees/:id", uHdl.ProfileEmployee(), middleware.JWT([]byte(config.JWTKey)))
 	e.PUT("/employees/:id", uHdl.AdminEditEmployee(), middleware.JWT([]byte(config.JWTKey)))
 	e.PUT("/employees", uHdl.Update(), middleware.JWT([]byte(config.JWTKey)))
+	e.GET("/employees", uHdl.GetAllEmployee())
 
 	if err := e.Start(":8000"); err != nil {
 		log.Println(err.Error())
