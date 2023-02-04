@@ -25,22 +25,6 @@ func ToPostAnnouncementReponse(data announcement.Core) PostAnnouncementReponse {
 	}
 }
 
-func CoresToResponse(dataCore announcement.Core) PostAnnouncementReponse {
-	return PostAnnouncementReponse{
-		ID:      dataCore.ID,
-		Title:   dataCore.Title,
-		Message: dataCore.Message,
-	}
-}
-
-func ListCoreToResp(data []announcement.Core) []PostAnnouncementReponse {
-	var dataResp []PostAnnouncementReponse
-	for _, v := range data {
-		dataResp = append(dataResp, CoresToResponse(v))
-	}
-	return dataResp
-}
-
 type ShowAllAnnouncement struct {
 	ID      uint   `json:"id"`
 	Title   string `json:"title"`

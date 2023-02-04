@@ -46,3 +46,20 @@ func (auc *announcementUseCase) GetAnnouncement() ([]announcement.Core, error) {
 	}
 	return res, nil
 }
+
+func (auc *announcementUseCase) DeleteAnnouncement(token interface{}, announcementID uint) error {
+	id := helper.ExtractToken(token)
+
+	if id <= 0 {
+		return errors.New("data not found")
+	}
+
+	err := auc.qry.DeleteAnnouncement(uint(id), announcementID)
+
+	if err != nil {
+		log.Println("delete query error", err.Error())
+		return err
+	}
+
+	return nil
+}

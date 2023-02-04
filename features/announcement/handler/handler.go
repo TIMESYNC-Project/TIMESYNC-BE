@@ -3,6 +3,7 @@ package handler
 import (
 	"log"
 	"net/http"
+	"strconv"
 	"timesync-be/features/announcement"
 	"timesync-be/helper"
 
@@ -52,5 +53,28 @@ func (ac *announcementControll) GetAnnouncement() echo.HandlerFunc {
 			"message": "success get all announcement",
 		})
 
+	}
+}
+
+func (ac *announcementControll) DeleteAnnouncement() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		token := c.Get("user")
+
+		paramID := c.Param("id")
+
+		announcementID, err := strconv.Atoi(paramID)
+
+		if err != nil {
+			log.Println("convert id error", err.Error())
+			return c.JSON(http.StatusBadGateway, "Invalid input")
+		}
+
+		err = ac.srv.DeleteAnnouncement(token, uint(announcementID))
+
+		if err != nil {
+			return c.JSON(helper.PrintErrorResponse(err.Error()))
+		}
+
+		return c.JSON(http.StatusAccepted, "Success delete announcement")
 	}
 }

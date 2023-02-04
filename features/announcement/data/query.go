@@ -1,6 +1,7 @@
 package data
 
 import (
+	"errors"
 	"log"
 	"timesync-be/features/announcement"
 
@@ -32,7 +33,7 @@ func (aq *announcementQuery) PostAnnouncement(adminID uint, newAnnouncement anno
 
 func (aq *announcementQuery) GetAnnouncement() ([]announcement.Core, error) {
 	res := []Announcement{}
-	if err := aq.db.Table("announecements").Joins("JOIN users ON users.id = announcemenets.user_id").Select("announcements.id, announcements.title, announcements.message, announcements.created_at").Find(&res).Error; err != nil {
+	if err := aq.db.Table("announcements").Joins("JOIN users ON users.id = announcements.user_id").Select("announcements.id, announcements.title, announcements.message, announcements.created_at").Find(&res).Error; err != nil {
 		log.Println("get all announcement query error : ", err.Error())
 		return []announcement.Core{}, err
 	}
@@ -41,4 +42,23 @@ func (aq *announcementQuery) GetAnnouncement() ([]announcement.Core, error) {
 		result = append(result, ToCore(val))
 	}
 	return result, nil
+}
+
+func (aq *announcementQuery) DeleteAnnouncement(adminID uint, announcementID uint) error {
+	getID := Announcement{}
+	err := aq.db.Where("id = ?", announcementID).First(&getID).Error
+	if err != nil {
+		log.Println("get announcement error : ", err.Error())
+		return errors.New("failed to get announcement data")
+	}
+
+	qryDelete := aq.db.Delete(&Announcement{}, announcementID)
+	affRow := qryDelete.RowsAffected
+
+	if affRow <= 0 {
+		log.Println("No rows affected")
+		return errors.New("failed to delete announcement, data not found")
+	}
+
+	return nil
 }

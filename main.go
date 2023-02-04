@@ -50,7 +50,8 @@ func main() {
 	e.PUT("/employees", uHdl.Update(), middleware.JWT([]byte(config.JWTKey)))
 	e.GET("/employees", uHdl.GetAllEmployee())
 	e.POST("/announcements", announcementHdl.PostAnnouncement(), middleware.JWT([]byte(config.JWTKey)))
-	e.GET("/announcements", announcementHdl.PostAnnouncement(), middleware.JWT([]byte(config.JWTKey)))
+	e.GET("/announcements", announcementHdl.GetAnnouncement(), middleware.JWT([]byte(config.JWTKey)))
+	e.DELETE("/announcements/:id", announcementHdl.DeleteAnnouncement(), middleware.JWT([]byte(config.JWTKey)))
 
 	//attendance for emloyees
 	e.GET("/attendance/location", attendHdl.GetLL())
