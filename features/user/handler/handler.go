@@ -30,11 +30,7 @@ func (uc *userControll) Register() echo.HandlerFunc {
 
 		res, err := uc.srv.Register(*ReqToCore(input))
 		if err != nil {
-			if strings.Contains(err.Error(), "used") {
-				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "email already registered"})
-			} else {
-				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
-			}
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
 		}
 		log.Println(res)
 		return c.JSON(http.StatusCreated, map[string]interface{}{"message": "success create account"})
@@ -209,7 +205,6 @@ func (uc *userControll) AdminEditEmployee() echo.HandlerFunc {
 	}
 }
 
-// GetAllEmployee implements user.UserHandler
 func (uc *userControll) GetAllEmployee() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		res, err := uc.srv.GetAllEmployee()
