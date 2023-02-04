@@ -3,6 +3,9 @@ package main
 import (
 	"log"
 	"timesync-be/config"
+	announData "timesync-be/features/announcement/data"
+	announHdl "timesync-be/features/announcement/handler"
+	announSrv "timesync-be/features/announcement/services"
 	attData "timesync-be/features/attendance/data"
 	attHdl "timesync-be/features/attendance/handler"
 	attSrv "timesync-be/features/attendance/services"
@@ -27,6 +30,9 @@ func main() {
 	attendData := attData.New(db)
 	attendSrv := attSrv.New(attendData)
 	attendHdl := attHdl.New(attendSrv)
+	announcementData := announData.New(db)
+	announcementSrv := announSrv.New(announcementData)
+	announcementHdl := announHdl.New(announcementSrv)
 
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.CORS())
@@ -43,6 +49,7 @@ func main() {
 	e.PUT("/employees/:id", uHdl.AdminEditEmployee(), middleware.JWT([]byte(config.JWTKey)))
 	e.PUT("/employees", uHdl.Update(), middleware.JWT([]byte(config.JWTKey)))
 	e.GET("/employees", uHdl.GetAllEmployee())
+	e.POST("/announcements", announcementHdl.PostAnnouncement(), middleware.JWT([]byte(config.JWTKey)))
 
 	//attendance for emloyees
 	e.GET("/attendance/location", attendHdl.GetLL())
