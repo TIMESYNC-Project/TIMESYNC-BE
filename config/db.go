@@ -3,9 +3,8 @@ package config
 import (
 	"fmt"
 	"log"
-
-	attendData "timesync-be/features/attendance/data"
-	usrData "timesync-be/features/user/data"
+	aData "timesync-be/features/announcement/data"
+	uData "timesync-be/features/user/data"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -24,6 +23,6 @@ func InitDB(dc DBConfig) *gorm.DB {
 }
 
 func Migrate(db *gorm.DB) {
-	db.AutoMigrate(usrData.User{})
-	db.AutoMigrate(attendData.Attendance{})
+	db.AutoMigrate(uData.User{})
+	db.AutoMigrate(aData.Announcement{})
 }
