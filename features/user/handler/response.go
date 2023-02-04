@@ -164,3 +164,21 @@ func ToUpdateResponseEmployee(data user.Core) UpdateResponseEmployee {
 		Password:       data.Password,
 	}
 }
+
+type ShowAllEmployee struct {
+	ID             uint   `json:"id"`
+	ProfilePicture string `json:"profile_picture"`
+	Name           string `json:"name"`
+	Nip            string `json:"nip"`
+	Position       string `json:"position"`
+}
+
+func ShowAllEmployeeJson(data user.Core) ShowAllEmployee {
+	return ShowAllEmployee{
+		ID:             data.ID,
+		ProfilePicture: data.ProfilePicture,
+		Name:           data.Name,
+		Nip:            data.Nip,
+		Position:       data.Position,
+	}
+}

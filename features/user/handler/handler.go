@@ -212,9 +212,13 @@ func (uc *userControll) GetAllEmployee() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
 		}
+		result := []ShowAllEmployee{}
+		for _, val := range res {
+			result = append(result, ShowAllEmployeeJson(val))
+		}
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"data":    res,
-			"message": "update profile success",
+			"data":    result,
+			"message": "success show all employee",
 		})
 	}
 }

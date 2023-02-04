@@ -339,13 +339,13 @@ paths:
     get:
       tags:
         - "Admin"
-      description: get employee data
-      summary: get employee data
+      description: get and show all employee
+      summary: get and show all employee
       security:
         - JWTAuth: []
       responses:
         200:
-          description: success show employee profile
+          description: success show all employee
           content:
             application/json:
               schema:
@@ -368,7 +368,7 @@ paths:
                       postion: "frontend engineer",
                     },
                   ]
-                message: success show employee profile
+                message: success show all employee
         400:
           $ref: "#/components/responses/400"
         500:
