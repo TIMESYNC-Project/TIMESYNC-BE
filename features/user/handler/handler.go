@@ -204,3 +204,17 @@ func (uc *userControll) AdminEditEmployee() echo.HandlerFunc {
 		})
 	}
 }
+
+// GetAllEmployee implements user.UserHandler
+func (uc *userControll) GetAllEmployee() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		res, err := uc.srv.GetAllEmployee()
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
+		}
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"data":    res,
+			"message": "update profile success",
+		})
+	}
+}

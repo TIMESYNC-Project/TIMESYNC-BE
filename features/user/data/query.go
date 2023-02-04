@@ -186,3 +186,8 @@ func (uq *userQuery) Profile(userID uint) (user.Core, error) {
 	}
 	return ToCore(res), nil
 }
+
+// GetAllEmployee implements user.UserData
+func (*userQuery) GetAllEmployee() ([]user.Core, error) {
+	panic("unimplemented")
+}

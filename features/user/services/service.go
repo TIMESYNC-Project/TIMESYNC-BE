@@ -195,3 +195,18 @@ func (uuc *userUseCase) AdminEditEmployee(employeeID uint, fileData multipart.Fi
 	}
 	return res, nil
 }
+
+// GetAllEmployee implements user.UserService
+func (uuc *userUseCase) GetAllEmployee() ([]user.Core, error) {
+	res, err := uuc.qry.GetAllEmployee()
+	if err != nil {
+		msg := ""
+		if strings.Contains(err.Error(), "not found") {
+			msg = "data not found"
+		} else {
+			msg = "server error"
+		}
+		return []user.Core{}, errors.New(msg)
+	}
+	return res, nil
+}

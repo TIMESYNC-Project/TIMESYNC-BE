@@ -31,6 +31,7 @@ type UserHandler interface {
 	Update() echo.HandlerFunc
 	Csv() echo.HandlerFunc
 	AdminEditEmployee() echo.HandlerFunc
+	GetAllEmployee() echo.HandlerFunc
 }
 
 type UserService interface {
@@ -42,6 +43,7 @@ type UserService interface {
 	ProfileEmployee(userID uint) (Core, error)
 	Update(token interface{}, fileData multipart.FileHeader, updateData Core) (Core, error)
 	AdminEditEmployee(employeeID uint, fileData multipart.FileHeader, updateData Core) (Core, error)
+	GetAllEmployee() ([]Core, error)
 }
 
 type UserData interface {
@@ -51,4 +53,5 @@ type UserData interface {
 	Update(employeeID uint, updateData Core) (Core, error)
 	Delete(adminID uint, employeeID uint) error
 	Csv(newUserBatch []Core) error
+	GetAllEmployee() ([]Core, error)
 }
