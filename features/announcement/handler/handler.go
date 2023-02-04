@@ -69,15 +69,15 @@ func (ac *announcementControll) GetAnnouncementDetail() echo.HandlerFunc {
 
 		res, err := ac.srv.GetAnnouncementDetail(token, uint(announcementID))
 
-		result := []ShowAllAnnouncement{}
+		if err != nil {
+			return c.JSON(helper.PrintErrorResponse(err.Error()))
+		}
 
+		result := []ShowAllAnnouncement{}
 		for _, val := range res {
 			result = append(result, ShowAllAnnouncementJson(val))
 		}
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"data":    result,
-			"message": "success get announcement details",
-		})
+		return c.JSON(helper.PrintSuccessReponse(http.StatusOK, "success get announcement details", result))
 
 	}
 }
