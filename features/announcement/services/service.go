@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"log"
+	"strings"
 	"timesync-be/features/announcement"
 	"timesync-be/helper"
 )
@@ -28,6 +29,20 @@ func (auc *announcementUseCase) PostAnnouncement(token interface{}, newAnnouncem
 	if err != nil {
 		log.Println("query error", err.Error())
 		return announcement.Core{}, errors.New("query error, problem with server")
+	}
+	return res, nil
+}
+
+func (auc *announcementUseCase) GetAnnouncement() ([]announcement.Core, error) {
+	res, err := auc.qry.GetAnnouncement()
+	if err != nil {
+		msg := ""
+		if strings.Contains(err.Error(), "not found") {
+			msg = "announcement not found"
+		} else {
+			msg = "There is a problem with the server"
+		}
+		return []announcement.Core{}, errors.New(msg)
 	}
 	return res, nil
 }

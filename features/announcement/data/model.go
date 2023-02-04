@@ -33,3 +33,21 @@ func CoreToData(data announcement.Core) Announcement {
 		Message: data.Message,
 	}
 }
+
+func (dataModel *Announcement) AllModelsToCore() announcement.Core {
+	return announcement.Core{
+		ID:      dataModel.ID,
+		UserID:  dataModel.UserID,
+		Type:    dataModel.Type,
+		Title:   dataModel.Title,
+		Message: dataModel.Message,
+	}
+}
+
+func AllListToCore(data []Announcement) []announcement.Core {
+	var dataCore []announcement.Core
+	for _, v := range data {
+		dataCore = append(dataCore, v.AllModelsToCore())
+	}
+	return dataCore
+}

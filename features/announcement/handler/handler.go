@@ -36,3 +36,21 @@ func (ac *announcementControll) PostAnnouncement() echo.HandlerFunc {
 		return c.JSON(helper.PrintSuccessReponse(http.StatusCreated, "send announcement message to employee success", ToPostAnnouncementReponse(res)))
 	}
 }
+
+func (ac *announcementControll) GetAnnouncement() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		res, err := ac.srv.GetAnnouncement()
+		if err != nil {
+			return c.JSON(helper.PrintErrorResponse(err.Error()))
+		}
+		result := []ShowAllAnnouncement{}
+		for _, val := range res {
+			result = append(result, ShowAllAnnouncementJson(val))
+		}
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"data":    result,
+			"message": "success get all announcement",
+		})
+
+	}
+}

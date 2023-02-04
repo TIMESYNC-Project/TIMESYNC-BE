@@ -25,6 +25,36 @@ func ToPostAnnouncementReponse(data announcement.Core) PostAnnouncementReponse {
 	}
 }
 
+func CoresToResponse(dataCore announcement.Core) PostAnnouncementReponse {
+	return PostAnnouncementReponse{
+		ID:      dataCore.ID,
+		Title:   dataCore.Title,
+		Message: dataCore.Message,
+	}
+}
+
+func ListCoreToResp(data []announcement.Core) []PostAnnouncementReponse {
+	var dataResp []PostAnnouncementReponse
+	for _, v := range data {
+		dataResp = append(dataResp, CoresToResponse(v))
+	}
+	return dataResp
+}
+
+type ShowAllAnnouncement struct {
+	ID      uint   `json:"id"`
+	Title   string `json:"title"`
+	Message string `json:"message"`
+}
+
+func ShowAllAnnouncementJson(data announcement.Core) ShowAllAnnouncement {
+	return ShowAllAnnouncement{
+		ID:      data.ID,
+		Title:   data.Title,
+		Message: data.Message,
+	}
+}
+
 func PrintSuccessReponse(code int, message string, data ...interface{}) (int, interface{}) {
 	resp := map[string]interface{}{}
 	if len(data) < 2 {
