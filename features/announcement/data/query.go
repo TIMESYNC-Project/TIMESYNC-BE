@@ -44,6 +44,19 @@ func (aq *announcementQuery) GetAnnouncement() ([]announcement.Core, error) {
 	return result, nil
 }
 
+func (aq *announcementQuery) GetAnnouncementDetail(adminID uint, announcementID uint) ([]announcement.Core, error) {
+	res := []Announcement{}
+	if err := aq.db.Where("id = ?", announcementID).Find(&res).Error; err != nil {
+		log.Println("get announcement by id query error : ", err.Error())
+		return []announcement.Core{}, err
+	}
+	result := []announcement.Core{}
+	for _, val := range res {
+		result = append(result, ToCore(val))
+	}
+	return result, nil
+}
+
 func (aq *announcementQuery) DeleteAnnouncement(adminID uint, announcementID uint) error {
 	getID := Announcement{}
 	err := aq.db.Where("id = ?", announcementID).First(&getID).Error

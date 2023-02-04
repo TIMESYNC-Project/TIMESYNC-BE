@@ -56,6 +56,27 @@ func (ac *announcementControll) GetAnnouncement() echo.HandlerFunc {
 	}
 }
 
+func (ac *announcementControll) GetAnnouncementDetail() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		token := c.Get("user")
+		paramID := c.Param("id")
+
+		announcementID, err := strconv.Atoi(paramID)
+		if err != nil {
+			log.Println("convert id error", err.Error())
+			return c.JSON(http.StatusBadGateway, "Invalid input")
+		}
+
+		res, err := ac.srv.GetAnnouncementDetail(token, uint(announcementID))
+
+		if err != nil {
+			return c.JSON(helper.PrintErrorResponse(err.Error()))
+		}
+
+		return c.JSON(helper.PrintSuccessReponse(http.StatusOK, "success get announcement details", res))
+	}
+}
+
 func (ac *announcementControll) DeleteAnnouncement() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		token := c.Get("user")
@@ -75,6 +96,6 @@ func (ac *announcementControll) DeleteAnnouncement() echo.HandlerFunc {
 			return c.JSON(helper.PrintErrorResponse(err.Error()))
 		}
 
-		return c.JSON(http.StatusAccepted, "Success delete announcement")
+		return c.JSON(http.StatusAccepted, "success delete announcement")
 	}
 }

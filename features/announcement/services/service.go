@@ -40,10 +40,31 @@ func (auc *announcementUseCase) GetAnnouncement() ([]announcement.Core, error) {
 		if strings.Contains(err.Error(), "not found") {
 			msg = "announcement not found"
 		} else {
-			msg = "There is a problem with the server"
+			msg = "there is a problem with the server"
 		}
 		return []announcement.Core{}, errors.New(msg)
 	}
+	return res, nil
+}
+
+func (auc *announcementUseCase) GetAnnouncementDetail(token interface{}, announcementID uint) ([]announcement.Core, error) {
+	id := helper.ExtractToken(token)
+
+	if id <= 0 {
+		return []announcement.Core{}, errors.New("data not found")
+	}
+
+	res, err := auc.qry.GetAnnouncementDetail(uint(id), announcementID)
+	if err != nil {
+		msg := ""
+		if strings.Contains(err.Error(), "not found") {
+			msg = "announcement not found"
+		} else {
+			msg = "there is a problem with the server"
+		}
+		return []announcement.Core{}, errors.New(msg)
+	}
+
 	return res, nil
 }
 
