@@ -11,8 +11,8 @@ type PostAnnouncementReponse struct {
 	ID        uint      `json:"id"`
 	UserID    uint      `json:"user_id"`
 	Type      string    `json:"type"`
-	Title     string    `json:"title"`
-	Message   string    `json:"message"`
+	Title     string    `json:"announcement_title"`
+	Message   string    `json:"announcement_description"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
@@ -27,8 +27,8 @@ func ToPostAnnouncementReponse(data announcement.Core) PostAnnouncementReponse {
 
 type ShowAllAnnouncement struct {
 	ID        uint      `json:"id"`
-	Title     string    `json:"title"`
-	Message   string    `json:"message"`
+	Title     string    `json:"announcement_title"`
+	Message   string    `json:"announcement_description"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
