@@ -3,10 +3,10 @@ package handler
 import "timesync-be/features/announcement"
 
 type PostAnnouncementRequest struct {
-	Nip     string `json:"nip" form:"nip"`
+	Nip     string `json:"to" form:"to"`
 	Type    string `json:"type" form:"type"`
-	Title   string `json:"title" form:"title"`
-	Message string `json:"message" form:"message"`
+	Title   string `json:"announcement_title" form:"announcement_title"`
+	Message string `json:"announcement_description" form:"announcement_description"`
 }
 
 func ReqToCore(data interface{}) *announcement.Core {
