@@ -52,9 +52,26 @@ func (auc *attendanceUseCase) AttendanceFromAdmin(token interface{}, dateStart s
 	if err != nil {
 		if strings.Contains(err.Error(), "already clock out today") {
 			return errors.New("already creating attendance")
+		} else if strings.Contains(err.Error(), "wrong input format") {
+			return errors.New("wrong input format")
 		} else {
 			return errors.New("server error")
 		}
 	}
 	return nil
+}
+
+// Record implements attendance.AttendanceService
+func (auc *attendanceUseCase) Record(token interface{}, dateFrom string, dateTo string) ([]attendance.Core, error) {
+	userID := helper.ExtractToken(token)
+	res, err := auc.qry.Record(uint(userID), dateFrom, dateTo)
+	if err != nil {
+		if strings.Contains(err.Error(), "wrong input format") {
+			return []attendance.Core{}, errors.New("wrong input format")
+		} else {
+			return []attendance.Core{}, errors.New("server error")
+		}
+
+	}
+	return res, nil
 }
