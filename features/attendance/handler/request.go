@@ -20,3 +20,8 @@ type CreateAttendance struct {
 	DateStart  string `json:"date_start" form:"date_start"`
 	DateEnd    string `json:"date_end" form:"date_end"`
 }
+
+type RecordRequest struct {
+	DateFrom string `json:"date_from" form:"date_from"`
+	DateTo   string `json:"date_to" form:"date_to"`
+}

@@ -144,3 +144,26 @@ func (ac *attendanceController) AttendanceFromAdmin() echo.HandlerFunc {
 		})
 	}
 }
+
+// Record implements attendance.AttendanceHandler
+func (ac *attendanceController) Record() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		input := RecordRequest{}
+		err := c.Bind(&input)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "input format inccorect"})
+		}
+		res, err := ac.srv.Record(c.Get("user"), input.DateFrom, input.DateTo)
+		if err != nil {
+			if strings.Contains(err.Error(), "input format") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "input format inccorect"})
+			} else {
+				return c.JSON(http.StatusNotFound, map[string]interface{}{"message": "data not found"})
+			}
+		}
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"data":    res,
+			"message": "success show records",
+		})
+	}
+}

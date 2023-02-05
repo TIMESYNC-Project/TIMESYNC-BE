@@ -17,6 +17,9 @@ tags:
 servers:
   # Added by API Auto Mocking Plugin
   # Added by API Auto Mocking Plugin
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/ALIFMUHAMADHAFIDZ23/TimeSync/1.0.0
   - description: SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/fauzilax/TIMESYNC/1.0.0
   - url: https://shirayuki.site
@@ -59,7 +62,6 @@ paths:
             example:
               name: "Fauzi Sofyan"
               birth_of_date: "2000-01-31"
-              nip: "21"
               email: "fauzilax@gmail.com"
               gender: "male"
               position: "backend engineer"
@@ -125,7 +127,6 @@ paths:
             example:
               name: "Fauzi Sofyan"
               birth_of_date: "2000-01-31"
-              nip: "21"
               email: "fauzilax@gmail.com"
               gender: "male"
               position: "backend engineer"
@@ -193,6 +194,8 @@ paths:
       tags:
         - "Admin"
       description: get company profile information
+      security:
+        - JWTAuth: []
       summary: get company profile information
       responses:
         200:
@@ -339,13 +342,13 @@ paths:
     get:
       tags:
         - "Admin"
-      description: get and show all employee
-      summary: get and show all employee
+      description: get employee data
+      summary: get employee data
       security:
         - JWTAuth: []
       responses:
         200:
-          description: success show all employee
+          description: success show employee profile
           content:
             application/json:
               schema:
@@ -368,7 +371,40 @@ paths:
                       postion: "frontend engineer",
                     },
                   ]
-                message: success show all employee
+                message: success show employee profile
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+  /employees/profile:
+    get:
+      tags:
+        - "Employee"
+      description: get employee profile
+      summary: get employee profile
+      security:
+        - JWTAuth: []
+      responses:
+        200:
+          description: success show employee profile
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 2
+                  profile_picture: "https://fauziawsbucket.s3.ap-southeast-1.amazonaws.com/559d75ff-88c8-40af-8740-233667b36feco.png"
+                  name: "Fauzi Sofyan"
+                  birth_of_date: "2000-01-31"
+                  nip: "23001"
+                  email: "fauzilax@gmail.com"
+                  geneder: "Male"
+                  position: "Backend Engineer"
+                  phone: "00888"
+                  address: "bdg"
+                  annual_leave: 14
+                message: success show employee profile
         400:
           $ref: "#/components/responses/400"
         500:
@@ -537,10 +573,10 @@ paths:
             schema:
               type: object
               properties:
-                check_in:
+                working_hour_start:
                   type: string
                   example: "08:00"
-                leave_off:
+                working_hour_end:
                   type: string
                   example: "17:00"
                 tollerance:
@@ -558,10 +594,36 @@ paths:
                 $ref: "#/components/schemas/responseObject"
               example:
                 data:
-                  check_in: "08:00"
-                  leave_off: "17:00"
+                  working_hour_start: "08:00"
+                  working_hour_end: "17:00"
+                  tollerance: "30:00"
                   annual_leave_settings: 14
                 message: "update working hour schedule and annual leave for employee success"
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+    get:
+      tags:
+        - "Admin"
+      description: get working hour and annual leave for employee
+      summary: get working hour and annual leave for employee
+      security:
+        - JWTAuth: []
+      responses:
+        200:
+          description: "success get working hour schedule and annual leave for employee"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseObject"
+              example:
+                data:
+                  working_hour_start: "08:00"
+                  working_hour_end: "17:00"
+                  tollerance: "30:00"
+                  annual_leave_settings: 14
+                message: "success get working hour schedule for employee"
         400:
           $ref: "#/components/responses/400"
         500:
@@ -641,6 +703,36 @@ paths:
         500:
           $ref: "#/components/responses/500"
   /announcements/{id}:
+    get:
+      tags:
+        - "Employee"
+      description: get announcement details message
+      summary: get announcement details
+      security:
+        - JWTAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: "get announcement details"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseObject"
+              example:
+                data:
+                  id: 1
+                  announcement_title: "Libur"
+                  announcement_description: "Karena besok ada rapat atasan mendadak, jadi kantor diliburkan"
+                message: "success get announcement details"
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
     delete:
       tags:
         - "Admin"
@@ -733,7 +825,54 @@ paths:
           $ref: "#/components/responses/400"
         500:
           $ref: "#/components/responses/500"
-  /attendances:
+  /attendance/{id}:
+    put:
+      tags:
+        - "Admin"
+      description : edit employee attendance status
+      summary : edit employee attendance status
+      security:
+        - JWTAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                attendance:
+                  type: object
+                  example: ["annual leave", "on leave", "sick leave"]
+                start_date:
+                  type: string
+                  example: "2023-02-01"
+                end_date:
+                  type: string
+                  example: "2023-02-04"
+      responses:
+        200:
+          description: "edit employee attendance status success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseObject"
+              example:
+                data:
+                  id: 1
+                  attendance: "annual leave"
+                  start_date: "2023-02-01"
+                  end_date: "2023-02-04"
+                message: "edit employee attendance status success"
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+  /attendance:
     post:
       tags:
         - "Employee"
@@ -765,13 +904,12 @@ paths:
               example:
                 data:
                   id: 1
-                  attendace_date: "2023-02-04"
-                  clock_in: "07:50"
                   clock_in_location: "Jalan Cagar Alam,Depok,Jawa Barat,10550"
-                  clock_in_map_location: "https://www.openstreetmap.org/#map=16/-6.4096/106.8185"
-                  clock_out: ""
                   clock_out_location: ""
+                  clock_in_map_location: "https://www.openstreetmap.org/#map=16/-6.4096/106.8185"
                   clock_out_map_location: ""
+                  clock_in: "07:50"
+                  clock_out: ""
                 message: "clock in success"
         400:
           $ref: "#/components/responses/400"
@@ -888,33 +1026,6 @@ paths:
           $ref: "#/components/responses/400"
         500:
           $ref: "#/components/responses/500"
-          
-  /attendance/location:
-    get:
-      tags:
-        - "Employee"
-      description: employee attendance menu
-      summary: employee attendance & home menu
-      security:
-        - JWTAuth: []
-      responses:
-        200:
-          description: success show employee attendance menu
-          content:
-            application/json:
-              schema:
-                type: object
-              example:
-                data:
-                  id: 1,
-                  latitude: -6.4096
-                longitude: 106.8185
-                message: success show employee attendance menu
-        400:
-          $ref: "#/components/responses/400"
-        500:
-          $ref: "#/components/responses/500"
-          
   /approvals:
     post:
       tags:
@@ -1161,6 +1272,8 @@ paths:
         - "Admin"
       summary: find employee
       description: searching employee by their name,nip or position
+      security:
+        - JWTAuth: []
       parameters:
         - in: query
           name: offset

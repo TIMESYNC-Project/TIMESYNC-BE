@@ -21,16 +21,20 @@ type AttendanceHandler interface {
 	ClockIn() echo.HandlerFunc
 	ClockOut() echo.HandlerFunc
 	AttendanceFromAdmin() echo.HandlerFunc
+	Record() echo.HandlerFunc
+	// TotalPresenceToday()
 }
 
 type AttendanceService interface {
 	ClockIn(token interface{}, latitudeData string, longitudeData string) (Core, error)
 	ClockOut(token interface{}, latitudeData string, longitudeData string) (Core, error)
 	AttendanceFromAdmin(token interface{}, dateStart string, dateEnd string, attendanceType string, employeeID uint) error
+	Record(token interface{}, dateFrom string, dateTo string) ([]Core, error)
 }
 
 type AttendanceData interface {
 	ClockIn(employeeID uint, latitudeData string, longitudeData string) (Core, error)
 	ClockOut(employeeID uint, latitudeData string, longitudeData string) (Core, error)
 	AttendanceFromAdmin(adminID uint, dateStart string, dateEnd string, attendanceType string, employeeID uint) error
+	Record(employeeID uint, dateFrom string, dateTo string) ([]Core, error)
 }

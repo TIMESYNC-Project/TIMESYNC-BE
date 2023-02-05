@@ -287,38 +287,30 @@ func (aq *attendanceQuery) ClockOut(employeeID uint, latitudeData string, longit
 
 // AttendanceFromAdmin implements attendance.AttendanceData
 func (aq *attendanceQuery) AttendanceFromAdmin(adminID uint, dateStart string, dateEnd string, attendanceType string, employeeID uint) error {
-	log.Println(adminID)
 	if adminID != 1 {
 		log.Println("user is not admin")
 		return errors.New("user is not admin")
 	}
-	isfalse := true
-	date := ""
-	now := time.Now()
-	//cari nilai x, x adalah tanggal pertama user mulai izin
-	x := 1
-	for isfalse {
-		createAt := date
-		if createAt == dateStart {
-			isfalse = false
-		}
-		tomorrow := now.AddDate(0, 0, x)
-		year := strconv.Itoa(tomorrow.Year())
-		monthCnv := int(tomorrow.Month())
-		month := strconv.Itoa(monthCnv)
-		day := strconv.Itoa(tomorrow.Day())
-		if len(month) == 1 {
-			month = "0" + month
-		}
-		if len(day) == 1 {
-			day = "0" + day
-		}
-		date = fmt.Sprintf("%s-%s-%s", year, month, day)
-		x++
+	yFr, _ := strconv.Atoi(dateStart[:4])
+	yTo, _ := strconv.Atoi(dateEnd[:4])
+	mFr, _ := strconv.Atoi(dateStart[5:7])
+	mTo, _ := strconv.Atoi(dateEnd[5:7])
+	dFr, _ := strconv.Atoi(dateStart[8:])
+	dTo, _ := strconv.Atoi(dateEnd[8:])
+	if dTo < dFr || yTo < yFr || mTo < mFr {
+		log.Println("wrong input format")
+		return errors.New("wrong input format")
 	}
-	x -= 1
+	isfalse := true
+	y, _ := strconv.Atoi(dateStart[:4])
+	mm, _ := strconv.Atoi(dateStart[5:7])
+	d, _ := strconv.Atoi(dateStart[8:])
+	m := time.Month(mm)
+	// log.Println(y, m, d)
+	fD := time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
+	x := 1
 	data := []Attendance{}
-	date = dateStart
+	date := dateStart
 	isfalse = true
 	i := 0
 	for isfalse {
@@ -332,7 +324,7 @@ func (aq *attendanceQuery) AttendanceFromAdmin(adminID uint, dateStart string, d
 		if createAt == dateEnd {
 			isfalse = false
 		}
-		tomorrow := now.AddDate(0, 0, x)
+		tomorrow := fD.AddDate(0, 0, x)
 		year := strconv.Itoa(tomorrow.Year())
 		monthCnv := int(tomorrow.Month())
 		month := strconv.Itoa(monthCnv)
@@ -353,4 +345,130 @@ func (aq *attendanceQuery) AttendanceFromAdmin(adminID uint, dateStart string, d
 		return errors.New("creating data fail, server error")
 	}
 	return nil
+}
+
+// Record implements attendance.AttendanceData
+func (aq *attendanceQuery) Record(employeeID uint, dateFrom string, dateTo string) ([]attendance.Core, error) {
+	yFr, _ := strconv.Atoi(dateFrom[:4])
+	yTo, _ := strconv.Atoi(dateTo[:4])
+	mFr, _ := strconv.Atoi(dateFrom[5:7])
+	mTo, _ := strconv.Atoi(dateTo[5:7])
+	dFr, _ := strconv.Atoi(dateFrom[8:])
+	dTo, _ := strconv.Atoi(dateTo[8:])
+	log.Println(yFr, yTo)
+	if dTo < dFr || yTo < yFr || mTo < mFr {
+		log.Println("wrong input format")
+		return []attendance.Core{}, errors.New("wrong input format")
+	}
+	data := []Attendance{}
+	err := aq.db.Where("user_id = ?", employeeID).Find(&data).Error //.Order("attendance_date desc")
+	if err != nil {
+		log.Println("query error data not found", err.Error())
+		return []attendance.Core{}, errors.New("data not found")
+	}
+	result := []attendance.Core{}
+	for i := 0; i < len(data); i++ {
+		result = append(result, DataToCore(data[i]))
+	}
+	//Cek apakah result
+	date := dateFrom
+	isfalse := true
+	y, _ := strconv.Atoi(date[:4])
+	mm, _ := strconv.Atoi(date[5:7])
+	d, _ := strconv.Atoi(date[8:])
+	m := time.Month(mm)
+	// log.Println(y, m, d)
+	fD := time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
+	x := 1
+	i := 0
+	val := 0
+	response := []attendance.Core{}
+	for isfalse {
+
+		createAt := date
+
+		// if response[i].AttendanceDate == dateTo {
+		// 	isfalse = false
+		// }
+		log.Println(result[val].AttendanceDate, createAt)
+		crtInt, _ := strconv.Atoi(createAt[8:])
+		rs, _ := strconv.Atoi(result[val].AttendanceDate[8:])
+		log.Println(rs, crtInt)
+		if val > 0 {
+			if rs > crtInt {
+				val -= 1
+			}
+		}
+		if rs >= crtInt || result[val].AttendanceDate == createAt {
+			if createAt != result[val].AttendanceDate {
+				crtInt, _ := strconv.Atoi(createAt[8:])
+				rs, _ := strconv.Atoi(result[val].AttendanceDate[8:])
+				log.Println(rs, crtInt)
+				if rs > crtInt && result[val].AttendanceDate == result[0].AttendanceDate {
+					temp := attendance.Core{}
+					//cari data attendance date
+					if len(response) == 0 {
+						temp.AttendanceDate = date
+					} else {
+						conv, _ := strconv.Atoi(response[len(response)-1].AttendanceDate[8:])
+						conv += 1
+						cnvS := strconv.Itoa(conv)
+						if len(cnvS) == 1 {
+							cnvS = "0" + cnvS
+						}
+						final := (response[len(response)-1].AttendanceDate[:8]) + cnvS
+						temp.AttendanceDate = final
+					}
+					temp.Attendance = "NO DATA"
+					response = append(response, temp)
+				} else {
+					temp := attendance.Core{}
+					//cari data attendance date
+					if len(response) == 0 {
+						temp.AttendanceDate = date
+					} else {
+						conv, _ := strconv.Atoi(response[len(response)-1].AttendanceDate[8:])
+						conv += 1
+						cnvS := strconv.Itoa(conv)
+						if len(cnvS) == 1 {
+							cnvS = "0" + cnvS
+						}
+						final := (response[len(response)-1].AttendanceDate[:8]) + cnvS
+						temp.AttendanceDate = final
+					}
+					temp.Attendance = "Absent"
+					response = append(response, temp)
+				}
+			} else {
+				response = append(response, result[val])
+			}
+
+			if createAt == dateTo {
+				isfalse = false
+			}
+			tomorrow := fD.AddDate(0, 0, x)
+			year := strconv.Itoa(tomorrow.Year())
+			monthCnv := int(tomorrow.Month())
+			month := strconv.Itoa(monthCnv)
+			day := strconv.Itoa(tomorrow.Day())
+			if len(month) == 1 {
+				month = "0" + month
+			}
+			if len(day) == 1 {
+				day = "0" + day
+			}
+			date = fmt.Sprintf("%s-%s-%s", year, month, day)
+			x++
+			i++
+		}
+		if result[val].AttendanceDate == result[len(result)-1].AttendanceDate {
+			log.Println("data reach limit")
+			break
+			// return []attendance.Core{}, errors.New("data reach limit")
+		}
+		val++
+	}
+	// log.Println(response)
+
+	return response, nil
 }
