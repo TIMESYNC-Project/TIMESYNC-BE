@@ -36,7 +36,7 @@ func (auc *approvalUseCase) PostApproval(token interface{}, fileData multipart.F
 		defer src.Close()
 		uploadURL, err := helper.UploadToS3(fileData.Filename, src)
 		if err != nil {
-			return approval.Core{}, errors.New("cannon upload to s3 server error")
+			return approval.Core{}, errors.New("cannot upload to s3 server error")
 		}
 		newApproval.ApprovalImage = uploadURL
 	}
@@ -54,8 +54,18 @@ func (auc *approvalUseCase) PostApproval(token interface{}, fileData multipart.F
 }
 
 // GetApproval implements approval.ApprovalService
-func (*approvalUseCase) GetApproval() ([]approval.Core, error) {
-	panic("unimplemented")
+func (auc *approvalUseCase) GetApproval() ([]approval.Core, error) {
+	res, err := auc.qry.GetApproval()
+	if err != nil {
+		msg := ""
+		if strings.Contains(err.Error(), "not found") {
+			msg = "approval not found"
+		} else {
+			msg = "there is a problem with the server"
+		}
+		return []approval.Core{}, errors.New(msg)
+	}
+	return res, nil
 }
 
 // UpdateApproval implements approval.ApprovalService

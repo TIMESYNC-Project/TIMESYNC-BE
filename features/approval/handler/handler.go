@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"timesync-be/features/approval"
+	"timesync-be/helper"
 
 	"github.com/labstack/echo/v4"
 )
@@ -49,8 +50,22 @@ func (ac *approvalControll) PostApproval() echo.HandlerFunc {
 }
 
 // GetApproval implements approval.ApprovalHandler
-func (*approvalControll) GetApproval() echo.HandlerFunc {
-	panic("unimplemented")
+func (ac *approvalControll) GetApproval() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		res, err := ac.srv.GetApproval()
+		if err != nil {
+			return c.JSON(helper.PrintErrorResponse(err.Error()))
+		}
+		result := []ShowAllApproval{}
+		for _, val := range res {
+			result = append(result, ShowAllApprovalJson(val))
+		}
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"data":    result,
+			"message": "success show employee approval record",
+		})
+
+	}
 }
 
 // UpdateApproval implements approval.ApprovalHandler
