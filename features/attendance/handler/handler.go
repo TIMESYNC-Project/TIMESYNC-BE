@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"timesync-be/features/attendance"
 
 	"github.com/labstack/echo/v4"
@@ -28,22 +29,44 @@ func (ac *attendanceController) ClockIn() echo.HandlerFunc {
 		longLat := LongitudeLatitude{}
 		err := c.Bind(&longLat)
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, "input format incorrect")
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "input format inccorect"})
 		}
 		res, err := ac.srv.ClockIn(c.Get("user"), longLat.Latitude, longLat.Longitude)
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "error"})
+			if strings.Contains(err.Error(), "you already clock in today") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "clock in fail, you already clock in today"})
+			} else {
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
+			}
 		}
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+		return c.JSON(http.StatusCreated, map[string]interface{}{
 			"data":    res,
-			"message": "error",
+			"message": "clock in success",
 		})
 	}
 }
 
 // ClockOut implements attendance.AttendanceHandler
-func (*attendanceController) ClockOut() echo.HandlerFunc {
-	panic("unimplemented")
+func (ac *attendanceController) ClockOut() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		longLat := LongitudeLatitude{}
+		err := c.Bind(&longLat)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "input format inccorect"})
+		}
+		res, err := ac.srv.ClockOut(c.Get("user"), longLat.Latitude, longLat.Longitude)
+		if err != nil {
+			if strings.Contains(err.Error(), "already clock out today") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "clock out fail, you already clock Out today"})
+			} else {
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
+			}
+		}
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"data":    res,
+			"message": "clock out success",
+		})
+	}
 }
 
 // GetLL implements attendance.AttendanceHandler
@@ -51,6 +74,7 @@ func (*attendanceController) GetLL() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		latitude, _ := strconv.ParseFloat(c.QueryParam("latitude"), 64)
 		longitude, _ := strconv.ParseFloat(c.QueryParam("longitude"), 64)
+		log.Println("cek data latitude, longitude", latitude, longitude)
 
 		url := fmt.Sprintf("https://nominatim.openstreetmap.org/reverse?format=json&lat=%f&lon=%f&zoom=18&addressdetails=1", latitude, longitude)
 		response, err := http.Get(url)
@@ -97,6 +121,26 @@ func (*attendanceController) GetLL() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"data":    result,
 			"message": "success get location",
+		})
+	}
+}
+
+// AttendanceFromAdmin implements attendance.AttendanceHandler
+func (ac *attendanceController) AttendanceFromAdmin() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		paramID := c.Param("id")
+		employeeID, _ := strconv.Atoi(paramID)
+		input := CreateAttendance{}
+		err := c.Bind(&input)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "input format inccorect"})
+		}
+		err = ac.srv.AttendanceFromAdmin(c.Get("user"), input.DateStart, input.DateEnd, input.Attendance, uint(employeeID))
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "user is not admin"})
+		}
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"message": "success create attendance",
 		})
 	}
 }

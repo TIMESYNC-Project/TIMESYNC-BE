@@ -1,6 +1,11 @@
 package services
 
-import "timesync-be/features/attendance"
+import (
+	"errors"
+	"strings"
+	"timesync-be/features/attendance"
+	"timesync-be/helper"
+)
 
 type attendanceUseCase struct {
 	qry attendance.AttendanceData
@@ -13,11 +18,43 @@ func New(ad attendance.AttendanceData) attendance.AttendanceService {
 }
 
 // ClockIn implements attendance.AttendanceService
-func (*attendanceUseCase) ClockIn(token interface{}, latitude interface{}, longitude interface{}) (attendance.Core, error) {
-	panic("unimplemented")
+func (auc *attendanceUseCase) ClockIn(token interface{}, latitude string, longitude string) (attendance.Core, error) {
+	employeeID := helper.ExtractToken(token)
+	res, err := auc.qry.ClockIn(uint(employeeID), latitude, longitude)
+	if err != nil {
+		if strings.Contains(err.Error(), "you already clock in today") {
+			return attendance.Core{}, errors.New("you already clock in today")
+		} else {
+			return attendance.Core{}, errors.New("server error")
+		}
+	}
+	return res, nil
 }
 
 // ClockOut implements attendance.AttendanceService
-func (*attendanceUseCase) ClockOut(token interface{}) (attendance.Core, error) {
-	panic("unimplemented")
+func (auc *attendanceUseCase) ClockOut(token interface{}, latitude string, longitude string) (attendance.Core, error) {
+	employeeID := helper.ExtractToken(token)
+	res, err := auc.qry.ClockOut(uint(employeeID), latitude, longitude)
+	if err != nil {
+		if strings.Contains(err.Error(), "already clock out today") {
+			return attendance.Core{}, errors.New("you already clock out today")
+		} else {
+			return attendance.Core{}, errors.New("server error")
+		}
+	}
+	return res, nil
+}
+
+// AttendanceFromAdmin implements attendance.AttendanceService
+func (auc *attendanceUseCase) AttendanceFromAdmin(token interface{}, dateStart string, dateEnd string, attendanceType string, employeeID uint) error {
+	adminID := helper.ExtractToken(token)
+	err := auc.qry.AttendanceFromAdmin(uint(adminID), dateStart, dateEnd, attendanceType, employeeID)
+	if err != nil {
+		if strings.Contains(err.Error(), "already clock out today") {
+			return errors.New("already creating attendance")
+		} else {
+			return errors.New("server error")
+		}
+	}
+	return nil
 }

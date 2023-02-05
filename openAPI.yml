@@ -733,7 +733,7 @@ paths:
           $ref: "#/components/responses/400"
         500:
           $ref: "#/components/responses/500"
-  /attendance:
+  /attendances:
     post:
       tags:
         - "Employee"
@@ -765,12 +765,13 @@ paths:
               example:
                 data:
                   id: 1
-                  clock_in_location: "Jalan Cagar Alam,Depok,Jawa Barat,10550"
-                  clock_out_location: ""
-                  clock_in_map_location: "https://www.openstreetmap.org/#map=16/-6.4096/106.8185"
-                  clock_out_map_location: ""
+                  attendace_date: "2023-02-04"
                   clock_in: "07:50"
+                  clock_in_location: "Jalan Cagar Alam,Depok,Jawa Barat,10550"
+                  clock_in_map_location: "https://www.openstreetmap.org/#map=16/-6.4096/106.8185"
                   clock_out: ""
+                  clock_out_location: ""
+                  clock_out_map_location: ""
                 message: "clock in success"
         400:
           $ref: "#/components/responses/400"

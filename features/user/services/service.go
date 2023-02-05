@@ -23,6 +23,7 @@ func New(ud user.UserData) user.UserService {
 		qry: ud,
 	}
 }
+
 func (uuc *userUseCase) Register(newUser user.Core) (user.Core, error) {
 	hashed, _ := helper.GeneratePassword(newUser.Password)
 	newUser.Password = string(hashed)
@@ -61,6 +62,7 @@ func (uuc *userUseCase) Login(nip, password string) (string, user.Core, error) {
 	claims := jwt.MapClaims{}
 	claims["authorized"] = true
 	claims["userID"] = res.ID
+	// claims["exp"] = time.Now().Add(time.Hour * 3).Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	useToken, _ := token.SignedString([]byte(config.JWTKey))
 	return useToken, res, nil
@@ -128,6 +130,9 @@ func (uuc *userUseCase) Csv(fileData multipart.FileHeader) ([]user.Core, error) 
 	if err != nil {
 		return []user.Core{}, err
 	}
+	if len(data) == 0 {
+		return []user.Core{}, errors.New("csv file is empty")
+	}
 	result := helper.ConvertCSV(data)
 	err = uuc.qry.Csv(result)
 	if err != nil {
@@ -188,6 +193,8 @@ func (uuc *userUseCase) AdminEditEmployee(employeeID uint, fileData multipart.Fi
 		msg := ""
 		if strings.Contains(err.Error(), "not found") {
 			msg = "data not found"
+		} else if strings.Contains(err.Error(), "admin data") {
+			msg = "admin data cannot modifed"
 		} else {
 			msg = "server error"
 		}
