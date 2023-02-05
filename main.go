@@ -51,7 +51,7 @@ func main() {
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: "method=${method}, uri=${uri}, status=${status}, error=${error}\n",
 	}))
-	//User
+	//Users
 	e.POST("/register", uHdl.Register())
 	e.POST("/login", uHdl.Login())
 	e.DELETE("/employees/:id", uHdl.Delete(), middleware.JWT([]byte(config.JWTKey)))
