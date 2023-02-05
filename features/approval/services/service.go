@@ -23,6 +23,10 @@ func New(ad approval.ApprovalData) approval.ApprovalService {
 func (auc *approvalUseCase) PostApproval(token interface{}, fileData multipart.FileHeader, newApproval approval.Core) (approval.Core, error) {
 	employeeID := helper.ExtractToken(token)
 
+	if employeeID <= 0 {
+		return approval.Core{}, errors.New("data not found")
+	}
+
 	if fileData.Size != 0 {
 		if fileData.Size > 500000 {
 			return approval.Core{}, errors.New("size error")
@@ -69,6 +73,28 @@ func (auc *approvalUseCase) GetApproval() ([]approval.Core, error) {
 }
 
 // UpdateApproval implements approval.ApprovalService
-func (*approvalUseCase) UpdateApproval(token interface{}, approvalID uint) ([]approval.Core, error) {
-	panic("unimplemented")
+func (auc *approvalUseCase) UpdateApproval(token interface{}, approvalID uint, updatedApproval approval.Core) (approval.Core, error) {
+	adminID := helper.ExtractToken(token)
+
+	if adminID <= 0 {
+		return approval.Core{}, errors.New("data not found")
+	}
+
+	res, err := auc.qry.UpdateApproval(uint(adminID), approvalID, updatedApproval)
+	if err != nil {
+		msg := ""
+		if strings.Contains(err.Error(), "not found") {
+			msg = "Failed to update, no new record or data not found"
+		} else if strings.Contains(err.Error(), "Unauthorized") {
+			msg = "Unauthorized request"
+		} else {
+			msg = "unable to process the data"
+		}
+		return approval.Core{}, errors.New(msg)
+	}
+	res.ID = approvalID
+	res.UserID = uint(adminID)
+
+	return res, nil
+
 }

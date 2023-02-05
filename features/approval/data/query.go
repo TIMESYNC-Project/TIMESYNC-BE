@@ -38,7 +38,7 @@ func (aq *approvalQuery) GetApproval() ([]approval.Core, error) {
 	res := []Approval{}
 	if err := aq.db.Table("approvals").Joins("JOIN users ON users.id = approvals.user_id").Select("approvals.id, approvals.title, approvals.end_date, approvals.status").Find(&res).Error; err != nil {
 		log.Println("get all approvals record query error : ", err.Error())
-		return []approval.Core{}, err
+		return []approval.Core{}, errors.New("get all approval query error")
 	}
 	result := []approval.Core{}
 	for _, val := range res {
@@ -48,6 +48,28 @@ func (aq *approvalQuery) GetApproval() ([]approval.Core, error) {
 }
 
 // UpdateApproval implements approval.ApprovalData
-func (*approvalQuery) UpdateApproval(adminID uint, approvalID uint) ([]approval.Core, error) {
-	panic("unimplemented")
+func (aq *approvalQuery) UpdateApproval(adminID uint, approvalID uint, updatedApproval approval.Core) (approval.Core, error) {
+	getID := Approval{}
+	err := aq.db.Where("id = ?", approvalID).First(&getID).Error
+	if err != nil {
+		log.Println("get approval error : ", err.Error())
+		return approval.Core{}, errors.New("get approval query error")
+	}
+
+	if getID.UserID != adminID {
+		log.Println("Unauthorized request")
+		return approval.Core{}, errors.New("Unauthorized request")
+	}
+
+	cnv := CoreToData(updatedApproval)
+	qry := aq.db.Where("id = ?", approvalID).Updates(&cnv)
+	if qry.RowsAffected <= 0 {
+		log.Println("update approval query error : data not found")
+		return approval.Core{}, errors.New("not found")
+	}
+
+	if err := qry.Error; err != nil {
+		log.Println("update approval query error : ", err.Error())
+	}
+	return updatedApproval, nil
 }

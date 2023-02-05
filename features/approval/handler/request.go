@@ -14,6 +14,10 @@ type PostApprovalRequest struct {
 	FileHeader    multipart.FileHeader
 }
 
+type UpdateApprovalRequest struct {
+	Status string `json:"approval_status" form:"approval_status"`
+}
+
 func ReqToCore(data interface{}) *approval.Core {
 	res := approval.Core{}
 
@@ -25,6 +29,9 @@ func ReqToCore(data interface{}) *approval.Core {
 		res.EndDate = cnv.EndDate
 		res.Description = cnv.Description
 		res.ApprovalImage = cnv.ApprovalImage
+	case UpdateApprovalRequest:
+		cnv := data.(UpdateApprovalRequest)
+		res.Status = cnv.Status
 	default:
 		return nil
 	}

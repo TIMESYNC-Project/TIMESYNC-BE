@@ -3,6 +3,7 @@ package handler
 import (
 	"log"
 	"net/http"
+	"strconv"
 	"timesync-be/features/approval"
 	"timesync-be/helper"
 
@@ -69,6 +70,34 @@ func (ac *approvalControll) GetApproval() echo.HandlerFunc {
 }
 
 // UpdateApproval implements approval.ApprovalHandler
-func (*approvalControll) UpdateApproval() echo.HandlerFunc {
-	panic("unimplemented")
+func (ac *approvalControll) UpdateApproval() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		token := c.Get("user")
+		paramID := c.Param("id")
+
+		approvalID, err := strconv.Atoi(paramID)
+
+		if err != nil {
+			log.Println("convert id error", err.Error())
+			return c.JSON(http.StatusBadGateway, "Invalid input")
+		}
+
+		input := UpdateApprovalRequest{}
+		if err := c.Bind(&input); err != nil {
+			return c.JSON(http.StatusBadGateway, "invalid input")
+		}
+
+		res, err := ac.srv.UpdateApproval(token, uint(approvalID), *ReqToCore(input))
+
+		if err != nil {
+			log.Println("error update approval : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, "unable to process the data")
+		}
+
+		return c.JSON(http.StatusCreated, map[string]interface{}{
+			"data":    ToPostApprovalResponse(res),
+			"message": "success approve employee permission",
+		})
+	}
+
 }

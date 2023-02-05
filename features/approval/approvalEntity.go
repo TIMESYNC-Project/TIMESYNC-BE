@@ -8,6 +8,7 @@ import (
 
 type Core struct {
 	ID            uint
+	UserID        uint
 	Title         string
 	StartDate     string
 	EndDate       string
@@ -25,11 +26,11 @@ type ApprovalHandler interface {
 type ApprovalService interface {
 	PostApproval(token interface{}, fileData multipart.FileHeader, newApproval Core) (Core, error)
 	GetApproval() ([]Core, error)
-	UpdateApproval(token interface{}, approvalID uint) ([]Core, error)
+	UpdateApproval(token interface{}, approvalID uint, updatedApproval Core) (Core, error)
 }
 
 type ApprovalData interface {
 	PostApproval(employeeID uint, newApproval Core) (Core, error)
 	GetApproval() ([]Core, error)
-	UpdateApproval(adminID uint, approvalID uint) ([]Core, error)
+	UpdateApproval(adminID uint, approvalID uint, updatedApproval Core) (Core, error)
 }

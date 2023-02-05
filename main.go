@@ -67,6 +67,7 @@ func main() {
 	e.DELETE("/announcements/:id", announcementHdl.DeleteAnnouncement(), middleware.JWT([]byte(config.JWTKey)))
 	e.POST("/approvals", approvalHdl.PostApproval(), middleware.JWT([]byte(config.JWTKey)))
 	e.GET("/approvals", approvalHdl.GetApproval(), middleware.JWT([]byte(config.JWTKey)))
+	e.PUT("/approvals/:id", approvalHdl.UpdateApproval(), middleware.JWT([]byte(config.JWTKey)))
 
 	//attendances for emloyees
 	e.GET("/attendances/location", attendHdl.GetLL())
