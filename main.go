@@ -6,6 +6,9 @@ import (
 	announData "timesync-be/features/announcement/data"
 	announHdl "timesync-be/features/announcement/handler"
 	announSrv "timesync-be/features/announcement/services"
+	approvalData "timesync-be/features/approval/data"
+	approvalHdl "timesync-be/features/approval/handler"
+	approvalSrv "timesync-be/features/approval/services"
 	attData "timesync-be/features/attendance/data"
 	attHdl "timesync-be/features/attendance/handler"
 	attSrv "timesync-be/features/attendance/services"
@@ -39,6 +42,9 @@ func main() {
 	setData := stData.New(db)
 	setSrv := stSrv.New(setData)
 	setHdl := stHdl.New(setSrv)
+	approvalData := approvalData.New(db)
+	approvalSrv := approvalSrv.New(approvalData)
+	approvalHdl := approvalHdl.New(approvalSrv)
 
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.CORS())
@@ -59,6 +65,7 @@ func main() {
 	e.GET("/announcements", announcementHdl.GetAnnouncement(), middleware.JWT([]byte(config.JWTKey)))
 	e.GET("/announcements/:id", announcementHdl.GetAnnouncementDetail(), middleware.JWT([]byte(config.JWTKey)))
 	e.DELETE("/announcements/:id", announcementHdl.DeleteAnnouncement(), middleware.JWT([]byte(config.JWTKey)))
+	e.POST("/approvals", approvalHdl.PostApproval(), middleware.JWT([]byte(config.JWTKey)))
 
 	//attendances for emloyees
 	e.GET("/attendances/location", attendHdl.GetLL())
