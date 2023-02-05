@@ -9,6 +9,9 @@ import (
 	attData "timesync-be/features/attendance/data"
 	attHdl "timesync-be/features/attendance/handler"
 	attSrv "timesync-be/features/attendance/services"
+	stData "timesync-be/features/setting/data"
+	stHdl "timesync-be/features/setting/handler"
+	stSrv "timesync-be/features/setting/service"
 	usrData "timesync-be/features/user/data"
 	usrHdl "timesync-be/features/user/handler"
 	usrSrv "timesync-be/features/user/services"
@@ -33,6 +36,9 @@ func main() {
 	announcementData := announData.New(db)
 	announcementSrv := announSrv.New(announcementData)
 	announcementHdl := announHdl.New(announcementSrv)
+	setData := stData.New(db)
+	setSrv := stSrv.New(setData)
+	setHdl := stHdl.New(setSrv)
 
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.CORS())
@@ -40,7 +46,7 @@ func main() {
 		Format: "method=${method}, uri=${uri}, status=${status}, error=${error}\n",
 	}))
 	//User
-	e.POST("/register", uHdl.Register(), middleware.JWT([]byte(config.JWTKey)))
+	e.POST("/register", uHdl.Register())
 	e.POST("/login", uHdl.Login())
 	e.DELETE("/employees/:id", uHdl.Delete(), middleware.JWT([]byte(config.JWTKey)))
 	e.POST("/register/csv", uHdl.Csv(), middleware.JWT([]byte(config.JWTKey)))
@@ -55,8 +61,14 @@ func main() {
 	e.DELETE("/announcements/:id", announcementHdl.DeleteAnnouncement(), middleware.JWT([]byte(config.JWTKey)))
 
 	//attendances for emloyees
-	e.GET("/attendance/location", attendHdl.GetLL())
+	e.GET("/attendances/location", attendHdl.GetLL())
+	e.POST("attendances", attendHdl.ClockIn(), middleware.JWT([]byte(config.JWTKey)))
+	e.PUT("attendances", attendHdl.ClockOut(), middleware.JWT([]byte(config.JWTKey)))
+	e.POST("attendances/:id", attendHdl.AttendanceFromAdmin(), middleware.JWT([]byte(config.JWTKey)))
 
+	//setting
+	e.GET("/setting", setHdl.GetSetting())
+	e.PUT("/setting", setHdl.EditSetting(), middleware.JWT([]byte(config.JWTKey)))
 	if err := e.Start(":8000"); err != nil {
 		log.Println(err.Error())
 	}

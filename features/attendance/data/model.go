@@ -11,6 +11,7 @@ type Attendance struct {
 	UserId           uint
 	ClockIn          string
 	ClockOut         string
+	AttendanceDate   string
 	Attendance       string
 	AttendanceStatus string
 	WorkTime         int
@@ -20,11 +21,36 @@ type Attendance struct {
 	ClockOutOSM      string
 }
 
+type User struct {
+	gorm.Model
+	ProfilePicture string
+	Name           string
+	BirthOfDate    string
+	Nip            string `gorm:"not null"`
+	Email          string `gorm:"unique"`
+	Gender         string
+	Position       string
+	Phone          string
+	Address        string
+	Password       string
+	Role           string
+	AnnualLeave    int
+}
+
+type Setting struct {
+	gorm.Model
+	Start       string
+	End         string
+	Tolerance   int
+	AnnualLeave int
+}
+
 func DataToCore(data Attendance) attendance.Core {
 	return attendance.Core{
 		ID:               data.ID,
 		ClockIn:          data.ClockIn,
-		ClockOut:         data.ClockIn,
+		ClockOut:         data.ClockOut,
+		AttendanceDate:   data.AttendanceDate,
 		Attendance:       data.Attendance,
 		AttendanceStatus: data.AttendanceStatus,
 		WorkTime:         data.WorkTime,
@@ -40,6 +66,7 @@ func CoreToData(core attendance.Core) Attendance {
 		Model:            gorm.Model{ID: core.ID},
 		ClockIn:          core.ClockIn,
 		ClockOut:         core.ClockOut,
+		AttendanceDate:   core.AttendanceDate,
 		Attendance:       core.Attendance,
 		AttendanceStatus: core.AttendanceStatus,
 		WorkTime:         core.WorkTime,
@@ -48,4 +75,14 @@ func CoreToData(core attendance.Core) Attendance {
 		ClockInOSM:       core.ClockInOSM,
 		ClockOutOSM:      core.ClockOutLocation,
 	}
+}
+
+type NominatimResponse struct {
+	Address struct {
+		City     string `json:"city"`
+		Road     string `json:"road"`
+		Postcode string `json:"postcode"`
+		State    string `json:"state"`
+		Country  string `json:"country"`
+	} `json:"address"`
 }

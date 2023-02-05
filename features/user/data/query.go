@@ -77,6 +77,14 @@ func (uq *userQuery) Login(nip string) (user.Core, error) {
 }
 
 func (uq *userQuery) Delete(AdminID uint, employeeID uint) error {
+	if employeeID == 1 {
+		log.Println("cannot modifed admin data")
+		return errors.New("cannot modifed admin data")
+	}
+	if AdminID != 1 {
+		log.Println("except admin not allowed modifed datad")
+		return errors.New("except admin not allowed modifed data")
+	}
 	getID := User{}
 	err := uq.db.Where("id = ?", employeeID).First(&getID).Error
 	if err != nil {
@@ -101,6 +109,10 @@ func (uq *userQuery) Delete(AdminID uint, employeeID uint) error {
 
 // Update implements user.UserData
 func (uq *userQuery) Update(employeeID uint, updateData user.Core) (user.Core, error) {
+	if employeeID == 1 {
+		log.Println("cannot modifed admin data")
+		return user.Core{}, errors.New("cannot modifed admin data")
+	}
 	if updateData.Email != "" {
 		dupEmail := User{}
 		err := uq.db.Where("email = ?", updateData.Email).First(&dupEmail).Error
@@ -178,6 +190,10 @@ func (uq *userQuery) Csv(newUserBatch []user.Core) error {
 
 // Profile implements user.UserData
 func (uq *userQuery) Profile(userID uint) (user.Core, error) {
+	if userID == 1 {
+		log.Println("cannot access admin data")
+		return user.Core{}, errors.New("cannot access admin data")
+	}
 	res := User{}
 	err := uq.db.Where("id = ?", userID).First(&res).Error
 	if err != nil {

@@ -11,6 +11,12 @@ type NominatimResponse struct {
 }
 
 type LongitudeLatitude struct {
-	Latitude  interface{} `json:"latitude" form:"latitude"`
-	Longitude interface{} `json:"longitude" form:"longitude"`
+	Latitude  string `json:"latitude" form:"latitude"`
+	Longitude string `json:"longitude" form:"longitude"`
+}
+
+type CreateAttendance struct {
+	Attendance string `json:"attendance" form:"attendance"`
+	DateStart  string `json:"date_start" form:"date_start"`
+	DateEnd    string `json:"date_end" form:"date_end"`
 }
