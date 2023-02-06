@@ -103,6 +103,17 @@ func TestEditProfile(t *testing.T) {
 		repo.AssertExpectations(t)
 	})
 
+	t.Run("user not found ", func(t *testing.T) {
+		srv := New(repo)
+
+		_, token := helper.GenerateToken(1)
+
+		res, err := srv.EditProfile(token, *imageTrueCnv, inputData)
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "not found")
+		assert.Equal(t, uint(0), res.ID)
+	})
+
 	t.Run("server problem", func(t *testing.T) {
 		repo.On("EditProfile", uint(1), inputData).Return(company.Core{}, errors.New("server problem"))
 		srv := New(repo)

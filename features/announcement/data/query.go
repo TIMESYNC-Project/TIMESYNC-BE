@@ -67,8 +67,8 @@ func (aq *announcementQuery) GetAnnouncement() ([]announcement.Core, error) {
 }
 
 func (aq *announcementQuery) GetAnnouncementDetail(adminID uint, announcementID uint) (announcement.Core, error) {
-	res := announcement.Core{}
-	if err := aq.db.Raw("SELECT a.id, a.title, a.message, a.user_id FROM announcements a JOIN users u ON u.id = a.user_id WHERE a.deleted_at is null and a.id = ?", announcementID).Find(&res).Error; err != nil {
+	res := Announcement{}
+	if err := aq.db.Where("id = ?", announcementID).First(&res).Error; err != nil {
 		log.Println("get announcement by id query error : ", err.Error())
 		return announcement.Core{}, err
 	}
@@ -76,7 +76,7 @@ func (aq *announcementQuery) GetAnnouncementDetail(adminID uint, announcementID 
 	// for _, val := range res {
 	// 	result = append(result, ToCore(val))
 	// }
-	return res, nil
+	return ToCore(res), nil
 }
 
 func (aq *announcementQuery) DeleteAnnouncement(adminID uint, announcementID uint) error {
