@@ -17,7 +17,7 @@ import (
 	cmpSrv "timesync-be/features/company/services"
 	stData "timesync-be/features/setting/data"
 	stHdl "timesync-be/features/setting/handler"
-	stSrv "timesync-be/features/setting/service"
+	stSrv "timesync-be/features/setting/services"
 	usrData "timesync-be/features/user/data"
 	usrHdl "timesync-be/features/user/handler"
 	usrSrv "timesync-be/features/user/services"

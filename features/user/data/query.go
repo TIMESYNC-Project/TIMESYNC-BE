@@ -22,7 +22,7 @@ func New(db *gorm.DB) user.UserData {
 func (uq *userQuery) Register(newUser user.Core) (user.Core, error) {
 	if newUser.Email == "" || newUser.Password == "" {
 		log.Println("data empty")
-		return user.Core{}, errors.New("email or password not allowed empty")
+		return user.Core{}, errors.New("nip or password not allowed empty")
 	}
 	dupEmail := CoreToData(newUser)
 	err := uq.db.Where("email = ?", newUser.Email).First(&dupEmail).Error
