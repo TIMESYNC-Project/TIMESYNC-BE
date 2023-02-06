@@ -26,9 +26,9 @@ func (cc *companyController) EditProfile() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, "input format incorrect")
 		}
 		//proses cek apakah user input foto ?
-		checkFile, _, _ := c.Request().FormFile("file")
+		checkFile, _, _ := c.Request().FormFile("company_picture")
 		if checkFile != nil {
-			formHeader, err := c.FormFile("file")
+			formHeader, err := c.FormFile("company_picture")
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "Select a file to upload"})
 			}
@@ -40,7 +40,7 @@ func (cc *companyController) EditProfile() echo.HandlerFunc {
 		}
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"data":    res,
-			"message": "success show company profile",
+			"message": "success update company profile",
 		})
 	}
 }

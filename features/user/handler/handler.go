@@ -100,9 +100,9 @@ func (uc *userControll) Update() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, "input format incorrect")
 		}
 		//proses cek apakah user input foto ?
-		checkFile, _, _ := c.Request().FormFile("file")
+		checkFile, _, _ := c.Request().FormFile("profile_picture")
 		if checkFile != nil {
-			formHeader, err := c.FormFile("file")
+			formHeader, err := c.FormFile("profile_picture")
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "Select a file to upload"})
 			}
@@ -189,9 +189,9 @@ func (uc *userControll) AdminEditEmployee() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, "input format incorrect")
 		}
 		//proses cek apakah user input foto ?
-		checkFile, _, _ := c.Request().FormFile("file")
+		checkFile, _, _ := c.Request().FormFile("profile_picture")
 		if checkFile != nil {
-			formHeader, err := c.FormFile("file")
+			formHeader, err := c.FormFile("profile_picture")
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "Select a file to upload"})
 			}

@@ -30,9 +30,9 @@ func (ac *approvalControll) PostApproval() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, "input format incorrect")
 		}
 
-		checkFile, _, _ := c.Request().FormFile("file")
+		checkFile, _, _ := c.Request().FormFile("approval_image")
 		if checkFile != nil {
-			formHeader, err := c.FormFile("file")
+			formHeader, err := c.FormFile("approval_image")
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "Select a file to upload"})
 			}

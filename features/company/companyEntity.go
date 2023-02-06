@@ -7,7 +7,7 @@ import (
 )
 
 type Core struct {
-	ID             uint   `json:"id" `
+	ID             uint   `json:"id"`
 	Picture        string `json:"company_picture"`
 	Name           string `json:"company_name"`
 	Email          string `json:"company_email"`

@@ -6,10 +6,10 @@ import (
 )
 
 type EditRequest struct {
-	Picture        string `json:"picture" form:"picture"`
-	Name           string `json:"name" form:"name"`
-	Email          string `json:"email" form:"email"`
-	SocialMedia    string `json:"social_media" form:"social_media"`
+	Picture        string `json:"company_picture" form:"company_picture"`
+	Name           string `json:"company_name" form:"company_name"`
+	Email          string `json:"company_email" form:"company_email"`
+	SocialMedia    string `json:"sosmed" form:"sosmed"`
 	Description    string `json:"description" form:"description"`
 	CompanyPhone   string `json:"company_phone" form:"company_phone"`
 	CompanyAddress string `json:"company_address" form:"company_address"`
