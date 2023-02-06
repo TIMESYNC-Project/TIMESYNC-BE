@@ -51,16 +51,14 @@ func (_m *AnnouncementService) GetAnnouncement() ([]announcement.Core, error) {
 }
 
 // GetAnnouncementDetail provides a mock function with given fields: token, announcementID
-func (_m *AnnouncementService) GetAnnouncementDetail(token interface{}, announcementID uint) ([]announcement.Core, error) {
+func (_m *AnnouncementService) GetAnnouncementDetail(token interface{}, announcementID uint) (announcement.Core, error) {
 	ret := _m.Called(token, announcementID)
 
-	var r0 []announcement.Core
-	if rf, ok := ret.Get(0).(func(interface{}, uint) []announcement.Core); ok {
+	var r0 announcement.Core
+	if rf, ok := ret.Get(0).(func(interface{}, uint) announcement.Core); ok {
 		r0 = rf(token, announcementID)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]announcement.Core)
-		}
+		r0 = ret.Get(0).(announcement.Core)
 	}
 
 	var r1 error

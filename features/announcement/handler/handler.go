@@ -71,11 +71,11 @@ func (ac *announcementControll) GetAnnouncementDetail() echo.HandlerFunc {
 			return c.JSON(helper.PrintErrorResponse(err.Error()))
 		}
 
-		result := []ShowAllAnnouncement{}
-		for _, val := range res {
-			result = append(result, ShowAllAnnouncementJson(val))
-		}
-		return c.JSON(helper.PrintSuccessReponse(http.StatusOK, "success get announcement details", result))
+		// result := []ShowAllAnnouncement{}
+		// for _, val := range res {
+		// 	result = append(result, ShowAllAnnouncementJson(val))
+		// }
+		return c.JSON(helper.PrintSuccessReponse(http.StatusOK, "success get announcement details", ShowAllAnnouncementJson(res)))
 
 	}
 }
