@@ -37,26 +37,17 @@ func (_m *UserService) AdminEditEmployee(employeeID uint, fileData multipart.Fil
 }
 
 // Csv provides a mock function with given fields: fileHeader
-func (_m *UserService) Csv(fileHeader multipart.FileHeader) ([]user.Core, error) {
+func (_m *UserService) Csv(fileHeader multipart.FileHeader) error {
 	ret := _m.Called(fileHeader)
 
-	var r0 []user.Core
-	if rf, ok := ret.Get(0).(func(multipart.FileHeader) []user.Core); ok {
+	var r0 error
+	if rf, ok := ret.Get(0).(func(multipart.FileHeader) error); ok {
 		r0 = rf(fileHeader)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]user.Core)
-		}
+		r0 = ret.Error(0)
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(multipart.FileHeader) error); ok {
-		r1 = rf(fileHeader)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // Delete provides a mock function with given fields: token, employeeID

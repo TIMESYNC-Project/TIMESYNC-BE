@@ -36,7 +36,7 @@ type UserHandler interface {
 
 type UserService interface {
 	Register(newUser Core) (Core, error)
-	Csv(fileHeader multipart.FileHeader) ([]Core, error)
+	Csv(fileHeader multipart.FileHeader) error
 	Login(nip, password string) (string, Core, error)
 	Delete(token interface{}, employeeID uint) error
 	Profile(token interface{}) (Core, error)
