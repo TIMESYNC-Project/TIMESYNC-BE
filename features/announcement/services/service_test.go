@@ -139,4 +139,33 @@ func TestGetAnnouncementDetail(t *testing.T) {
 		repo.AssertExpectations(t)
 	})
 
+	t.Run("invalid jwt token", func(t *testing.T) {
+		srv := New(repo)
+
+		_, token := helper.GenerateToken(0)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+
+		res, err := srv.GetAnnouncementDetail(pToken, uint(1))
+
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "found")
+		assert.Equal(t, uint(0), res.ID)
+		repo.AssertExpectations(t)
+	})
+
+	t.Run("server problem", func(t *testing.T) {
+		repo.On("GetAnnouncementDetail", uint(1), uint(1)).Return(announcement.Core{}, errors.New("server problem")).Once()
+
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.GetAnnouncementDetail(pToken, uint(1))
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "server")
+		assert.Equal(t, res.ID, uint(0))
+		repo.AssertExpectations(t)
+	})
+
 }
