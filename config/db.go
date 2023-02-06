@@ -6,6 +6,7 @@ import (
 	aData "timesync-be/features/announcement/data"
 	approvalData "timesync-be/features/approval/data"
 	attendData "timesync-be/features/attendance/data"
+	CmpData "timesync-be/features/company/data"
 	settData "timesync-be/features/setting/data"
 	uData "timesync-be/features/user/data"
 
@@ -31,4 +32,5 @@ func Migrate(db *gorm.DB) {
 	db.AutoMigrate(attendData.Attendance{})
 	db.AutoMigrate(settData.Setting{})
 	db.AutoMigrate(approvalData.Approval{})
+	db.AutoMigrate(CmpData.Company{})
 }

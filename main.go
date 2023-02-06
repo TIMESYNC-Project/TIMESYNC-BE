@@ -12,6 +12,9 @@ import (
 	attData "timesync-be/features/attendance/data"
 	attHdl "timesync-be/features/attendance/handler"
 	attSrv "timesync-be/features/attendance/services"
+	cmpData "timesync-be/features/company/data"
+	cmpHdl "timesync-be/features/company/handler"
+	cmpSrv "timesync-be/features/company/services"
 	stData "timesync-be/features/setting/data"
 	stHdl "timesync-be/features/setting/handler"
 	stSrv "timesync-be/features/setting/service"
@@ -45,6 +48,9 @@ func main() {
 	approvalData := approvalData.New(db)
 	approvalSrv := approvalSrv.New(approvalData)
 	approvalHdl := approvalHdl.New(approvalSrv)
+	cmData := cmpData.New(db)
+	cmSrv := cmpSrv.New(cmData)
+	cmHdl := cmpHdl.New(cmSrv)
 
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.CORS())
@@ -79,6 +85,11 @@ func main() {
 	//setting
 	e.GET("/setting", setHdl.GetSetting())
 	e.PUT("/setting", setHdl.EditSetting(), middleware.JWT([]byte(config.JWTKey)))
+
+	//company
+	e.GET("/companies", cmHdl.GetProfile(), middleware.JWT([]byte(config.JWTKey)))
+	e.PUT("/companies", cmHdl.EditProfile(), middleware.JWT([]byte(config.JWTKey)))
+
 	if err := e.Start(":8000"); err != nil {
 		log.Println(err.Error())
 	}
