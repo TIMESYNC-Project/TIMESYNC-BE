@@ -229,6 +229,20 @@ func TestUpdateApproval(t *testing.T) {
 		repo.AssertExpectations(t)
 	})
 
+	t.Run("unauthorized request", func(t *testing.T) {
+		repo.On("UpdateApproval", uint(1), uint(1), inputData).Return(approval.Core{}, errors.New("unauthorized request")).Once()
+		srv := New(repo)
+
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.UpdateApproval(pToken, uint(1), inputData)
+		assert.NotNil(t, err)
+		assert.Equal(t, uint(0), res.ID)
+		assert.ErrorContains(t, err, "unauthorized")
+		repo.AssertExpectations(t)
+	})
+
 	t.Run("server problem", func(t *testing.T) {
 		repo.On("UpdateApproval", uint(1), uint(1), inputData).Return(approval.Core{}, errors.New("server problem"))
 		srv := New(repo)

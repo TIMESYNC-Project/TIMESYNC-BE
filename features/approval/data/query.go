@@ -58,7 +58,7 @@ func (aq *approvalQuery) UpdateApproval(adminID uint, approvalID uint, updatedAp
 
 	if getID.UserID != adminID {
 		log.Println("Unauthorized request")
-		return approval.Core{}, errors.New("Unauthorized request")
+		return approval.Core{}, errors.New("unauthorized request")
 	}
 
 	cnv := CoreToData(updatedApproval)
