@@ -203,6 +203,45 @@ func TestUpdate(t *testing.T) {
 	})
 }
 
+func TestAdminEditEmploye(t *testing.T) {
+	repo := mocks.NewUserData(t)
+	filePath := filepath.Join("..", "..", "..", "ERD.png")
+	// imageFalse, _ := os.Open(filePath)
+	// imageFalseCnv := &multipart.FileHeader{
+	// 	Filename: imageFalse.Name(),
+	// }
+	imageTrue, err := os.Open(filePath)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	imageTrueCnv := &multipart.FileHeader{
+		Filename: imageTrue.Name(),
+	}
+	inputData := user.Core{ID: 1, Name: "Alif", Phone: "08123", ProfilePicture: "ERD.png"}
+	resData := user.Core{ID: 1, Name: "Alif", Phone: "08123", ProfilePicture: imageTrueCnv.Filename}
+	t.Run("success updating account", func(t *testing.T) {
+		repo.On("Update", uint(1), inputData).Return(resData, nil).Once()
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.AdminEditEmployee(uint(1), *imageTrueCnv, inputData)
+		assert.Nil(t, err)
+		assert.Equal(t, resData.ID, res.ID)
+		repo.AssertExpectations(t)
+	})
+
+	t.Run("fail updating account", func(t *testing.T) {
+		repo.On("Update", uint(1), inputData).Return(user.Core{}, errors.New("query error,update fail")).Once()
+		srv := New(repo)
+		res, err := srv.AdminEditEmployee(uint(1), *imageTrueCnv, inputData)
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "error")
+		assert.Equal(t, user.Core{}, res)
+		repo.AssertExpectations(t)
+	})
+}
+
 func TestDelete(t *testing.T) {
 	repo := mocks.NewUserData(t)
 	t.Run("deleting account successful", func(t *testing.T) {
@@ -230,3 +269,99 @@ func TestDelete(t *testing.T) {
 		repo.AssertExpectations(t)
 	})
 }
+
+func TestGetAllEmployee(t *testing.T) {
+	repo := mocks.NewUserData(t)
+	resData := []user.Core{
+		{
+			ID:    1,
+			Name:  "Fauzi",
+			Email: "fauzi@gmail.com",
+			Phone: "081234",
+		},
+	}
+	t.Run("get all employee successful", func(t *testing.T) {
+		repo.On("GetAllEmployee").Return(resData, nil).Once()
+		srv := New(repo)
+		res, err := srv.GetAllEmployee()
+		assert.Equal(t, res[0].ID, resData[0].ID)
+		assert.Nil(t, err)
+		repo.AssertExpectations(t)
+	})
+	// internal server error, account fail to GetAllEmployee
+	t.Run("internal server error, account fail to GetAllEmployee", func(t *testing.T) {
+		repo.On("GetAllEmployee").Return([]user.Core{}, errors.New("data not found")).Once()
+		srv := New(repo)
+		res, err := srv.GetAllEmployee()
+		assert.Equal(t, res, []user.Core{})
+		assert.ErrorContains(t, err, "data not found")
+		assert.NotNil(t, err)
+		repo.AssertExpectations(t)
+	})
+}
+
+// func (bl *blogic) Add(file *multipart.Fileheader) error {
+// 	read, err := file.Open()
+// 	if err != nil {
+// 		log.Panic(err.Error())
+// 		return err
+// 	}
+// 	log.Println(read)
+// 	return nil
+// }
+// func TestCsv(t *testing.T) {
+// 	// repo := mocks.NewUserData(t)
+// 	srv := New()
+// 	filePath := filepath.Join("..", "..", "..", "TimeSyncUnitTesting.csv")
+// 	f, err := os.Open(filePath)
+// 	if err != nil {
+// 		log.Println(err.Error())
+// 	}
+// 	body := &bytes.Buffer{}
+// 	writter := multipart.NewWriter(body)
+// 	part, err := writter.CreateFormFile("file", filePath)
+// 	if err != nil {
+// 		log.Fatal(err.Error())
+// 	}
+// 	_, err = io.Copy(part, f)
+// 	if err != nil {
+// 		log.Fatal(err.Error())
+// 	}
+// 	writter.Close()
+// 	req, _ := http.NewRequest("POST", "/upload", body)
+// 	req.Header.Set("Content type", writter.FormDataContentType())
+// 	_, header, _ := req.FormFile("file")
+// 	err = srv.Csv(*header)
+// 	if err != nil {
+// 		log.Println(err.Error())
+// 	}
+// 	assert.Nil(t, err)
+
+// 	// csvReader := csv.NewReader(csvTrue)
+// 	// data, _ := csvReader.ReadAll()
+// 	// inputData := helper.ConvertCSV(data)
+// 	// csvTrueCnv := &multipart.FileHeader{
+// 	// 	Filename: csvTrue.Name(),
+// 	// }
+// 	// t.Run("success creating account from csv", func(t *testing.T) {
+// 	// 	repo.On("Csv", inputData).Return(nil).Once()
+// 	// 	srv := New(repo)
+// 	// 	err := srv.Csv(*csvTrueCnv)
+// 	// 	log.Println(err)
+// 	// 	assert.Nil(t, err)
+// 	// 	repo.AssertExpectations(t)
+// 	// })
+
+// 	// t.Run("fail updating account", func(t *testing.T) {
+// 	// 	repo.On("Update", uint(1), inputData).Return(user.Core{}, errors.New("query error,update fail")).Once()
+// 	// 	srv := New(repo)
+// 	// 	_, token := helper.GenerateToken(1)
+// 	// 	pToken := token.(*jwt.Token)
+// 	// 	pToken.Valid = true
+// 	// 	res, err := srv.Csv(pToken, *imageTrueCnv, inputData)
+// 	// 	assert.NotNil(t, err)
+// 	// 	assert.ErrorContains(t, err, "error")
+// 	// 	assert.Equal(t, user.Core{}, res)
+// 	// 	repo.AssertExpectations(t)
+// 	// })
+// }

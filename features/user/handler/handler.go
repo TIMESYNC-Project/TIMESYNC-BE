@@ -135,11 +135,11 @@ func (uc *userControll) Csv() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "Select a file to upload"})
 		}
-		res, err := uc.srv.Csv(*formHeader)
+		err = uc.srv.Csv(*formHeader)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
 		}
-		log.Println(res)
+
 		return c.JSON(http.StatusCreated, map[string]interface{}{"message": "success create account from csv"})
 	}
 }

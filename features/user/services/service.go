@@ -122,27 +122,30 @@ func (uuc *userUseCase) Update(token interface{}, fileData multipart.FileHeader,
 }
 
 // Csv implements user.UserService
-func (uuc *userUseCase) Csv(fileData multipart.FileHeader) ([]user.Core, error) {
-	src, err := fileData.Open()
-	if err != nil {
-		return []user.Core{}, err
+func (uuc *userUseCase) Csv(fileData multipart.FileHeader) error {
+	result := []user.Core{}
+	if fileData.Size != 0 {
+		src, err := fileData.Open()
+		if err != nil {
+			return err
+		}
+		csvReader := csv.NewReader(src)
+		data, err := csvReader.ReadAll()
+		if err != nil {
+			return err
+		}
+		if len(data) == 0 {
+			return errors.New("csv file is empty")
+		}
+		result = helper.ConvertCSV(data)
 	}
-	csvReader := csv.NewReader(src)
-	data, err := csvReader.ReadAll()
-	if err != nil {
-		return []user.Core{}, err
-	}
-	if len(data) == 0 {
-		return []user.Core{}, errors.New("csv file is empty")
-	}
-	result := helper.ConvertCSV(data)
-	err = uuc.qry.Csv(result)
+	err := uuc.qry.Csv(result)
 	if err != nil {
 		log.Println("query error")
-		return []user.Core{}, errors.New("server error")
+		return errors.New("server error")
 	}
 
-	return []user.Core{}, nil
+	return nil
 
 }
 
@@ -209,13 +212,8 @@ func (uuc *userUseCase) AdminEditEmployee(employeeID uint, fileData multipart.Fi
 func (uuc *userUseCase) GetAllEmployee() ([]user.Core, error) {
 	res, err := uuc.qry.GetAllEmployee()
 	if err != nil {
-		msg := ""
-		if strings.Contains(err.Error(), "not found") {
-			msg = "data not found"
-		} else {
-			msg = "server error"
-		}
-		return []user.Core{}, errors.New(msg)
+		log.Println("data not found", err.Error())
+		return []user.Core{}, errors.New("data not found")
 	}
 	return res, nil
 }
