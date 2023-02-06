@@ -169,3 +169,59 @@ func TestGetAnnouncementDetail(t *testing.T) {
 	})
 
 }
+
+func TestDeleteAnnouncement(t *testing.T) {
+	repo := mocks.NewAnnouncementData(t)
+
+	t.Run("success delete announcement", func(t *testing.T) {
+		repo.On("DeleteAnnouncement", uint(1), uint(1)).Return(nil).Once()
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		err := srv.DeleteAnnouncement(pToken, uint(1))
+		assert.Nil(t, err)
+		repo.AssertExpectations(t)
+	})
+
+	t.Run("invalid jwt token", func(t *testing.T) {
+		srv := New(repo)
+
+		_, token := helper.GenerateToken(0)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+
+		err := srv.DeleteAnnouncement(pToken, uint(1))
+
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "found")
+		repo.AssertExpectations(t)
+	})
+
+	t.Run("data not found", func(t *testing.T) {
+		repo.On("DeleteAnnouncement", uint(1), uint(1)).Return(errors.New("data not found")).Once()
+
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		err := srv.DeleteAnnouncement(pToken, uint(1))
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "not found")
+		repo.AssertExpectations(t)
+	})
+
+	t.Run("server problem", func(t *testing.T) {
+		repo.On("DeleteAnnouncement", uint(1), uint(1)).Return(errors.New("server problem")).Once()
+
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		err := srv.DeleteAnnouncement(pToken, uint(1))
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "server")
+		repo.AssertExpectations(t)
+	})
+
+}

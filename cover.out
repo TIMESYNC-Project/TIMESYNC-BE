@@ -19,8 +19,8 @@ timesync-be/features/announcement/services/service.go:58.16,60.49 2 1
 timesync-be/features/announcement/services/service.go:65.3,65.46 1 1
 timesync-be/features/announcement/services/service.go:60.49,62.4 1 1
 timesync-be/features/announcement/services/service.go:62.9,64.4 1 1
-timesync-be/features/announcement/services/service.go:71.98,74.13 2 0
-timesync-be/features/announcement/services/service.go:78.2,80.16 2 0
-timesync-be/features/announcement/services/service.go:85.2,85.12 1 0
-timesync-be/features/announcement/services/service.go:74.13,76.3 1 0
-timesync-be/features/announcement/services/service.go:80.16,83.3 2 0
+timesync-be/features/announcement/services/service.go:71.98,74.13 2 1
+timesync-be/features/announcement/services/service.go:78.2,80.16 2 1
+timesync-be/features/announcement/services/service.go:85.2,85.12 1 1
+timesync-be/features/announcement/services/service.go:74.13,76.3 1 1
+timesync-be/features/announcement/services/service.go:80.16,83.3 2 1
