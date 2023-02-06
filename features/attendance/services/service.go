@@ -24,6 +24,8 @@ func (auc *attendanceUseCase) ClockIn(token interface{}, latitude string, longit
 	if err != nil {
 		if strings.Contains(err.Error(), "you already clock in today") {
 			return attendance.Core{}, errors.New("you already clock in today")
+		} else if strings.Contains(err.Error(), "clockin time was expired") {
+			return attendance.Core{}, errors.New("invalid clock out time request")
 		} else {
 			return attendance.Core{}, errors.New("server error")
 		}
@@ -38,6 +40,8 @@ func (auc *attendanceUseCase) ClockOut(token interface{}, latitude string, longi
 	if err != nil {
 		if strings.Contains(err.Error(), "already clock out today") {
 			return attendance.Core{}, errors.New("you already clock out today")
+		} else if strings.Contains(err.Error(), "clock out time expired") {
+			return attendance.Core{}, errors.New("invalid clock out time request")
 		} else {
 			return attendance.Core{}, errors.New("server error")
 		}
@@ -50,9 +54,7 @@ func (auc *attendanceUseCase) AttendanceFromAdmin(token interface{}, dateStart s
 	adminID := helper.ExtractToken(token)
 	err := auc.qry.AttendanceFromAdmin(uint(adminID), dateStart, dateEnd, attendanceType, employeeID)
 	if err != nil {
-		if strings.Contains(err.Error(), "already clock out today") {
-			return errors.New("already creating attendance")
-		} else if strings.Contains(err.Error(), "wrong input format") {
+		if strings.Contains(err.Error(), "wrong input format") {
 			return errors.New("wrong input format")
 		} else {
 			return errors.New("server error")

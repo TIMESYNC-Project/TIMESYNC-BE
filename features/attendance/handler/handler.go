@@ -35,6 +35,8 @@ func (ac *attendanceController) ClockIn() echo.HandlerFunc {
 		if err != nil {
 			if strings.Contains(err.Error(), "you already clock in today") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "clock in fail, you already clock in today"})
+			} else if strings.Contains(err.Error(), "invalid") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "clock in session has ended"})
 			} else {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
 			}
@@ -57,7 +59,9 @@ func (ac *attendanceController) ClockOut() echo.HandlerFunc {
 		res, err := ac.srv.ClockOut(c.Get("user"), longLat.Latitude, longLat.Longitude)
 		if err != nil {
 			if strings.Contains(err.Error(), "already clock out today") {
-				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "clock out fail, you already clock Out today"})
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "clock out fail, you already clock out today"})
+			} else if strings.Contains(err.Error(), "invalid") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "clock out session has ended"})
 			} else {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
 			}
