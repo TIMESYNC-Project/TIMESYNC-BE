@@ -114,7 +114,7 @@ func TestGetAnnouncementDetail(t *testing.T) {
 	}
 
 	t.Run("success get announcement detail", func(t *testing.T) {
-		repo.On("GetAnnouncementDetail", uint(1)).Return(resData, nil).Once()
+		repo.On("GetAnnouncementDetail", uint(1), uint(1)).Return(resData, nil).Once()
 		srv := New(repo)
 		_, token := helper.GenerateToken(1)
 		pToken := token.(*jwt.Token)
@@ -122,6 +122,20 @@ func TestGetAnnouncementDetail(t *testing.T) {
 		res, err := srv.GetAnnouncementDetail(pToken, uint(1))
 		assert.Nil(t, err)
 		assert.Equal(t, resData.Type, res.Type)
+		repo.AssertExpectations(t)
+	})
+
+	t.Run("data not found", func(t *testing.T) {
+		repo.On("GetAnnouncementDetail", uint(1), uint(1)).Return(announcement.Core{}, errors.New("data not found")).Once()
+
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.GetAnnouncementDetail(pToken, uint(1))
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "not found")
+		assert.Equal(t, res.ID, uint(0))
 		repo.AssertExpectations(t)
 	})
 
