@@ -7,14 +7,14 @@ import (
 )
 
 type Core struct {
-	ID             uint
-	Picture        string
-	Name           string
-	Email          string
-	Description    string
-	CompanyAddress string
-	CompanyPhone   string
-	SocialMedia    string
+	ID             uint   `json:"id" `
+	Picture        string `json:"company_picture"`
+	Name           string `json:"company_name"`
+	Email          string `json:"company_email"`
+	Description    string `json:"description"`
+	CompanyAddress string `json:"company_address"`
+	CompanyPhone   string `json:"company_phone"`
+	SocialMedia    string `json:"sosmed"`
 }
 
 type CompanyHandler interface {

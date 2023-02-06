@@ -47,11 +47,11 @@ func (auc *announcementUseCase) GetAnnouncement() ([]announcement.Core, error) {
 	return res, nil
 }
 
-func (auc *announcementUseCase) GetAnnouncementDetail(token interface{}, announcementID uint) ([]announcement.Core, error) {
+func (auc *announcementUseCase) GetAnnouncementDetail(token interface{}, announcementID uint) (announcement.Core, error) {
 	id := helper.ExtractToken(token)
 
 	if id <= 0 {
-		return []announcement.Core{}, errors.New("data not found")
+		return announcement.Core{}, errors.New("data not found")
 	}
 
 	res, err := auc.qry.GetAnnouncementDetail(uint(id), announcementID)
@@ -62,7 +62,7 @@ func (auc *announcementUseCase) GetAnnouncementDetail(token interface{}, announc
 		} else {
 			msg = "there is a problem with the server"
 		}
-		return []announcement.Core{}, errors.New(msg)
+		return announcement.Core{}, errors.New(msg)
 	}
 
 	return res, nil
