@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"timesync-be/features/approval"
 	"timesync-be/helper"
 
@@ -39,8 +40,12 @@ func (ac *approvalControll) PostApproval() echo.HandlerFunc {
 		}
 		res, err := ac.srv.PostApproval(c.Get("user"), input.FileHeader, *ReqToCore(input))
 		if err != nil {
+			if strings.Contains(err.Error(), "type") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "only jpg or png file can be upload"})
+			}
 			log.Println("error post approval : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, "unable to process the data")
+
 		}
 
 		return c.JSON(http.StatusCreated, map[string]interface{}{

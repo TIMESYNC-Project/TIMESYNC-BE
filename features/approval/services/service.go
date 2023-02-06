@@ -37,6 +37,10 @@ func (auc *approvalUseCase) PostApproval(token interface{}, fileData multipart.F
 		if err != nil {
 			return approval.Core{}, errors.New("error open fileData")
 		}
+		// Validasi Type
+		if !helper.TypeFile(src) {
+			return approval.Core{}, errors.New("file type error")
+		}
 		defer src.Close()
 		uploadURL, err := helper.UploadToS3(fileData.Filename, src)
 		if err != nil {
