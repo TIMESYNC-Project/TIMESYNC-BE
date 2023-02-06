@@ -71,9 +71,6 @@ func (uuc *userUseCase) Login(nip, password string) (string, user.Core, error) {
 
 func (uuc *userUseCase) Delete(token interface{}, employeeID uint) error {
 	id := helper.ExtractToken(token)
-	if id <= 0 {
-		return errors.New("data not found")
-	}
 	err := uuc.qry.Delete(uint(id), employeeID)
 	if err != nil {
 		log.Println("query error", err.Error())
@@ -93,11 +90,16 @@ func (uuc *userUseCase) Update(token interface{}, fileData multipart.FileHeader,
 		if fileData.Size > 500000 {
 			return user.Core{}, errors.New("size error")
 		}
+
 		fileName := uuid.NewV4().String()
 		fileData.Filename = fileName + fileData.Filename[(len(fileData.Filename)-5):len(fileData.Filename)]
 		src, err := fileData.Open()
 		if err != nil {
 			return user.Core{}, errors.New("error open fileData")
+		}
+		// Validasi Type
+		if !helper.TypeFile(src) {
+			return user.Core{}, errors.New("file type error")
 		}
 		defer src.Close()
 		uploadURL, err := helper.UploadToS3(fileData.Filename, src)

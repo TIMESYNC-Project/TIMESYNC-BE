@@ -112,6 +112,8 @@ func (uc *userControll) Update() echo.HandlerFunc {
 		if err != nil {
 			if strings.Contains(err.Error(), "email") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "email already used"})
+			} else if strings.Contains(err.Error(), "type") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "only jpg or png file can be upload"})
 			} else if strings.Contains(err.Error(), "not found") {
 				return c.JSON(http.StatusNotFound, map[string]interface{}{"message": "account not registered"})
 			} else {
