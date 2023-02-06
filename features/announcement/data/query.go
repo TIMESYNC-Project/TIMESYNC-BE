@@ -51,10 +51,14 @@ func (aq *announcementQuery) PostAnnouncement(adminID uint, newAnnouncement anno
 
 func (aq *announcementQuery) GetAnnouncement() ([]announcement.Core, error) {
 	res := []Announcement{}
-	if err := aq.db.Table("announcements").Joins("JOIN users ON users.id = announcements.user_id").Select("announcements.id, announcements.title, announcements.message, announcements.created_at").Find(&res).Error; err != nil {
+	if err := aq.db.Find(&res).Error; err != nil {
 		log.Println("get all announcement query error : ", err.Error())
 		return []announcement.Core{}, err
 	}
+	// if err := aq.db.Table("announcements").Joins("JOIN users ON users.id = announcements.user_id").Select("announcements.id, announcements.title, announcements.message, announcements.created_at").Find(&res).Error; err != nil {
+	// 	log.Println("get all announcement query error : ", err.Error())
+	// 	return []announcement.Core{}, err
+	// }
 	result := []announcement.Core{}
 	for _, val := range res {
 		result = append(result, ToCore(val))
