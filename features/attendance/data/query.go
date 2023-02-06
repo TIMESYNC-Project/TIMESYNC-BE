@@ -135,7 +135,7 @@ func (aq *attendanceQuery) ClockIn(employeeID uint, latitudeData string, longitu
 		input.AttendanceStatus = "late"
 	}
 	hrEnd, _ := strconv.Atoi(stg.End[:2])
-	if hr > hrEnd {
+	if hr >= hrEnd {
 		log.Println("expired clockin time")
 		return attendance.Core{}, errors.New("clockin time was expired")
 	}
@@ -257,7 +257,7 @@ func (aq *attendanceQuery) ClockOut(employeeID uint, latitudeData string, longit
 		return attendance.Core{}, errors.New("server error, setting not found")
 	}
 	workingHourEnd, _ := strconv.Atoi(stg.End[:2])
-	if clockOutHour > (workingHourEnd + 1) {
+	if clockOutHour >= (workingHourEnd + 1) {
 		log.Println("time clock out not match")
 		return attendance.Core{}, errors.New("clock out time expired")
 	}
