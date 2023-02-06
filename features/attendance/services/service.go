@@ -25,7 +25,7 @@ func (auc *attendanceUseCase) ClockIn(token interface{}, latitude string, longit
 		if strings.Contains(err.Error(), "you already clock in today") {
 			return attendance.Core{}, errors.New("you already clock in today")
 		} else if strings.Contains(err.Error(), "clockin time was expired") {
-			return attendance.Core{}, errors.New("invalid clock out time request")
+			return attendance.Core{}, errors.New("invalid clock in time request")
 		} else {
 			return attendance.Core{}, errors.New("server error")
 		}

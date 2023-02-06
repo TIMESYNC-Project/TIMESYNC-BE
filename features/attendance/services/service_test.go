@@ -56,6 +56,18 @@ func TestClockIn(t *testing.T) {
 		assert.Equal(t, uint(0), res.ID)
 		data.AssertExpectations(t)
 	})
+	t.Run("clockin expired", func(t *testing.T) {
+		data.On("ClockIn", uint(1), "-6.4096", "106.8185").Return(attendance.Core{}, errors.New("clockin time was expired")).Once()
+		srv := New(data)
+		_, token := helper.GenerateToken(1)
+		mockToken := token.(*jwt.Token)
+		mockToken.Valid = true
+		res, err := srv.ClockIn(mockToken, "-6.4096", "106.8185")
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "invalid clock in time request")
+		assert.Equal(t, uint(0), res.ID)
+		data.AssertExpectations(t)
+	})
 }
 func TestClockOut(t *testing.T) {
 	data := mocks.NewAttendanceData(t)
@@ -99,6 +111,18 @@ func TestClockOut(t *testing.T) {
 		res, err := srv.ClockOut(mockToken, "-6.4096", "106.8185")
 		assert.NotNil(t, err)
 		assert.ErrorContains(t, err, "you already clock out today")
+		assert.Equal(t, uint(0), res.ID)
+		data.AssertExpectations(t)
+	})
+	t.Run(" ClockOut expired", func(t *testing.T) {
+		data.On("ClockOut", uint(1), "-6.4096", "106.8185").Return(attendance.Core{}, errors.New("clock out time expired")).Once()
+		srv := New(data)
+		_, token := helper.GenerateToken(1)
+		mockToken := token.(*jwt.Token)
+		mockToken.Valid = true
+		res, err := srv.ClockOut(mockToken, "-6.4096", "106.8185")
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "invalid clock out time request")
 		assert.Equal(t, uint(0), res.ID)
 		data.AssertExpectations(t)
 	})
