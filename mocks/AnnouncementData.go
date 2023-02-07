@@ -27,6 +27,29 @@ func (_m *AnnouncementData) DeleteAnnouncement(adminID uint, announcementID uint
 	return r0
 }
 
+// EmployeeInbox provides a mock function with given fields: employeeID
+func (_m *AnnouncementData) EmployeeInbox(employeeID uint) ([]announcement.Core, error) {
+	ret := _m.Called(employeeID)
+
+	var r0 []announcement.Core
+	if rf, ok := ret.Get(0).(func(uint) []announcement.Core); ok {
+		r0 = rf(employeeID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]announcement.Core)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(uint) error); ok {
+		r1 = rf(employeeID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetAnnouncement provides a mock function with given fields:
 func (_m *AnnouncementData) GetAnnouncement() ([]announcement.Core, error) {
 	ret := _m.Called()
