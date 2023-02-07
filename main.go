@@ -58,7 +58,7 @@ func main() {
 		Format: "method=${method}, uri=${uri}, status=${status}, error=${error}\n",
 	}))
 	//Users
-	e.POST("/register", uHdl.Register())
+	e.POST("/register", uHdl.Register(), middleware.JWT([]byte(config.JWTKey)))
 	e.POST("/login", uHdl.Login())
 	e.DELETE("/employees/:id", uHdl.Delete(), middleware.JWT([]byte(config.JWTKey)))
 	e.POST("/register/csv", uHdl.Csv(), middleware.JWT([]byte(config.JWTKey)))
@@ -74,6 +74,7 @@ func main() {
 	e.POST("/approvals", approvalHdl.PostApproval(), middleware.JWT([]byte(config.JWTKey)))
 	e.GET("/approvals", approvalHdl.GetApproval(), middleware.JWT([]byte(config.JWTKey)))
 	e.PUT("/approvals/:id", approvalHdl.UpdateApproval(), middleware.JWT([]byte(config.JWTKey)))
+	e.GET("/search", uHdl.Search(), middleware.JWT([]byte(config.JWTKey)))
 
 	//attendances for emloyees
 	e.GET("/attendances/location", attendHdl.GetLL())

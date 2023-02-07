@@ -32,26 +32,29 @@ type UserHandler interface {
 	Csv() echo.HandlerFunc
 	AdminEditEmployee() echo.HandlerFunc
 	GetAllEmployee() echo.HandlerFunc
+	Search() echo.HandlerFunc
 }
 
 type UserService interface {
-	Register(newUser Core) (Core, error)
+	Register(token interface{}, newUser Core) (Core, error)
 	Csv(fileHeader multipart.FileHeader) error
-	Login(nip, password string) (string, Core, error)
+	Login(nip, password string) (string, string, Core, error)
 	Delete(token interface{}, employeeID uint) error
 	Profile(token interface{}) (Core, error)
 	ProfileEmployee(userID uint) (Core, error)
 	Update(token interface{}, fileData multipart.FileHeader, updateData Core) (Core, error)
 	AdminEditEmployee(employeeID uint, fileData multipart.FileHeader, updateData Core) (Core, error)
 	GetAllEmployee() ([]Core, error)
+	Search(token interface{}, quote string) ([]Core, error)
 }
 
 type UserData interface {
-	Register(newUser Core) (Core, error)
+	Register(adminID uint, newUser Core) (Core, error)
 	Login(nip string) (Core, error)
 	Profile(userID uint) (Core, error)
 	Update(employeeID uint, updateData Core) (Core, error)
 	Delete(adminID uint, employeeID uint) error
 	Csv(newUserBatch []Core) error
 	GetAllEmployee() ([]Core, error)
+	Search(adminID uint, quote string) ([]Core, error)
 }

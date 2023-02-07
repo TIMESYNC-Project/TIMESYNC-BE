@@ -19,10 +19,10 @@ func New(db *gorm.DB) user.UserData {
 	}
 }
 
-func (uq *userQuery) Register(newUser user.Core) (user.Core, error) {
-	if newUser.Email == "" || newUser.Password == "" {
-		log.Println("data empty")
-		return user.Core{}, errors.New("nip or password not allowed empty")
+func (uq *userQuery) Register(adminID uint, newUser user.Core) (user.Core, error) {
+	if adminID != 1 {
+		log.Println("access denied")
+		return user.Core{}, errors.New("access denied")
 	}
 	dupEmail := CoreToData(newUser)
 	err := uq.db.Where("email = ?", newUser.Email).First(&dupEmail).Error
@@ -140,12 +140,22 @@ func (uq *userQuery) Update(employeeID uint, updateData user.Core) (user.Core, e
 
 // Csv implements user.UserData
 func (uq *userQuery) Csv(newUserBatch []user.Core) error {
+	if newUserBatch[0].Name == "" {
+		log.Println("empty data")
+		return errors.New("cannot insert empty file")
+	}
+	stg := Setting{}
+	err := uq.db.First(&stg).Error
+	if err != nil {
+		log.Println("query error")
+		return errors.New("server error")
+	}
 	//prepare to make auto increment role
 	batch := []User{}
 	for i := 0; i < len(newUserBatch); i++ {
 		batch = append(batch, CoreToData(newUserBatch[i]))
 		batch[i].Role = "employee"
-		batch[i].AnnualLeave = 14
+		batch[i].AnnualLeave = stg.AnnualLeave
 		batch[i].ProfilePicture = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
 		nipField := []User{}
 		err := uq.db.Find(&nipField).Error
@@ -180,7 +190,7 @@ func (uq *userQuery) Csv(newUserBatch []user.Core) error {
 
 		}
 	}
-	err := uq.db.Create(&batch).Error
+	err = uq.db.Create(&batch).Error
 	if err != nil {
 		log.Println("query error")
 		return errors.New("server error")
@@ -214,6 +224,25 @@ func (uq *userQuery) GetAllEmployee() ([]user.Core, error) {
 	result := []user.Core{}
 	for _, val := range getall {
 		result = append(result, ToCore(val))
+	}
+	return result, nil
+}
+
+// Search implements user.UserData
+func (uq *userQuery) Search(adminID uint, quote string) ([]user.Core, error) {
+	if adminID != 1 {
+		log.Println("admin only")
+		return []user.Core{}, errors.New("access denied")
+	}
+	find := []User{}
+	err := uq.db.Where("name LIKE ?", "%"+quote+"%").Or("nip LIKE ?", "%"+quote+"%").Find(&find).Error
+	if err != nil {
+		log.Println("no data processed", err.Error())
+		return []user.Core{}, errors.New("no user found")
+	}
+	result := []user.Core{}
+	for i := 0; i < len(find); i++ {
+		result = append(result, ToCore(find[i]))
 	}
 	return result, nil
 }

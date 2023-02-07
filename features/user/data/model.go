@@ -22,6 +22,14 @@ type User struct {
 	AnnualLeave    int
 }
 
+type Setting struct {
+	gorm.Model
+	Start       string
+	End         string
+	Tolerance   int
+	AnnualLeave int
+}
+
 func ToCore(data User) user.Core {
 	return user.Core{
 		ID:             data.ID,
