@@ -32,3 +32,5 @@ type AnnouncementData interface {
 	GetAnnouncementDetail(adminID uint, announcementID uint) (Core, error)
 	DeleteAnnouncement(adminID uint, announcementID uint) error
 }
+
+//test
