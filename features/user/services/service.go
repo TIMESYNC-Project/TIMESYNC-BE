@@ -1,7 +1,6 @@
 package services
 
 import (
-	"encoding/csv"
 	"errors"
 	"log"
 	"mime/multipart"
@@ -10,20 +9,17 @@ import (
 	"timesync-be/features/user"
 	"timesync-be/helper"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt"
 	uuid "github.com/satori/go.uuid"
 )
 
 type userUseCase struct {
 	qry user.UserData
-	vld *validator.Validate
 }
 
 func New(ud user.UserData) user.UserService {
 	return &userUseCase{
 		qry: ud,
-		vld: validator.New(),
 	}
 }
 
@@ -137,14 +133,15 @@ func (uuc *userUseCase) Update(token interface{}, fileData multipart.FileHeader,
 // Csv implements user.UserService
 func (uuc *userUseCase) Csv(fileData multipart.FileHeader) error {
 	result := []user.Core{}
-	if fileData.Size != 0 {
-		src, _ := fileData.Open()
-		csvReader := csv.NewReader(src)
-		data, _ := csvReader.ReadAll()
-		if len(data) == 0 {
-			return errors.New("csv file is empty")
+	if fileData.Filename != "" {
+		src, err := fileData.Open()
+		if err != nil {
+			log.Println("open file error", err.Error())
+			return errors.New("can't open file")
 		}
-		result = helper.ConvertCSV(data)
+		result = helper.ConvertCSV(src)
+	} else {
+		log.Panic(result)
 	}
 	err := uuc.qry.Csv(result)
 	if err != nil {

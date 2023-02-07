@@ -1,6 +1,8 @@
 package helper
 
 import (
+	"encoding/csv"
+	"mime/multipart"
 	"timesync-be/features/user"
 )
 
@@ -28,8 +30,12 @@ func ConvertToCore(data CsvRequest) user.Core {
 	}
 }
 
-func ConvertCSV(data [][]string) []user.Core {
-
+func ConvertCSV(csvInput multipart.File) []user.Core {
+	csvReader := csv.NewReader(csvInput)
+	data, _ := csvReader.ReadAll()
+	if len(data) == 0 {
+		return nil
+	}
 	res := []CsvRequest{}
 	for i := 1; i < len(data); i++ {
 		//inisialisasi data pertama kosong
@@ -61,7 +67,10 @@ func ConvertCSV(data [][]string) []user.Core {
 			}
 			if j == 7 {
 				res[i-1].Password = data[i][j]
-				res[i-1].Password, _ = GeneratePassword(res[i-1].Password)
+				if len(res[i-1].Password) == 0 {
+					res[i-1].Password, _ = GeneratePassword(res[i-1].Password)
+				}
+
 			}
 		}
 	}

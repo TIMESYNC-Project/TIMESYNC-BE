@@ -1,9 +1,12 @@
 package services
 
 import (
+	"bytes"
 	"errors"
+	"io"
 	"log"
 	"mime/multipart"
+	"net/http"
 	"os"
 	"path/filepath"
 	"testing"
@@ -352,98 +355,79 @@ func TestSearch(t *testing.T) {
 	})
 }
 
-// func (bl *blogic) Add(file *multipart.Fileheader) error {
-// 	read, err := file.Open()
-// 	if err != nil {
-// 		log.Panic(err.Error())
-// 		return err
-// 	}
-// 	log.Println(read)
-// 	return nil
-// }
-// func TestCsv(t *testing.T) {
-// 	// repo := mocks.NewUserData(t)
-// 	srv := New()
-// 	filePath := filepath.Join("..", "..", "..", "TimeSyncUnitTesting.csv")
-// 	f, err := os.Open(filePath)
-// 	if err != nil {
-// 		log.Println(err.Error())
-// 	}
-// 	body := &bytes.Buffer{}
-// 	writter := multipart.NewWriter(body)
-// 	part, err := writter.CreateFormFile("file", filePath)
-// 	if err != nil {
-// 		log.Fatal(err.Error())
-// 	}
-// 	_, err = io.Copy(part, f)
-// 	if err != nil {
-// 		log.Fatal(err.Error())
-// 	}
-// 	writter.Close()
-// 	req, _ := http.NewRequest("POST", "/upload", body)
-// 	req.Header.Set("Content type", writter.FormDataContentType())
-// 	_, header, _ := req.FormFile("file")
-// 	err = srv.Csv(*header)
-// 	if err != nil {
-// 		log.Println(err.Error())
-// 	}
-// 	assert.Nil(t, err)
-
-// 	// csvReader := csv.NewReader(csvTrue)
-// 	// data, _ := csvReader.ReadAll()
-// 	// inputData := helper.ConvertCSV(data)
-// 	// csvTrueCnv := &multipart.FileHeader{
-// 	// 	Filename: csvTrue.Name(),
-// 	// }
-// 	// t.Run("success creating account from csv", func(t *testing.T) {
-// 	// 	repo.On("Csv", inputData).Return(nil).Once()
-// 	// 	srv := New(repo)
-// 	// 	err := srv.Csv(*csvTrueCnv)
-// 	// 	log.Println(err)
-// 	// 	assert.Nil(t, err)
-// 	// 	repo.AssertExpectations(t)
-// 	// })
-
-// 	// t.Run("fail updating account", func(t *testing.T) {
-// 	// 	repo.On("Update", uint(1), inputData).Return(user.Core{}, errors.New("query error,update fail")).Once()
-// 	// 	srv := New(repo)
-// 	// 	_, token := helper.GenerateToken(1)
-// 	// 	pToken := token.(*jwt.Token)
-// 	// 	pToken.Valid = true
-// 	// 	res, err := srv.Csv(pToken, *imageTrueCnv, inputData)
-// 	// 	assert.NotNil(t, err)
-// 	// 	assert.ErrorContains(t, err, "error")
-// 	// 	assert.Equal(t, user.Core{}, res)
-// 	// 	repo.AssertExpectations(t)
-// 	// })
-// }
-
 func TestCsv(t *testing.T) {
+	inputData := []user.Core{
+		{
+			ID:          1,
+			Name:        "Fauzi Sofyan",
+			BirthOfDate: "2000-01-31",
+			Email:       "fauzilax@gmail.com",
+			Gender:      "male",
+			Position:    "backendengineer",
+			Phone:       "0813456",
+			Address:     "bandung",
+			Password:    "$2a$10$zdYUgJmywnCr.SojT9IhfO3oCTTEELwmbs9zoEAXd8BvMiWED89kO",
+		},
+	}
+
 	repo := mocks.NewUserData(t)
+	srv := New(repo)
 	filePath := filepath.Join("..", "..", "..", "TimeSyncUnitTesting.csv")
-	// imageFalse, _ := os.Open(filePath)
-	// imageFalseCnv := &multipart.FileHeader{
-	// 	Filename: imageFalse.Name(),
-	// }
-	imageTrue, err := os.Open(filePath)
+	f, err := os.Open(filePath)
 	if err != nil {
 		log.Println(err.Error())
 	}
-	imageTrueCnv := &multipart.FileHeader{
-		Filename: imageTrue.Name(),
+	body := &bytes.Buffer{}
+	writter := multipart.NewWriter(body)
+	part, err := writter.CreateFormFile("file", filePath)
+	if err != nil {
+		log.Panic("create form file", err.Error())
 	}
-	// inputData := []user.Core{
-	// 	{
-	// 		ID:    0,
-	// 		Name:  "Fauzi",
-	// 		Email: "fauzi@gmail.com",
-	// 		Phone: "081234",
-	// 	},
-	// }
-	t.Run("get all employee successful", func(t *testing.T) {
+	_, err = io.Copy(part, f)
+	if err != nil {
+		log.Panic("io copy error", err.Error())
+	}
+	writter.Close()
+	req, err := http.NewRequest("POST", "/upload", body)
+	if err != nil {
+		log.Panic("post", err.Error())
+	}
+	req.Header.Set("Content-Type", writter.FormDataContentType())
+	// req.Header.Set("Content-Type")
+	_, header, err := req.FormFile("file")
+	if err != nil {
+		log.Panic("content type", err.Error())
+	}
 
-		srv := New(repo)
-		err := srv.Csv(*imageTrueCnv)
+	// csvReader := csv.NewReader(csvTrue)
+	// data, _ := csvReader.ReadAll()
+	// inputData := helper.ConvertCSV(data)
+	// csvTrueCnv := &multipart.FileHeader{
+	// 	Filename: csvTrue.Name(),
+	// }
+	value, _ := header.Open()
+	inputData = helper.ConvertCSV(value)
+	t.Run("success creating account from csv", func(t *testing.T) {
+		repo.On("Csv", inputData).Return(nil).Once()
+		err = srv.Csv(*header)
 		assert.Nil(t, err)
+		repo.AssertExpectations(t)
 	})
+	t.Run("cannot insert empty file", func(t *testing.T) {
+		repo.On("Csv", []user.Core{}).Return(errors.New("cannot insert empty file"))
+		err = srv.Csv(*header)
+		assert.Error(t, err)
+	})
+	// t.Run("fail updating account", func(t *testing.T) {
+	// 	repo.On("Update", uint(1), inputData).Return(user.Core{}, errors.New("query error,update fail")).Once()
+	// 	srv := New(repo)
+	// 	_, token := helper.GenerateToken(1)
+	// 	pToken := token.(*jwt.Token)
+	// 	pToken.Valid = true
+	// 	res, err := srv.Csv(pToken, *imageTrueCnv, inputData)
+	// 	assert.NotNil(t, err)
+	// 	assert.ErrorContains(t, err, "error")
+	// 	assert.Equal(t, user.Core{}, res)
+	// 	repo.AssertExpectations(t)
+	// })
 }
