@@ -36,7 +36,7 @@ func (aq *approvalQuery) PostApproval(employeeID uint, newApproval approval.Core
 // GetApproval implements approval.ApprovalData
 func (aq *approvalQuery) GetApproval() ([]approval.Core, error) {
 	res := []Approval{}
-	if err := aq.db.Table("approvals").Joins("JOIN users ON users.id = approvals.user_id").Select("approvals.id, approvals.title, approvals.end_date, approvals.status").Find(&res).Error; err != nil {
+	if err := aq.db.Table("approvals").Joins("JOIN users ON users.id = approvals.user_id").Select("approvals.id, users.name,approvals.title, approvals.start_date, approvals.end_date, approvals.status").Find(&res).Error; err != nil {
 		log.Println("get all approvals record query error : ", err.Error())
 		return []approval.Core{}, errors.New("get all approval query error")
 	}

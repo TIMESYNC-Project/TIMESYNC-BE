@@ -8,6 +8,7 @@ import (
 
 type Core struct {
 	ID            uint
+	Name          string
 	UserID        uint
 	Title         string
 	StartDate     string
