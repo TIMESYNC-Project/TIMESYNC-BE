@@ -101,7 +101,6 @@ func (uuc *userUseCase) Update(token interface{}, fileData multipart.FileHeader,
 		if fileData.Size > 500000 {
 			return user.Core{}, errors.New("size error")
 		}
-
 		fileName := uuid.NewV4().String()
 		fileData.Filename = fileName + fileData.Filename[(len(fileData.Filename)-5):len(fileData.Filename)]
 		src, err := fileData.Open()
