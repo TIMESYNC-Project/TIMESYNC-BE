@@ -13,6 +13,50 @@ type ApprovalData struct {
 	mock.Mock
 }
 
+// ApprovalDetail provides a mock function with given fields: approvalID
+func (_m *ApprovalData) ApprovalDetail(approvalID uint) (approval.Core, error) {
+	ret := _m.Called(approvalID)
+
+	var r0 approval.Core
+	if rf, ok := ret.Get(0).(func(uint) approval.Core); ok {
+		r0 = rf(approvalID)
+	} else {
+		r0 = ret.Get(0).(approval.Core)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(uint) error); ok {
+		r1 = rf(approvalID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// EmployeeApprovalRecord provides a mock function with given fields: employeeID
+func (_m *ApprovalData) EmployeeApprovalRecord(employeeID uint) ([]approval.Core, error) {
+	ret := _m.Called(employeeID)
+
+	var r0 []approval.Core
+	if rf, ok := ret.Get(0).(func(uint) []approval.Core); ok {
+		r0 = rf(employeeID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]approval.Core)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(uint) error); ok {
+		r1 = rf(employeeID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetApproval provides a mock function with given fields:
 func (_m *ApprovalData) GetApproval() ([]approval.Core, error) {
 	ret := _m.Called()

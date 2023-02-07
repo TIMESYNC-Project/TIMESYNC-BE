@@ -68,9 +68,50 @@ func (ac *approvalControll) GetApproval() echo.HandlerFunc {
 		}
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"data":    result,
-			"message": "success show employee approval record",
+			"message": "success show all employee approval record",
 		})
 
+	}
+}
+
+func (ac *approvalControll) ApprovalDetail() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		paramID := c.Param("id")
+		announcementID, err := strconv.Atoi(paramID)
+		if err != nil {
+			log.Println("convert id error", err.Error())
+			return c.JSON(http.StatusBadGateway, "Invalid input")
+		}
+
+		res, err := ac.srv.ApprovalDetail(uint(announcementID))
+
+		if err != nil {
+			if strings.Contains(err.Error(), "approval") {
+				return c.JSON(http.StatusNotFound, map[string]interface{}{
+					"message": "approval not found",
+				})
+			}
+		}
+		return c.JSON(helper.PrintSuccessReponse(http.StatusOK, "success get approval detail", ShowAllApprovalJson(res)))
+	}
+}
+
+func (ac *approvalControll) EmployeeApprovalRecord() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		token := c.Get("user")
+		res, err := ac.srv.EmployeeApprovalRecord(token)
+
+		if err != nil {
+			return c.JSON(helper.PrintErrorResponse(err.Error()))
+		}
+		result := []ShowAllApproval{}
+		for _, val := range res {
+			result = append(result, ShowAllApprovalJson(val))
+		}
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"data":    result,
+			"message": "success show employee approval record",
+		})
 	}
 }
 

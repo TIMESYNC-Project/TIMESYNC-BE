@@ -15,6 +15,50 @@ type ApprovalService struct {
 	mock.Mock
 }
 
+// ApprovalDetail provides a mock function with given fields: approvalID
+func (_m *ApprovalService) ApprovalDetail(approvalID uint) (approval.Core, error) {
+	ret := _m.Called(approvalID)
+
+	var r0 approval.Core
+	if rf, ok := ret.Get(0).(func(uint) approval.Core); ok {
+		r0 = rf(approvalID)
+	} else {
+		r0 = ret.Get(0).(approval.Core)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(uint) error); ok {
+		r1 = rf(approvalID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// EmployeeApprovalRecord provides a mock function with given fields: token
+func (_m *ApprovalService) EmployeeApprovalRecord(token interface{}) ([]approval.Core, error) {
+	ret := _m.Called(token)
+
+	var r0 []approval.Core
+	if rf, ok := ret.Get(0).(func(interface{}) []approval.Core); ok {
+		r0 = rf(token)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]approval.Core)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(interface{}) error); ok {
+		r1 = rf(token)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetApproval provides a mock function with given fields:
 func (_m *ApprovalService) GetApproval() ([]approval.Core, error) {
 	ret := _m.Called()
