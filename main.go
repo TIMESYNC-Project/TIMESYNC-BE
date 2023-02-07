@@ -74,6 +74,7 @@ func main() {
 	e.POST("/approvals", approvalHdl.PostApproval(), middleware.JWT([]byte(config.JWTKey)))
 	e.GET("/approvals", approvalHdl.GetApproval(), middleware.JWT([]byte(config.JWTKey)))
 	e.PUT("/approvals/:id", approvalHdl.UpdateApproval(), middleware.JWT([]byte(config.JWTKey)))
+	e.GET("/approvals/:id", approvalHdl.ApprovalDetail())
 	e.GET("/search", uHdl.Search(), middleware.JWT([]byte(config.JWTKey)))
 
 	//attendances for emloyees

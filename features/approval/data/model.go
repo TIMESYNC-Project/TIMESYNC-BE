@@ -16,6 +16,7 @@ type Approval struct {
 	Description   string
 	ApprovalImage string
 	Status        string
+	ApprovalDate  string
 }
 
 type User struct {

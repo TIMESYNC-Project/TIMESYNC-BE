@@ -2,6 +2,7 @@ package data
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"timesync-be/features/approval"
 
@@ -44,6 +45,29 @@ func (aq *approvalQuery) GetApproval() ([]approval.Core, error) {
 	for _, val := range res {
 		result = append(result, ToCore(val))
 	}
+	return result, nil
+}
+
+func (aq *approvalQuery) ApprovalDetail(approvalID uint) (approval.Core, error) {
+	res := Approval{}
+	if err := aq.db.Where("id = ?", approvalID).First(&res).Error; err != nil {
+		log.Println("get detail approval query error : ", err.Error())
+		return approval.Core{}, errors.New("get detail approval query error")
+	}
+	result := ToCore(res)
+	user := User{}
+	if res.UserID != 0 {
+		if err := aq.db.Where("id = ?", res.UserID).First(&user).Error; err != nil {
+			log.Println("get user by id query error : ", err.Error())
+			return approval.Core{}, errors.New("get user by id error")
+		}
+		result.Name = user.Name
+	}
+	y := res.CreatedAt.Year()
+	m := int(res.CreatedAt.Month())
+	d := res.CreatedAt.Day()
+	result.ApprovalDate = fmt.Sprintf("%d-%d-%d", y, m, d)
+
 	return result, nil
 }
 

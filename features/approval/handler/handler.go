@@ -74,6 +74,28 @@ func (ac *approvalControll) GetApproval() echo.HandlerFunc {
 	}
 }
 
+func (ac *approvalControll) ApprovalDetail() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		paramID := c.Param("id")
+		announcementID, err := strconv.Atoi(paramID)
+		if err != nil {
+			log.Println("convert id error", err.Error())
+			return c.JSON(http.StatusBadGateway, "Invalid input")
+		}
+
+		res, err := ac.srv.ApprovalDetail(uint(announcementID))
+
+		if err != nil {
+			if strings.Contains(err.Error(), "approval") {
+				return c.JSON(http.StatusNotFound, map[string]interface{}{
+					"message": "approval not found",
+				})
+			}
+		}
+		return c.JSON(helper.PrintSuccessReponse(http.StatusOK, "success get approval detail", ShowAllApprovalJson(res)))
+	}
+}
+
 // UpdateApproval implements approval.ApprovalHandler
 func (ac *approvalControll) UpdateApproval() echo.HandlerFunc {
 	return func(c echo.Context) error {
