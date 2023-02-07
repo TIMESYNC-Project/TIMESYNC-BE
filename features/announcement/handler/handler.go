@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"timesync-be/features/announcement"
 	"timesync-be/helper"
 
@@ -68,7 +69,15 @@ func (ac *announcementControll) GetAnnouncementDetail() echo.HandlerFunc {
 		res, err := ac.srv.GetAnnouncementDetail(token, uint(announcementID))
 
 		if err != nil {
-			return c.JSON(helper.PrintErrorResponse(err.Error()))
+			if strings.Contains(err.Error(), "user") {
+				return c.JSON(http.StatusNotFound, map[string]interface{}{
+					"message": "user not found",
+				})
+			} else {
+				return c.JSON(http.StatusNotFound, map[string]interface{}{
+					"message": "announcement not found",
+				})
+			}
 		}
 
 		// result := []ShowAllAnnouncement{}
@@ -77,6 +86,26 @@ func (ac *announcementControll) GetAnnouncementDetail() echo.HandlerFunc {
 		// }
 		return c.JSON(helper.PrintSuccessReponse(http.StatusOK, "success get announcement details", ShowAllAnnouncementJson(res)))
 
+	}
+}
+
+func (ac *announcementControll) EmployeeInbox() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		token := c.Get("user")
+
+		res, err := ac.srv.EmployeeInbox(token)
+
+		if err != nil {
+			return c.JSON(helper.PrintErrorResponse(err.Error()))
+		}
+		result := []ShowAllAnnouncement{}
+		for _, val := range res {
+			result = append(result, ShowAllAnnouncementJson(val))
+		}
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"data":    result,
+			"message": "success show employee inbox message",
+		})
 	}
 }
 

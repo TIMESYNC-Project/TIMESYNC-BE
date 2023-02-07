@@ -16,6 +16,7 @@ type AnnouncementHandler interface {
 	PostAnnouncement() echo.HandlerFunc
 	GetAnnouncement() echo.HandlerFunc
 	GetAnnouncementDetail() echo.HandlerFunc
+	EmployeeInbox() echo.HandlerFunc
 	DeleteAnnouncement() echo.HandlerFunc
 }
 
@@ -23,6 +24,7 @@ type AnnouncementService interface {
 	PostAnnouncement(token interface{}, newAnnouncement Core) (Core, error)
 	GetAnnouncement() ([]Core, error)
 	GetAnnouncementDetail(token interface{}, announcementID uint) (Core, error)
+	EmployeeInbox(token interface{}) ([]Core, error)
 	DeleteAnnouncement(token interface{}, announcementID uint) error
 }
 
@@ -30,7 +32,6 @@ type AnnouncementData interface {
 	PostAnnouncement(adminID uint, newAnnouncement Core) (Core, error)
 	GetAnnouncement() ([]Core, error)
 	GetAnnouncementDetail(adminID uint, announcementID uint) (Core, error)
+	EmployeeInbox(employeeID uint) ([]Core, error)
 	DeleteAnnouncement(adminID uint, announcementID uint) error
 }
-
-//test

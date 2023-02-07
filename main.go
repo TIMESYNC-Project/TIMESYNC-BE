@@ -77,10 +77,11 @@ func main() {
 	e.GET("/search", uHdl.Search(), middleware.JWT([]byte(config.JWTKey)))
 
 	//attendances for emloyees
+	e.GET("/inbox", announcementHdl.EmployeeInbox(), middleware.JWT([]byte(config.JWTKey)))
 	e.GET("/attendances/location", attendHdl.GetLL())
-	e.POST("attendances", attendHdl.ClockIn(), middleware.JWT([]byte(config.JWTKey)))
-	e.PUT("attendances", attendHdl.ClockOut(), middleware.JWT([]byte(config.JWTKey)))
-	e.POST("attendances/:id", attendHdl.AttendanceFromAdmin(), middleware.JWT([]byte(config.JWTKey)))
+	e.POST("/attendances", attendHdl.ClockIn(), middleware.JWT([]byte(config.JWTKey)))
+	e.PUT("/attendances", attendHdl.ClockOut(), middleware.JWT([]byte(config.JWTKey)))
+	e.POST("/attendances/:id", attendHdl.AttendanceFromAdmin(), middleware.JWT([]byte(config.JWTKey)))
 	e.GET("/attendances", attendHdl.Record(), middleware.JWT([]byte(config.JWTKey)))
 
 	//setting

@@ -89,22 +89,52 @@ func (aq *announcementQuery) GetAnnouncementDetail(adminID uint, announcementID 
 	res := Announcement{}
 	if err := aq.db.Where("id = ?", announcementID).First(&res).Error; err != nil {
 		log.Println("get announcement by id query error : ", err.Error())
-		return announcement.Core{}, err
+		return announcement.Core{}, errors.New("get announcement by id error")
 	}
-
+	result := ToCore(res)
 	user := User{}
-	if err := aq.db.Where("id = ?", res.UserID).First(&user).Error; err != nil {
-		log.Println("get user by id query error : ", err.Error())
-		return announcement.Core{}, err
+	if res.UserID != 0 {
+		if err := aq.db.Where("id = ?", res.UserID).First(&user).Error; err != nil {
+			log.Println("get user by id query error : ", err.Error())
+			return announcement.Core{}, errors.New("get user by id error")
+		}
+		result.Name = user.Name
+		result.Nip = user.Nip
 	}
-
 	y := res.CreatedAt.Year()
 	m := int(res.CreatedAt.Month())
 	d := res.CreatedAt.Day()
-	result := ToCore(res)
 	result.AnnouncementDate = fmt.Sprintf("%d-%d-%d", y, m, d)
-	result.Name = user.Name
-	result.Nip = user.Nip
+
+	return result, nil
+}
+
+func (aq *announcementQuery) EmployeeInbox(employeeID uint) ([]announcement.Core, error) {
+	res := []Announcement{}
+	if err := aq.db.Where("user_id = ? OR type = ?", employeeID, "public").Find(&res).Error; err != nil {
+		log.Println("get employee inbox query error : ", err.Error())
+		return []announcement.Core{}, err
+	}
+	i := 0
+	result := []announcement.Core{}
+	for _, val := range res {
+		result = append(result, ToCore(val))
+		y := val.CreatedAt.Year()
+		m := int(val.CreatedAt.Month())
+		d := val.CreatedAt.Day()
+		result[i].AnnouncementDate = fmt.Sprintf("%d-%d-%d", y, m, d)
+		user := User{}
+		if val.UserID != 0 {
+			if err := aq.db.Where("id = ?", val.UserID).First(&user).Error; err != nil {
+				log.Println("get user by id query error : ", err.Error())
+				return []announcement.Core{}, errors.New("get user by id error")
+			}
+			result[i].Name = user.Name
+			result[i].Nip = user.Nip
+		}
+		i++
+	}
+
 	return result, nil
 }
 

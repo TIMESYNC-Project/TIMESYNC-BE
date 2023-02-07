@@ -13,10 +13,12 @@ type PostApprovalResponse struct {
 }
 
 type ShowAllApproval struct {
-	ID      uint   `json:"id"`
-	Title   string `json:"approval_title"`
-	EndDate string `json:"approval_end_date"`
-	Status  string `json:"approval_status"`
+	ID        uint   `json:"id"`
+	Name      string `json:"employee_name"`
+	Title     string `json:"approval_title"`
+	StartDate string `json:"approval_start_date"`
+	EndDate   string `json:"approval_end_date"`
+	Status    string `json:"approval_status"`
 }
 
 func ToPostApprovalResponse(data approval.Core) PostApprovalResponse {
@@ -33,9 +35,11 @@ func ToPostApprovalResponse(data approval.Core) PostApprovalResponse {
 
 func ShowAllApprovalJson(data approval.Core) ShowAllApproval {
 	return ShowAllApproval{
-		ID:      data.ID,
-		Title:   data.Title,
-		EndDate: data.EndDate,
-		Status:  data.Status,
+		ID:        data.ID,
+		Name:      data.Name,
+		Title:     data.Title,
+		StartDate: data.StartDate,
+		EndDate:   data.EndDate,
+		Status:    data.Status,
 	}
 }

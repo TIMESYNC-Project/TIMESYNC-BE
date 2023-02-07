@@ -9,6 +9,7 @@ import (
 type Approval struct {
 	gorm.Model
 	UserID        uint
+	Name          string
 	Title         string
 	StartDate     string
 	EndDate       string
@@ -29,6 +30,7 @@ type User struct {
 func ToCore(data Approval) approval.Core {
 	return approval.Core{
 		ID:            data.ID,
+		Name:          data.Name,
 		Title:         data.Title,
 		StartDate:     data.StartDate,
 		EndDate:       data.EndDate,
@@ -41,6 +43,7 @@ func ToCore(data Approval) approval.Core {
 func CoreToData(data approval.Core) Approval {
 	return Approval{
 		Model:         gorm.Model{ID: data.ID},
+		Name:          data.Name,
 		Title:         data.Title,
 		StartDate:     data.StartDate,
 		EndDate:       data.EndDate,
