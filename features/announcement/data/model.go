@@ -8,10 +8,11 @@ import (
 
 type Announcement struct {
 	gorm.Model
-	UserID  uint
-	Type    string
-	Title   string
-	Message string
+	UserID           uint
+	Type             string
+	Title            string
+	Message          string
+	AnnouncementDate string
 }
 
 type User struct {
@@ -25,18 +26,20 @@ type User struct {
 
 func ToCore(data Announcement) announcement.Core {
 	return announcement.Core{
-		ID:      data.ID,
-		Type:    data.Type,
-		Title:   data.Title,
-		Message: data.Message,
+		ID:               data.ID,
+		Type:             data.Type,
+		Title:            data.Title,
+		Message:          data.Message,
+		AnnouncementDate: data.AnnouncementDate,
 	}
 }
 
 func CoreToData(data announcement.Core) Announcement {
 	return Announcement{
-		Model:   gorm.Model{ID: data.ID},
-		Type:    data.Type,
-		Title:   data.Title,
-		Message: data.Message,
+		Model:            gorm.Model{ID: data.ID},
+		Type:             data.Type,
+		Title:            data.Title,
+		Message:          data.Message,
+		AnnouncementDate: data.AnnouncementDate,
 	}
 }

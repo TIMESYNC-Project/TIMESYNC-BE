@@ -56,7 +56,7 @@ func (aq *approvalQuery) UpdateApproval(adminID uint, approvalID uint, updatedAp
 		return approval.Core{}, errors.New("get approval query error")
 	}
 
-	if getID.UserID != adminID {
+	if adminID != 1 {
 		log.Println("Unauthorized request")
 		return approval.Core{}, errors.New("unauthorized request")
 	}
@@ -71,5 +71,13 @@ func (aq *approvalQuery) UpdateApproval(adminID uint, approvalID uint, updatedAp
 	if err := qry.Error; err != nil {
 		log.Println("update approval query error : ", err.Error())
 	}
+
+	updatedApproval.ID = getID.ID
+	updatedApproval.Title = getID.Title
+	updatedApproval.StartDate = getID.StartDate
+	updatedApproval.EndDate = getID.EndDate
+	updatedApproval.Description = getID.Description
+	updatedApproval.ApprovalImage = getID.ApprovalImage
+
 	return updatedApproval, nil
 }

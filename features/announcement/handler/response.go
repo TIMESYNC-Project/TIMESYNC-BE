@@ -3,43 +3,48 @@ package handler
 import (
 	"net/http"
 	"strings"
-	"time"
 	"timesync-be/features/announcement"
 )
 
 type PostAnnouncementReponse struct {
-	ID        uint      `json:"id"`
-	Nip       string    `json:"nip"`
-	Type      string    `json:"type"`
-	Title     string    `json:"announcement_title"`
-	Message   string    `json:"announcement_description"`
-	CreatedAt time.Time `json:"created_at"`
+	ID      uint   `json:"id"`
+	Nip     string `json:"nip"`
+	Type    string `json:"type"`
+	Title   string `json:"announcement_title"`
+	Message string `json:"announcement_description"`
+	// CreatedAt time.Time `json:"created_at"`
+	AnnouncementDate string `json:"created_at"`
 }
 
 func ToPostAnnouncementReponse(data announcement.Core) PostAnnouncementReponse {
 	return PostAnnouncementReponse{
-		ID:        data.ID,
-		Nip:       data.Nip,
-		Type:      data.Type,
-		Title:     data.Title,
-		Message:   data.Message,
-		CreatedAt: time.Now(),
+		ID:               data.ID,
+		Nip:              data.Nip,
+		Type:             data.Type,
+		Title:            data.Title,
+		Message:          data.Message,
+		AnnouncementDate: data.AnnouncementDate,
 	}
 }
 
 type ShowAllAnnouncement struct {
-	ID        uint      `json:"id"`
-	Title     string    `json:"announcement_title"`
-	Message   string    `json:"announcement_description"`
-	CreatedAt time.Time `json:"created_at"`
+	ID      uint   `json:"id"`
+	Name    string `json:"to"`
+	Nip     string `json:"nip"`
+	Title   string `json:"announcement_title"`
+	Message string `json:"announcement_description"`
+	// CreatedAt time.Time `json:"created_at"`
+	AnnouncementDate string `json:"created_at"`
 }
 
 func ShowAllAnnouncementJson(data announcement.Core) ShowAllAnnouncement {
 	return ShowAllAnnouncement{
-		ID:        data.ID,
-		Title:     data.Title,
-		Message:   data.Message,
-		CreatedAt: time.Now(),
+		ID:               data.ID,
+		Name:             data.Name,
+		Nip:              data.Nip,
+		Title:            data.Title,
+		Message:          data.Message,
+		AnnouncementDate: data.AnnouncementDate,
 	}
 }
 
