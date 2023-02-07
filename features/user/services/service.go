@@ -5,6 +5,7 @@ import (
 	"log"
 	"mime/multipart"
 	"strings"
+	"time"
 	"timesync-be/config"
 	"timesync-be/features/user"
 	"timesync-be/helper"
@@ -74,6 +75,7 @@ func (uuc *userUseCase) Login(nip, password string) (string, string, user.Core, 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	useToken, _ := token.SignedString([]byte(config.JWTKey))
 	expired := helper.ExpiredToken()
+	log.Println("waktu : ", time.Now())
 	return expired, useToken, res, nil
 
 }
