@@ -40,7 +40,7 @@ func ExtractToken(t interface{}) int {
 }
 
 func ExpiredToken() string {
-	t := time.Now().Add(time.Hour * 5)
+	t := time.Now().Add(time.Hour * 12)
 	mont := int(t.Month())
 	y := strconv.Itoa(t.Year())
 	m := strconv.Itoa(mont)
