@@ -79,6 +79,7 @@ func main() {
 
 	//attendances for emloyees
 	e.GET("/inbox", announcementHdl.EmployeeInbox(), middleware.JWT([]byte(config.JWTKey)))
+	e.GET("/employee/approvals", approvalHdl.EmployeeApprovalRecord(), middleware.JWT([]byte(config.JWTKey)))
 	e.GET("/attendances/location", attendHdl.GetLL())
 	e.POST("/attendances", attendHdl.ClockIn(), middleware.JWT([]byte(config.JWTKey)))
 	e.PUT("/attendances", attendHdl.ClockOut(), middleware.JWT([]byte(config.JWTKey)))

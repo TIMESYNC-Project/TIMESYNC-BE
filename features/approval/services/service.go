@@ -90,6 +90,27 @@ func (auc *approvalUseCase) ApprovalDetail(approvalID uint) (approval.Core, erro
 	return res, nil
 }
 
+func (auc *approvalUseCase) EmployeeApprovalRecord(token interface{}) ([]approval.Core, error) {
+	id := helper.ExtractToken(token)
+
+	if id <= 0 {
+		return []approval.Core{}, errors.New("data not found")
+	}
+	res, err := auc.qry.EmployeeApprovalRecord(uint(id))
+
+	if err != nil {
+		msg := ""
+		if strings.Contains(err.Error(), "not found") {
+			msg = "approval not found"
+		} else {
+			msg = "there is a problem with the server"
+		}
+		return []approval.Core{}, errors.New(msg)
+	}
+
+	return res, nil
+}
+
 // UpdateApproval implements approval.ApprovalService
 func (auc *approvalUseCase) UpdateApproval(token interface{}, approvalID uint, updatedApproval approval.Core) (approval.Core, error) {
 	adminID := helper.ExtractToken(token)

@@ -96,6 +96,25 @@ func (ac *approvalControll) ApprovalDetail() echo.HandlerFunc {
 	}
 }
 
+func (ac *approvalControll) EmployeeApprovalRecord() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		token := c.Get("user")
+		res, err := ac.srv.EmployeeApprovalRecord(token)
+
+		if err != nil {
+			return c.JSON(helper.PrintErrorResponse(err.Error()))
+		}
+		result := []ShowAllApproval{}
+		for _, val := range res {
+			result = append(result, ShowAllApprovalJson(val))
+		}
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"data":    result,
+			"message": "success show employee approval record",
+		})
+	}
+}
+
 // UpdateApproval implements approval.ApprovalHandler
 func (ac *approvalControll) UpdateApproval() echo.HandlerFunc {
 	return func(c echo.Context) error {

@@ -23,6 +23,7 @@ type ApprovalHandler interface {
 	PostApproval() echo.HandlerFunc
 	GetApproval() echo.HandlerFunc
 	ApprovalDetail() echo.HandlerFunc
+	EmployeeApprovalRecord() echo.HandlerFunc
 	UpdateApproval() echo.HandlerFunc
 }
 
@@ -30,6 +31,7 @@ type ApprovalService interface {
 	PostApproval(token interface{}, fileData multipart.FileHeader, newApproval Core) (Core, error)
 	GetApproval() ([]Core, error)
 	ApprovalDetail(approvalID uint) (Core, error)
+	EmployeeApprovalRecord(token interface{}) ([]Core, error)
 	UpdateApproval(token interface{}, approvalID uint, updatedApproval Core) (Core, error)
 }
 
@@ -37,5 +39,6 @@ type ApprovalData interface {
 	PostApproval(employeeID uint, newApproval Core) (Core, error)
 	GetApproval() ([]Core, error)
 	ApprovalDetail(approvalID uint) (Core, error)
+	EmployeeApprovalRecord(employeeID uint) ([]Core, error)
 	UpdateApproval(adminID uint, approvalID uint, updatedApproval Core) (Core, error)
 }

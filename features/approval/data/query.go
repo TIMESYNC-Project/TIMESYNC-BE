@@ -71,6 +71,34 @@ func (aq *approvalQuery) ApprovalDetail(approvalID uint) (approval.Core, error) 
 	return result, nil
 }
 
+func (aq *approvalQuery) EmployeeApprovalRecord(employeeID uint) ([]approval.Core, error) {
+	res := []Approval{}
+	if err := aq.db.Where("user_id = ?", employeeID).Find(&res).Error; err != nil {
+		log.Println("get employee approval query error : ", err.Error())
+		return []approval.Core{}, err
+	}
+	i := 0
+	result := []approval.Core{}
+	for _, val := range res {
+		result = append(result, ToCore(val))
+		y := val.CreatedAt.Year()
+		m := int(val.CreatedAt.Month())
+		d := val.CreatedAt.Day()
+		result[i].ApprovalDate = fmt.Sprintf("%d-%d-%d", y, m, d)
+		user := User{}
+		if val.UserID != 0 {
+			if err := aq.db.Where("id = ?", val.UserID).First(&user).Error; err != nil {
+				log.Println("get user by id query error : ", err.Error())
+				return []approval.Core{}, errors.New("get user by id error")
+			}
+			result[i].Name = user.Name
+		}
+		i++
+	}
+
+	return result, nil
+}
+
 // UpdateApproval implements approval.ApprovalData
 func (aq *approvalQuery) UpdateApproval(adminID uint, approvalID uint, updatedApproval approval.Core) (approval.Core, error) {
 	getID := Approval{}
