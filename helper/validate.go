@@ -21,7 +21,7 @@ func TypeFile(test multipart.File) bool {
 }
 
 type UserValidate struct {
-	Name        string `validate:"required,alphanum"`
+	Name        string `validate:"required"`
 	BirthOfDate string `validate:"required"`
 	Email       string `validate:"required,email"`
 	Gender      string `validate:"required,alpha"`

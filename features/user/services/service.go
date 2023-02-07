@@ -110,7 +110,7 @@ func (uuc *userUseCase) Update(token interface{}, fileData multipart.FileHeader,
 		}
 		// Validasi Type
 		if !helper.TypeFile(src) {
-			return user.Core{}, errors.New("file type error")
+			return user.Core{}, errors.New("file type error only jpg or png file can be upload")
 		}
 		defer src.Close()
 		uploadURL, err := helper.UploadToS3(fileData.Filename, src)
@@ -124,8 +124,12 @@ func (uuc *userUseCase) Update(token interface{}, fileData multipart.FileHeader,
 		msg := ""
 		if strings.Contains(err.Error(), "not found") {
 			msg = "data not found"
+		} else if strings.Contains(err.Error(), "email") {
+			msg = "email duplicated"
+		} else if strings.Contains(err.Error(), "cannot modifed admin data") {
+			msg = "cannot modifed admin data"
 		} else {
-			msg = "server error"
+			msg = "account not registered"
 		}
 		return user.Core{}, errors.New(msg)
 	}
@@ -204,10 +208,12 @@ func (uuc *userUseCase) AdminEditEmployee(employeeID uint, fileData multipart.Fi
 		msg := ""
 		if strings.Contains(err.Error(), "not found") {
 			msg = "data not found"
-		} else if strings.Contains(err.Error(), "admin data") {
-			msg = "admin data cannot modifed"
+		} else if strings.Contains(err.Error(), "email") {
+			msg = "email duplicated"
+		} else if strings.Contains(err.Error(), "cannot modifed admin data") {
+			msg = "cannot modifed admin data"
 		} else {
-			msg = "server error"
+			msg = "account not registered"
 		}
 		return user.Core{}, errors.New(msg)
 	}

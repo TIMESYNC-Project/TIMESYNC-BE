@@ -131,7 +131,7 @@ func (uq *userQuery) Update(employeeID uint, updateData user.Core) (user.Core, e
 	err := qry.Error
 	if err != nil {
 		log.Println("update user query error", err.Error())
-		return user.Core{}, err
+		return user.Core{}, errors.New("user not found")
 	}
 	result := ToCore(cnv)
 	result.ID = employeeID

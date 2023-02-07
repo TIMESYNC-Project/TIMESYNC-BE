@@ -64,7 +64,7 @@ func (aq *attendanceQuery) ClockIn(employeeID uint, latitudeData string, longitu
 	//====================================================================
 	// cari Hour dan Minute kemudian convert ke string
 	//====================================================================
-	t := time.Now()
+	t := time.Now().Add(time.Hour * 7)
 	hour := strconv.Itoa(t.Hour())
 	minute := strconv.Itoa(t.Minute())
 	year := strconv.Itoa(t.Year())
@@ -157,7 +157,7 @@ func (aq *attendanceQuery) ClockOut(employeeID uint, latitudeData string, longit
 	// Cek apakah user udah clockin atau clockout ?
 	//====================================================================
 	//inisialisasi untuk mencari time nya
-	t := time.Now()
+	t := time.Now().Add(time.Hour * 7)
 	hour := strconv.Itoa(t.Hour())
 	minute := strconv.Itoa(t.Minute())
 	year := strconv.Itoa(t.Year())
