@@ -189,7 +189,7 @@ func (aq *attendanceQuery) ClockOut(employeeID uint, latitudeData string, longit
 	}
 	// cek apakah data clockout sudah terisi berarti user sudah melakukan clock in dan clock out
 	if len(check.ClockOut) != 0 || check.ClockOut != "" {
-		log.Println("query not found", err.Error())
+		log.Println("query not found")
 		return attendance.Core{}, errors.New("user already clock out today")
 	}
 
@@ -471,4 +471,34 @@ func (aq *attendanceQuery) Record(employeeID uint, dateFrom string, dateTo strin
 	// log.Println(response)
 
 	return response, nil
+}
+
+// GetPresenceToday implements attendance.AttendanceData
+func (aq *attendanceQuery) GetPresenceToday(employeeID uint) (attendance.Core, error) {
+	//inisialisasi
+	t := time.Now().Add(time.Hour * 7)
+	year := strconv.Itoa(t.Year())
+	monthConv := t.Month()
+	monthInt := int(monthConv)
+	month := fmt.Sprintf("%d", monthInt)
+	day := strconv.Itoa(t.Day())
+	if len(month) == 1 {
+		month = "0" + month
+	}
+	if len(day) == 1 {
+		day = "0" + day
+	}
+	dates := fmt.Sprintf("%s-%s-%s", year, month, day)
+	prs := Attendance{}
+	err := aq.db.Where("attendance_date = ? AND user_id = ?", dates, employeeID).First(&prs).Error
+	if err != nil {
+		log.Println("query error")
+		return attendance.Core{}, errors.New("data not found")
+	}
+	return DataToCore(prs), nil
+}
+
+// GetPresenceTotalToday implements attendance.AttendanceData
+func (aq *attendanceQuery) GetPresenceTotalToday(adminID uint) ([]attendance.Core, error) {
+	panic("unimplemented")
 }

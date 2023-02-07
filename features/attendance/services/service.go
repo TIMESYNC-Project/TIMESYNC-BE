@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"log"
 	"strings"
 	"timesync-be/features/attendance"
 	"timesync-be/helper"
@@ -76,4 +77,20 @@ func (auc *attendanceUseCase) Record(token interface{}, dateFrom string, dateTo 
 
 	}
 	return res, nil
+}
+
+// GetPresenceToday implements attendance.AttendanceService
+func (auc *attendanceUseCase) GetPresenceToday(token interface{}) (attendance.Core, error) {
+	employeeID := helper.ExtractToken(token)
+	res, err := auc.qry.GetPresenceToday(uint(employeeID))
+	if err != nil {
+		log.Println("data not found", err.Error())
+		return attendance.Core{}, errors.New("data not found")
+	}
+	return res, nil
+}
+
+// GetPresenceTotalToday implements attendance.AttendanceService
+func (auc *attendanceUseCase) GetPresenceTotalToday(token interface{}) ([]attendance.Core, error) {
+	panic("unimplemented")
 }

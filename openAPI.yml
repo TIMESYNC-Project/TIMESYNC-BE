@@ -430,7 +430,7 @@ paths:
             schema:
               type: object
               properties:
-                image:
+                profile_picture:
                   type: string
                   format: binary
             example:
@@ -446,7 +446,6 @@ paths:
                 phone: "0813456"
                 address: "bandung"
                 password: "123"
-                annual_leave: 14
       responses:
         200:
           description: success update profile
@@ -456,7 +455,7 @@ paths:
                 $ref: "#/components/schemas/responseObject"
               example:
                 data:
-                  id: 1
+                  id: 2
                   profile_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
                   name: "Fauzi Sofyan"
                   email: "fauzilax@gmail.com"
@@ -559,7 +558,7 @@ paths:
                   message: "data not found"
         500:
           $ref: "#/components/responses/500"
-  /settings:
+  /setting:
     put:
       tags:
         - "Admin"
@@ -580,8 +579,8 @@ paths:
                   type: string
                   example: "17:00"
                 tollerance:
-                  type: string
-                  example: "30:00"
+                  type: integer
+                  example: 30
                 annual_leave_settings:
                   type: integer
                   example: 14
@@ -596,7 +595,7 @@ paths:
                 data:
                   working_hour_start: "08:00"
                   working_hour_end: "17:00"
-                  tollerance: "30:00"
+                  tollerance: 30
                   annual_leave_settings: 14
                 message: "update working hour schedule and annual leave for employee success"
         400:
@@ -608,8 +607,6 @@ paths:
         - "Admin"
       description: get working hour and annual leave for employee
       summary: get working hour and annual leave for employee
-      security:
-        - JWTAuth: []
       responses:
         200:
           description: "success get working hour schedule and annual leave for employee"
@@ -773,7 +770,7 @@ paths:
                   message: "data not found"
         500:
           $ref: "#/components/responses/500"
-  /presences:
+  /presences/total:
     get:
       tags:
         - "Admin"
@@ -796,7 +793,7 @@ paths:
           $ref: "#/components/responses/400"
         500:
           $ref: "#/components/responses/500"
-  /presences/{id}:
+  /presences:
     get:
       tags:
         - "Employee"
@@ -804,12 +801,6 @@ paths:
       summary: total precences in a day per employee
       security:
         - JWTAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
       responses:
         200:
           description: "success get total precences in a day per employee"
@@ -1085,6 +1076,97 @@ paths:
           $ref: "#/components/responses/400"
         500:
           $ref: "#/components/responses/500"
+    get:
+      tags:
+        - "Admin"
+      description: get all employee approval record
+      summary: get all employee approval record
+      security:
+        - JWTAuth: []
+      responses:
+        200:
+          description: success show employee approval record
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  [
+                    {
+                      id: 1,
+                      employee_name: "Alif",
+                      approval_title: "Izin",
+                      approval_start_date: "2023-02-01",
+                      approval_end_date: "2023-02-04",
+                      approval_status: "Pending",
+                      created_at : "2023-02-1"
+                    },
+                    {
+                      id: 2,
+                      employee_name: "Fauzi",
+                      approval_title: "Izin",
+                      approval_start_date: "2023-02-04",
+                      approval_end_date: "2023-02-06",
+                      approval_status: "Pending",
+                      created_at : "2023-02-4"
+                    },
+                    {
+                      id: 3,
+                      employee_name: "Zain",
+                      approval_title: "Izin",
+                      approval_start_date: "2023-02-04",
+                      approval_end_date: "2023-02-06",
+                      approval_status: "Pending",
+                      created_at : "2023-02-4"
+                    },
+                    {
+                      id: 4,
+                      employee_name: "Yudha",
+                      approval_title: "Sakit",
+                      approval_start_date: "2023-02-04",
+                      approval_end_date: "2023-02-06",
+                      approval_status: "Approved",
+                      created_at : "2023-02-4"
+                    },
+                  ]
+                message: success show all employee approval record
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+  /approvals/{id}:
+    get:
+      tags:
+        - "Admin"
+      description: get approval detail
+      summary: get approval detail
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: "success approve employee permission"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseObject"
+              example:
+                data:
+                  id: 1
+                  approval_title: "sick"
+                  approval_date: "2023-02-01"
+                  approval_description: "i am going to hospital today, my body didn't feel so good for work"
+                  approval_image: "https://1.bp.blogspot.com/-e8s4FEI8wKs/WgpNDkIWdhI/AAAAAAAAAyQ/SUryjPXhJ28zqb32zPCyGZLjXCT0khK2wCLcBGAs/s1600/Contoh%2BSurat%2BKeterangan%2BSakit.png"
+                  approval_status: "approved"
+                message: "success get approval detail"
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
     put:
       tags:
         - "Admin"
@@ -1092,6 +1174,12 @@ paths:
       summary: Approval for Admin
       security:
         - JWTAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -1133,6 +1221,7 @@ paths:
           $ref: "#/components/responses/400"
         500:
           $ref: "#/components/responses/500"
+  /employee/approvals:
     get:
       tags:
         - "Employee"
@@ -1152,27 +1241,21 @@ paths:
                   [
                     {
                       id: 1,
-                      approval_date: "2023-02-01",
-                      leave: "1 Day annual leave",
+                      employee_name: "Alif",
+                      approval_title: "sakit",
+                      approval_start_date: "2023-02-01",
+                      approval_end_date: "2023-02-04",
                       approval_status: "Pending",
+                      created_at : "2023-02-1"
                     },
                     {
                       id: 2,
-                      approval_date: "2023-02-02",
-                      leave: "1 Day sick leave",
-                      approval_status: "Approved",
-                    },
-                    {
-                      id: 3,
-                      approval_date: "2023-02-03",
-                      leave: "1 Day annual leave",
-                      approval_status: "Rejected",
-                    },
-                    {
-                      id: 4,
-                      approval_date: "2023-02-04",
-                      leave: "1 Day annual leave",
-                      approval_status: "Approved",
+                      employee_name: "Alif",
+                      approval_title: "leave",
+                      approval_start_date: "2023-02-04",
+                      approval_end_date: "2023-02-06",
+                      approval_status: "Pending",
+                      created_at : "2023-02-4"
                     },
                   ]
                 message: success show employee approval record

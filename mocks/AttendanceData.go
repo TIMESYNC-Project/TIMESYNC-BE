@@ -69,6 +69,50 @@ func (_m *AttendanceData) ClockOut(employeeID uint, latitudeData string, longitu
 	return r0, r1
 }
 
+// GetPresenceToday provides a mock function with given fields: employeeID
+func (_m *AttendanceData) GetPresenceToday(employeeID uint) (attendance.Core, error) {
+	ret := _m.Called(employeeID)
+
+	var r0 attendance.Core
+	if rf, ok := ret.Get(0).(func(uint) attendance.Core); ok {
+		r0 = rf(employeeID)
+	} else {
+		r0 = ret.Get(0).(attendance.Core)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(uint) error); ok {
+		r1 = rf(employeeID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetPresenceTotalToday provides a mock function with given fields: adminID
+func (_m *AttendanceData) GetPresenceTotalToday(adminID uint) ([]attendance.Core, error) {
+	ret := _m.Called(adminID)
+
+	var r0 []attendance.Core
+	if rf, ok := ret.Get(0).(func(uint) []attendance.Core); ok {
+		r0 = rf(adminID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]attendance.Core)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(uint) error); ok {
+		r1 = rf(adminID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // Record provides a mock function with given fields: employeeID, dateFrom, dateTo
 func (_m *AttendanceData) Record(employeeID uint, dateFrom string, dateTo string) ([]attendance.Core, error) {
 	ret := _m.Called(employeeID, dateFrom, dateTo)
