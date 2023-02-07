@@ -1,7 +1,9 @@
 package helper
 
 import (
+	"fmt"
 	"log"
+	"strconv"
 	"time"
 	"timesync-be/config"
 
@@ -35,4 +37,30 @@ func ExtractToken(t interface{}) int {
 		}
 	}
 	return userId
+}
+
+func ExpiredToken() string {
+	t := time.Now().Add(time.Hour * 5)
+	mont := int(t.Month())
+	y := strconv.Itoa(t.Year())
+	m := strconv.Itoa(mont)
+	d := strconv.Itoa(t.Day())
+	hour := strconv.Itoa(t.Hour())
+	min := strconv.Itoa(t.Minute())
+
+	if len(m) == 1 {
+		m = "0" + m
+	}
+	if len(d) == 1 {
+		d = "0" + d
+	}
+	if len(hour) == 1 {
+		hour = "0" + hour
+	}
+	if len(min) == 1 {
+		min = "0" + min
+	}
+
+	expired := fmt.Sprintf("%s-%s-%s %s:%s", y, m, d, hour, min)
+	return expired
 }

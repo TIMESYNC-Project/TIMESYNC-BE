@@ -106,20 +106,43 @@ func (_m *UserData) Profile(userID uint) (user.Core, error) {
 	return r0, r1
 }
 
-// Register provides a mock function with given fields: newUser
-func (_m *UserData) Register(newUser user.Core) (user.Core, error) {
-	ret := _m.Called(newUser)
+// Register provides a mock function with given fields: adminID, newUser
+func (_m *UserData) Register(adminID uint, newUser user.Core) (user.Core, error) {
+	ret := _m.Called(adminID, newUser)
 
 	var r0 user.Core
-	if rf, ok := ret.Get(0).(func(user.Core) user.Core); ok {
-		r0 = rf(newUser)
+	if rf, ok := ret.Get(0).(func(uint, user.Core) user.Core); ok {
+		r0 = rf(adminID, newUser)
 	} else {
 		r0 = ret.Get(0).(user.Core)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(user.Core) error); ok {
-		r1 = rf(newUser)
+	if rf, ok := ret.Get(1).(func(uint, user.Core) error); ok {
+		r1 = rf(adminID, newUser)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Search provides a mock function with given fields: adminID, quote
+func (_m *UserData) Search(adminID uint, quote string) ([]user.Core, error) {
+	ret := _m.Called(adminID, quote)
+
+	var r0 []user.Core
+	if rf, ok := ret.Get(0).(func(uint, string) []user.Core); ok {
+		r0 = rf(adminID, quote)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]user.Core)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(uint, string) error); ok {
+		r1 = rf(adminID, quote)
 	} else {
 		r1 = ret.Error(1)
 	}

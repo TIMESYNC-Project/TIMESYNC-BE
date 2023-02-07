@@ -24,16 +24,25 @@ func New(ud user.UserData) user.UserService {
 	}
 }
 
-func (uuc *userUseCase) Register(newUser user.Core) (user.Core, error) {
+func (uuc *userUseCase) Register(token interface{}, newUser user.Core) (user.Core, error) {
+	adminID := helper.ExtractToken(token)
+	if len(newUser.Password) != 0 {
+		//validation
+		err := helper.RegistrationValidate(newUser)
+		if err != nil {
+			return user.Core{}, errors.New("validate: " + err.Error())
+		}
+	}
 	hashed, _ := helper.GeneratePassword(newUser.Password)
 	newUser.Password = string(hashed)
-	res, err := uuc.qry.Register(newUser)
+
+	res, err := uuc.qry.Register(uint(adminID), newUser)
 	if err != nil {
 		msg := ""
 		if strings.Contains(err.Error(), "duplicated") {
 			msg = "data already used"
-		} else if strings.Contains(err.Error(), "empty") {
-			msg = "email not allowed empty"
+		} else if strings.Contains(err.Error(), "access denied") {
+			msg = "access denied"
 		} else {
 			msg = "server error"
 		}
@@ -43,7 +52,7 @@ func (uuc *userUseCase) Register(newUser user.Core) (user.Core, error) {
 	return res, nil
 }
 
-func (uuc *userUseCase) Login(nip, password string) (string, user.Core, error) {
+func (uuc *userUseCase) Login(nip, password string) (string, string, user.Core, error) {
 	res, err := uuc.qry.Login(nip)
 	if err != nil {
 		msg := ""
@@ -52,11 +61,11 @@ func (uuc *userUseCase) Login(nip, password string) (string, user.Core, error) {
 		} else {
 			msg = "account not registered or server error"
 		}
-		return "", user.Core{}, errors.New(msg)
+		return "", "", user.Core{}, errors.New(msg)
 	}
 	if err := helper.ComparePassword(res.Password, password); err != nil {
 		log.Println("login compare", err.Error())
-		return "", user.Core{}, errors.New("password not matched")
+		return "", "", user.Core{}, errors.New("password not matched")
 	}
 
 	claims := jwt.MapClaims{}
@@ -65,7 +74,8 @@ func (uuc *userUseCase) Login(nip, password string) (string, user.Core, error) {
 	// claims["exp"] = time.Now().Add(time.Hour * 3).Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	useToken, _ := token.SignedString([]byte(config.JWTKey))
-	return useToken, res, nil
+	expired := helper.ExpiredToken()
+	return expired, useToken, res, nil
 
 }
 
@@ -125,15 +135,9 @@ func (uuc *userUseCase) Update(token interface{}, fileData multipart.FileHeader,
 func (uuc *userUseCase) Csv(fileData multipart.FileHeader) error {
 	result := []user.Core{}
 	if fileData.Size != 0 {
-		src, err := fileData.Open()
-		if err != nil {
-			return err
-		}
+		src, _ := fileData.Open()
 		csvReader := csv.NewReader(src)
-		data, err := csvReader.ReadAll()
-		if err != nil {
-			return err
-		}
+		data, _ := csvReader.ReadAll()
 		if len(data) == 0 {
 			return errors.New("csv file is empty")
 		}
@@ -214,6 +218,20 @@ func (uuc *userUseCase) GetAllEmployee() ([]user.Core, error) {
 	if err != nil {
 		log.Println("data not found", err.Error())
 		return []user.Core{}, errors.New("data not found")
+	}
+	return res, nil
+}
+
+// Search implements user.UserService
+func (uuc *userUseCase) Search(token interface{}, quote string) ([]user.Core, error) {
+	adminID := helper.ExtractToken(token)
+	res, err := uuc.qry.Search(uint(adminID), quote)
+	if err != nil {
+		if strings.Contains(err.Error(), "access denied") {
+			return []user.Core{}, errors.New("access denied")
+		} else {
+			return []user.Core{}, errors.New("data not found")
+		}
 	}
 	return res, nil
 }

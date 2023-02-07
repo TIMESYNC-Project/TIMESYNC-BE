@@ -182,3 +182,20 @@ func ShowAllEmployeeJson(data user.Core) ShowAllEmployee {
 		Position:       data.Position,
 	}
 }
+
+type Search struct {
+	ID             uint   `json:"id"`
+	ProfilePicture string `json:"profile_picture"`
+	Name           string `json:"name"`
+	Nip            string `json:"nip"`
+	Position       string `json:"position"`
+}
+
+func SearchResponse(data user.Core) Search {
+	return Search{
+		ID:       data.ID,
+		Name:     data.Name,
+		Nip:      data.Nip,
+		Position: data.Position,
+	}
+}

@@ -88,7 +88,7 @@ func (_m *UserService) GetAllEmployee() ([]user.Core, error) {
 }
 
 // Login provides a mock function with given fields: nip, password
-func (_m *UserService) Login(nip string, password string) (string, user.Core, error) {
+func (_m *UserService) Login(nip string, password string) (string, string, user.Core, error) {
 	ret := _m.Called(nip, password)
 
 	var r0 string
@@ -98,21 +98,28 @@ func (_m *UserService) Login(nip string, password string) (string, user.Core, er
 		r0 = ret.Get(0).(string)
 	}
 
-	var r1 user.Core
-	if rf, ok := ret.Get(1).(func(string, string) user.Core); ok {
+	var r1 string
+	if rf, ok := ret.Get(1).(func(string, string) string); ok {
 		r1 = rf(nip, password)
 	} else {
-		r1 = ret.Get(1).(user.Core)
+		r1 = ret.Get(1).(string)
 	}
 
-	var r2 error
-	if rf, ok := ret.Get(2).(func(string, string) error); ok {
+	var r2 user.Core
+	if rf, ok := ret.Get(2).(func(string, string) user.Core); ok {
 		r2 = rf(nip, password)
 	} else {
-		r2 = ret.Error(2)
+		r2 = ret.Get(2).(user.Core)
 	}
 
-	return r0, r1, r2
+	var r3 error
+	if rf, ok := ret.Get(3).(func(string, string) error); ok {
+		r3 = rf(nip, password)
+	} else {
+		r3 = ret.Error(3)
+	}
+
+	return r0, r1, r2, r3
 }
 
 // Profile provides a mock function with given fields: token
@@ -157,20 +164,43 @@ func (_m *UserService) ProfileEmployee(userID uint) (user.Core, error) {
 	return r0, r1
 }
 
-// Register provides a mock function with given fields: newUser
-func (_m *UserService) Register(newUser user.Core) (user.Core, error) {
-	ret := _m.Called(newUser)
+// Register provides a mock function with given fields: token, newUser
+func (_m *UserService) Register(token interface{}, newUser user.Core) (user.Core, error) {
+	ret := _m.Called(token, newUser)
 
 	var r0 user.Core
-	if rf, ok := ret.Get(0).(func(user.Core) user.Core); ok {
-		r0 = rf(newUser)
+	if rf, ok := ret.Get(0).(func(interface{}, user.Core) user.Core); ok {
+		r0 = rf(token, newUser)
 	} else {
 		r0 = ret.Get(0).(user.Core)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(user.Core) error); ok {
-		r1 = rf(newUser)
+	if rf, ok := ret.Get(1).(func(interface{}, user.Core) error); ok {
+		r1 = rf(token, newUser)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Search provides a mock function with given fields: token, quote
+func (_m *UserService) Search(token interface{}, quote string) ([]user.Core, error) {
+	ret := _m.Called(token, quote)
+
+	var r0 []user.Core
+	if rf, ok := ret.Get(0).(func(interface{}, string) []user.Core); ok {
+		r0 = rf(token, quote)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]user.Core)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(interface{}, string) error); ok {
+		r1 = rf(token, quote)
 	} else {
 		r1 = ret.Error(1)
 	}

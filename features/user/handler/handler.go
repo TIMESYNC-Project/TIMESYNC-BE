@@ -28,10 +28,14 @@ func (uc *userControll) Register() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "input format incorrect"})
 		}
 
-		res, err := uc.srv.Register(*ReqToCore(input))
+		res, err := uc.srv.Register(c.Get("user"), *ReqToCore(input))
 		if err != nil {
 			if strings.Contains(err.Error(), "already") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "email already registered"})
+			} else if strings.Contains(err.Error(), "access") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
+			} else if strings.Contains(err.Error(), "validate") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
 			} else {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
 			}
@@ -53,7 +57,7 @@ func (uc *userControll) Login() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "password not allowed empty"})
 		}
 
-		token, res, err := uc.srv.Login(input.Nip, input.Password)
+		expired, token, res, err := uc.srv.Login(input.Nip, input.Password)
 		if err != nil {
 			if strings.Contains(err.Error(), "password") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "password not match"})
@@ -62,10 +66,10 @@ func (uc *userControll) Login() echo.HandlerFunc {
 			}
 		}
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"data":    ToResponse(res),
-			"message": "success login",
-			"token":   token,
-			// "token_expired_at": "ok",
+			"data":             ToResponse(res),
+			"message":          "success login",
+			"token":            token,
+			"token_expired_at": expired,
 		})
 	}
 }
@@ -230,6 +234,32 @@ func (uc *userControll) GetAllEmployee() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"data":    result,
 			"message": "success show all employee",
+		})
+	}
+}
+
+// Search implements user.UserHandler
+func (uc *userControll) Search() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		quotes := c.QueryParam("q")
+		res, err := uc.srv.Search(c.Get("user"), quotes)
+		if err != nil {
+			if strings.Contains(err.Error(), "access denied") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
+			}
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": err.Error()})
+		}
+		if len(res) == 0 {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "user not found"})
+		}
+		result := []Search{}
+		for i := 0; i < len(res); i++ {
+			result = append(result, SearchResponse(res[i]))
+		}
+
+		return c.JSON(http.StatusCreated, map[string]interface{}{
+			"data":    result,
+			"message": "searching success",
 		})
 	}
 }

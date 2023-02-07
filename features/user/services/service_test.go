@@ -18,42 +18,54 @@ import (
 
 func TestRegister(t *testing.T) {
 	repo := mocks.NewUserData(t)
-	inputData := user.Core{Name: "Fauzi", Email: "fauzi@example.com", Phone: "08123", Password: "123"}
-	resData := user.Core{ID: uint(1), Name: "Fauzi", Email: "fauzi@example.com", Phone: "08123"}
+	inputData := user.Core{Name: "Fauzi", Email: "fauzi@example.com", Phone: "08123", Gender: "Male", Address: "Jalan Bandung", Position: "BE", BirthOfDate: "2000-01-03"}
+	resData := user.Core{ID: uint(1), Name: "Fauzi", Email: "fauzi@example.com", Phone: "08123", Gender: "Male", Address: "Jalan Bandung", Position: "BE", BirthOfDate: "2000-01-03"}
 
 	t.Run("success creating account", func(t *testing.T) {
-		repo.On("Register", mock.Anything).Return(resData, nil).Once()
+		repo.On("Register", uint(1), mock.Anything).Return(resData, nil).Once()
 		srv := New(repo)
-		res, err := srv.Register(inputData)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.Register(pToken, inputData)
 		assert.Nil(t, err)
 		assert.Equal(t, resData.ID, res.ID)
 		assert.Equal(t, resData.Phone, res.Phone)
 		repo.AssertExpectations(t)
 	})
 
-	t.Run("all input must fill", func(t *testing.T) {
-		repo.On("Register", mock.Anything).Return(user.Core{}, errors.New("email or password not allowed empty")).Once()
+	t.Run("access denied", func(t *testing.T) {
+		repo.On("Register", uint(1), mock.Anything).Return(user.Core{}, errors.New("access denied")).Once()
 		srv := New(repo)
-		res, err := srv.Register(user.Core{})
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.Register(pToken, inputData)
 		assert.NotNil(t, err)
-		assert.ErrorContains(t, err, "not allowed empty")
+		assert.ErrorContains(t, err, "access denied")
 		assert.Equal(t, uint(0), res.ID)
 		repo.AssertExpectations(t)
 	})
 
 	t.Run("internal server error", func(t *testing.T) {
-		repo.On("Register", mock.Anything).Return(user.Core{}, errors.New("server error")).Once()
+		repo.On("Register", uint(1), mock.Anything).Return(user.Core{}, errors.New("server error")).Once()
 		srv := New(repo)
-		res, err := srv.Register(inputData)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.Register(pToken, inputData)
 		assert.NotNil(t, err)
 		assert.Equal(t, uint(0), res.ID)
 		assert.ErrorContains(t, err, "server error")
 		repo.AssertExpectations(t)
 	})
 	t.Run("Duplicated", func(t *testing.T) {
-		repo.On("Register", mock.Anything).Return(user.Core{}, errors.New("duplicated")).Once()
+		repo.On("Register", uint(1), mock.Anything).Return(user.Core{}, errors.New("duplicated")).Once()
 		srv := New(repo)
-		res, err := srv.Register(inputData)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.Register(pToken, inputData)
 		assert.NotNil(t, err)
 		assert.Equal(t, uint(0), res.ID)
 		assert.ErrorContains(t, err, "used")
@@ -69,7 +81,7 @@ func TestLogin(t *testing.T) {
 	t.Run("login success", func(t *testing.T) {
 		repo.On("Login", inputEmail).Return(resData, nil).Once()
 		srv := New(repo)
-		token, res, err := srv.Login(inputEmail, "123")
+		_, token, res, err := srv.Login(inputEmail, "123")
 		assert.Nil(t, err)
 		assert.NotEmpty(t, token)
 		assert.Equal(t, resData.Name, res.Name)
@@ -78,7 +90,7 @@ func TestLogin(t *testing.T) {
 	t.Run("account not found", func(t *testing.T) {
 		repo.On("Login", inputEmail).Return(user.Core{}, errors.New("data not found")).Once()
 		srv := New(repo)
-		token, res, err := srv.Login(inputEmail, "123")
+		_, token, res, err := srv.Login(inputEmail, "123")
 		assert.NotNil(t, token)
 		assert.ErrorContains(t, err, "not")
 		assert.Empty(t, token)
@@ -90,7 +102,7 @@ func TestLogin(t *testing.T) {
 		inputEmail := "hitler@example.com"
 		repo.On("Login", inputEmail).Return(resData, nil).Once()
 		srv := New(repo)
-		_, res, err := srv.Login(inputEmail, "342")
+		_, _, res, err := srv.Login(inputEmail, "342")
 		assert.NotNil(t, err)
 		assert.ErrorContains(t, err, "password")
 		assert.Empty(t, nil)
@@ -101,7 +113,7 @@ func TestLogin(t *testing.T) {
 		inputEmail := "hitler@example.com"
 		repo.On("Login", inputEmail).Return(user.Core{}, errors.New("nip or password not allowed empty")).Once()
 		srv := New(repo)
-		_, res, err := srv.Login(inputEmail, "")
+		_, _, res, err := srv.Login(inputEmail, "")
 		assert.NotNil(t, err)
 		assert.ErrorContains(t, err, "empty")
 		assert.Equal(t, uint(0), res.ID)
@@ -300,6 +312,46 @@ func TestGetAllEmployee(t *testing.T) {
 	})
 }
 
+func TestSearch(t *testing.T) {
+	repo := mocks.NewUserData(t)
+	resData := []user.Core{{ID: 1, Name: "Fauzi", Nip: "23002"}}
+	t.Run("success Found", func(t *testing.T) {
+		repo.On("Search", uint(1), "eko").Return(resData, nil).Once()
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.Search(pToken, "eko")
+		assert.Nil(t, err)
+		assert.Equal(t, resData[0].Name, res[0].Name)
+		repo.AssertExpectations(t)
+	})
+	t.Run("Not found", func(t *testing.T) {
+		repo.On("Search", uint(1), "123ad").Return([]user.Core{}, errors.New("no user found")).Once()
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.Search(pToken, "123ad")
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "data")
+		assert.Equal(t, []user.Core{}, res)
+		repo.AssertExpectations(t)
+	})
+	t.Run("access denied", func(t *testing.T) {
+		repo.On("Search", uint(2), "123ad").Return([]user.Core{}, errors.New("access denied")).Once()
+		srv := New(repo)
+		_, token := helper.GenerateToken(2)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.Search(pToken, "123ad")
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "access denied")
+		assert.Equal(t, []user.Core{}, res)
+		repo.AssertExpectations(t)
+	})
+}
+
 // func (bl *blogic) Add(file *multipart.Fileheader) error {
 // 	read, err := file.Open()
 // 	if err != nil {
@@ -365,3 +417,33 @@ func TestGetAllEmployee(t *testing.T) {
 // 	// 	repo.AssertExpectations(t)
 // 	// })
 // }
+
+func TestCsv(t *testing.T) {
+	repo := mocks.NewUserData(t)
+	filePath := filepath.Join("..", "..", "..", "TimeSyncUnitTesting.csv")
+	// imageFalse, _ := os.Open(filePath)
+	// imageFalseCnv := &multipart.FileHeader{
+	// 	Filename: imageFalse.Name(),
+	// }
+	imageTrue, err := os.Open(filePath)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	imageTrueCnv := &multipart.FileHeader{
+		Filename: imageTrue.Name(),
+	}
+	// inputData := []user.Core{
+	// 	{
+	// 		ID:    0,
+	// 		Name:  "Fauzi",
+	// 		Email: "fauzi@gmail.com",
+	// 		Phone: "081234",
+	// 	},
+	// }
+	t.Run("get all employee successful", func(t *testing.T) {
+
+		srv := New(repo)
+		err := srv.Csv(*imageTrueCnv)
+		assert.Nil(t, err)
+	})
+}
