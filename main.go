@@ -85,6 +85,7 @@ func main() {
 	e.PUT("/attendances", attendHdl.ClockOut(), middleware.JWT([]byte(config.JWTKey)))
 	e.POST("/attendances/:id", attendHdl.AttendanceFromAdmin(), middleware.JWT([]byte(config.JWTKey)))
 	e.GET("/attendances", attendHdl.Record(), middleware.JWT([]byte(config.JWTKey)))
+	e.GET("/presences", attendHdl.GetPresenceToday(), middleware.JWT([]byte(config.JWTKey)))
 
 	//setting
 	e.GET("/setting", setHdl.GetSetting())
