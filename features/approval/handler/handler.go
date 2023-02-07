@@ -68,7 +68,7 @@ func (ac *approvalControll) GetApproval() echo.HandlerFunc {
 		}
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"data":    result,
-			"message": "success show employee approval record",
+			"message": "success show all employee approval record",
 		})
 
 	}
