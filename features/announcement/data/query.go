@@ -2,6 +2,7 @@ package data
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"timesync-be/features/announcement"
 
@@ -55,14 +56,32 @@ func (aq *announcementQuery) GetAnnouncement() ([]announcement.Core, error) {
 		log.Println("get all announcement query error : ", err.Error())
 		return []announcement.Core{}, err
 	}
-	// if err := aq.db.Table("announcements").Joins("JOIN users ON users.id = announcements.user_id").Select("announcements.id, announcements.title, announcements.message, announcements.created_at").Find(&res).Error; err != nil {
-	// 	log.Println("get all announcement query error : ", err.Error())
-	// 	return []announcement.Core{}, err
-	// }
 	result := []announcement.Core{}
+	i := 0
 	for _, val := range res {
 		result = append(result, ToCore(val))
+		if res[i].Type == "personal" {
+			user := User{}
+			if err := aq.db.Where("id = ?", res[i].UserID).First(&user).Error; err != nil {
+				log.Println("get user by id query error : ", err.Error())
+				return []announcement.Core{}, err
+			}
+			result[i].Name = user.Name
+			result[i].Nip = user.Nip
+			y := res[i].CreatedAt.Year()
+			m := int(res[i].CreatedAt.Month())
+			d := res[i].CreatedAt.Day()
+			result[i].AnnouncementDate = fmt.Sprintf("%d-%d-%d", y, m, d)
+		} else {
+			y := res[i].CreatedAt.Year()
+			m := int(res[i].CreatedAt.Month())
+			d := res[i].CreatedAt.Day()
+			result[i].AnnouncementDate = fmt.Sprintf("%d-%d-%d", y, m, d)
+		}
+
+		i++
 	}
+
 	return result, nil
 }
 
@@ -72,11 +91,21 @@ func (aq *announcementQuery) GetAnnouncementDetail(adminID uint, announcementID 
 		log.Println("get announcement by id query error : ", err.Error())
 		return announcement.Core{}, err
 	}
-	// result := []announcement.Core{}
-	// for _, val := range res {
-	// 	result = append(result, ToCore(val))
-	// }
-	return ToCore(res), nil
+
+	user := User{}
+	if err := aq.db.Where("id = ?", res.UserID).First(&user).Error; err != nil {
+		log.Println("get user by id query error : ", err.Error())
+		return announcement.Core{}, err
+	}
+
+	y := res.CreatedAt.Year()
+	m := int(res.CreatedAt.Month())
+	d := res.CreatedAt.Day()
+	result := ToCore(res)
+	result.AnnouncementDate = fmt.Sprintf("%d-%d-%d", y, m, d)
+	result.Name = user.Name
+	result.Nip = user.Nip
+	return result, nil
 }
 
 func (aq *announcementQuery) DeleteAnnouncement(adminID uint, announcementID uint) error {

@@ -12,12 +12,12 @@ type Core struct {
 	Name           string
 	BirthOfDate    string
 	Nip            string
-	Email          string
+	Email          string `validate:"omitempty,email"`
 	Gender         string
 	Position       string
 	Phone          string
 	Address        string
-	Password       string
+	Password       string `validate:"min=8,omitempty"`
 	Role           string
 	AnnualLeave    int
 }

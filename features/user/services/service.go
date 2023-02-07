@@ -10,17 +10,20 @@ import (
 	"timesync-be/features/user"
 	"timesync-be/helper"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt"
 	uuid "github.com/satori/go.uuid"
 )
 
 type userUseCase struct {
 	qry user.UserData
+	vld *validator.Validate
 }
 
 func New(ud user.UserData) user.UserService {
 	return &userUseCase{
 		qry: ud,
+		vld: validator.New(),
 	}
 }
 

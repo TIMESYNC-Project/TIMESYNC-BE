@@ -3,11 +3,13 @@ package announcement
 import "github.com/labstack/echo/v4"
 
 type Core struct {
-	ID      uint
-	Nip     string
-	Type    string
-	Title   string
-	Message string
+	ID               uint
+	Nip              string
+	Name             string
+	Type             string
+	Title            string
+	Message          string
+	AnnouncementDate string
 }
 
 type AnnouncementHandler interface {
