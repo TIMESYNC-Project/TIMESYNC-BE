@@ -158,6 +158,138 @@ func TestGetApproval(t *testing.T) {
 	})
 }
 
+func TestApprovalDetail(t *testing.T) {
+	repo := mocks.NewApprovalData(t)
+	filePath := filepath.Join("..", "..", "..", "ERD.png")
+	imageTrue, err := os.Open(filePath)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	imageTrueCnv := &multipart.FileHeader{
+		Filename: imageTrue.Name(),
+	}
+	resData := approval.Core{
+		ID:            1,
+		Title:         "Sakit",
+		StartDate:     "2023-02-01",
+		EndDate:       "2023-02-04",
+		Description:   "maaf pak tidak bisa hadir karena sakit",
+		ApprovalImage: imageTrueCnv.Filename,
+		Status:        "pending",
+	}
+
+	t.Run("success get approval detail", func(t *testing.T) {
+		repo.On("ApprovalDetail", uint(1)).Return(resData, nil).Once()
+		srv := New(repo)
+		res, err := srv.ApprovalDetail(uint(1))
+		assert.Nil(t, err)
+		assert.Equal(t, resData.ID, res.ID)
+		repo.AssertExpectations(t)
+	})
+
+	t.Run("data not found", func(t *testing.T) {
+		repo.On("ApprovalDetail", uint(1)).Return(approval.Core{}, errors.New("data not found")).Once()
+
+		srv := New(repo)
+
+		res, err := srv.ApprovalDetail(uint(1))
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "not found")
+		assert.NotEqual(t, 0, res.ID)
+		repo.AssertExpectations(t)
+	})
+
+	t.Run("server problem", func(t *testing.T) {
+		repo.On("ApprovalDetail", uint(1)).Return(approval.Core{}, errors.New("server problem")).Once()
+
+		srv := New(repo)
+
+		res, err := srv.ApprovalDetail(uint(1))
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "server")
+		assert.NotEqual(t, 0, res.ID)
+		repo.AssertExpectations(t)
+	})
+}
+
+func TestEmployeeApprovalRecord(t *testing.T) {
+	repo := mocks.NewApprovalData(t)
+	filePath := filepath.Join("..", "..", "..", "ERD.png")
+	imageTrue, err := os.Open(filePath)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	imageTrueCnv := &multipart.FileHeader{
+		Filename: imageTrue.Name(),
+	}
+	resData := []approval.Core{{
+		ID:            1,
+		Title:         "Sakit",
+		StartDate:     "2023-02-01",
+		EndDate:       "2023-02-04",
+		Description:   "maaf pak tidak bisa hadir karena sakit",
+		ApprovalImage: imageTrueCnv.Filename,
+		Status:        "pending",
+	}}
+
+	t.Run("success get employee approval record", func(t *testing.T) {
+		repo.On("EmployeeApprovalRecord", uint(1)).Return(resData, nil).Once()
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.EmployeeApprovalRecord(pToken)
+		assert.Nil(t, err)
+		assert.Equal(t, len(resData), len(res))
+		repo.AssertExpectations(t)
+	})
+
+	t.Run("invalid jwt token", func(t *testing.T) {
+		srv := New(repo)
+
+		_, token := helper.GenerateToken(0)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+
+		res, err := srv.EmployeeApprovalRecord(pToken)
+
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "found")
+		assert.NotEqual(t, len(resData), len(res))
+		repo.AssertExpectations(t)
+	})
+
+	t.Run("data not found", func(t *testing.T) {
+		repo.On("EmployeeApprovalRecord", uint(1)).Return([]approval.Core{}, errors.New("data not found")).Once()
+
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+
+		res, err := srv.EmployeeApprovalRecord(pToken)
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "not found")
+		assert.Equal(t, 0, len(res))
+		repo.AssertExpectations(t)
+	})
+
+	t.Run("server problem", func(t *testing.T) {
+		repo.On("EmployeeApprovalRecord", uint(1)).Return([]approval.Core{}, errors.New("server problem")).Once()
+
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+
+		res, err := srv.EmployeeApprovalRecord(pToken)
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "server")
+		assert.Equal(t, 0, len(res))
+		repo.AssertExpectations(t)
+	})
+}
+
 func TestUpdateApproval(t *testing.T) {
 	repo := mocks.NewApprovalData(t)
 	filePath := filepath.Join("..", "..", "..", "ERD.png")

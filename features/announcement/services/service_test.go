@@ -153,21 +153,53 @@ func TestGetAnnouncementDetail(t *testing.T) {
 		assert.Equal(t, uint(0), res.ID)
 		repo.AssertExpectations(t)
 	})
+}
 
-	t.Run("server problem", func(t *testing.T) {
-		repo.On("GetAnnouncementDetail", uint(1), uint(1)).Return(announcement.Core{}, errors.New("server problem")).Once()
+func TestEmployeeInbox(t *testing.T) {
+	repo := mocks.NewAnnouncementData(t)
+	resData := []announcement.Core{{ID: uint(1), Nip: "23001", Type: "personal", Title: "Libur guys", Message: "Besok Libur karena ada rapat"}}
+
+	t.Run("success get employee inbox", func(t *testing.T) {
+		repo.On("EmployeeInbox", uint(1)).Return(resData, nil).Once()
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.EmployeeInbox(pToken)
+		assert.Nil(t, err)
+		assert.Equal(t, len(resData), len(res))
+		repo.AssertExpectations(t)
+	})
+
+	t.Run("data not found", func(t *testing.T) {
+		repo.On("EmployeeInbox", uint(1)).Return([]announcement.Core{}, errors.New("data not found")).Once()
 
 		srv := New(repo)
 		_, token := helper.GenerateToken(1)
 		pToken := token.(*jwt.Token)
 		pToken.Valid = true
-		res, err := srv.GetAnnouncementDetail(pToken, uint(1))
+
+		res, err := srv.EmployeeInbox(pToken)
 		assert.NotNil(t, err)
-		assert.ErrorContains(t, err, "server")
-		assert.Equal(t, res.ID, uint(0))
+		assert.ErrorContains(t, err, "not found")
+		assert.Equal(t, 0, len(res))
 		repo.AssertExpectations(t)
 	})
 
+	t.Run("server problem", func(t *testing.T) {
+		repo.On("EmployeeInbox", uint(1)).Return([]announcement.Core{}, errors.New("server problem")).Once()
+
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+
+		res, err := srv.EmployeeInbox(pToken)
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "server")
+		assert.Equal(t, 0, len(res))
+		repo.AssertExpectations(t)
+	})
 }
 
 func TestDeleteAnnouncement(t *testing.T) {

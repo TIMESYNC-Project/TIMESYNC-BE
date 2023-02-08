@@ -176,7 +176,7 @@ func TestRecord(t *testing.T) {
 		},
 	}
 	t.Run("success Record", func(t *testing.T) {
-		data.On("Record", uint(1), "2023-01-28", "2023-01-28").Return(resData, nil).Once()
+		data.On("Record", uint(1), "2023-01-28", "2023-01-28").Return(resData, "", nil).Once()
 		srv := New(data)
 		_, token := helper.GenerateToken(1)
 		mockToken := token.(*jwt.Token)
@@ -188,7 +188,7 @@ func TestRecord(t *testing.T) {
 	})
 
 	t.Run("wrong input", func(t *testing.T) {
-		data.On("Record", uint(1), "2023-01-28", "2023-01-28").Return([]attendance.Core{}, errors.New("wrong input format")).Once()
+		data.On("Record", uint(1), "2023-01-28", "2023-01-28").Return([]attendance.Core{}, "", errors.New("wrong input format")).Once()
 		srv := New(data)
 		_, token := helper.GenerateToken(1)
 		mockToken := token.(*jwt.Token)
@@ -200,7 +200,7 @@ func TestRecord(t *testing.T) {
 		data.AssertExpectations(t)
 	})
 	t.Run("server error", func(t *testing.T) {
-		data.On("Record", uint(1), "2023-01-28", "2023-01-28").Return([]attendance.Core{}, errors.New("data not found")).Once()
+		data.On("Record", uint(1), "2023-01-28", "2023-01-28").Return([]attendance.Core{}, "", errors.New("server error")).Once()
 		srv := New(data)
 		_, token := helper.GenerateToken(1)
 		mockToken := token.(*jwt.Token)
@@ -208,6 +208,149 @@ func TestRecord(t *testing.T) {
 		res, err := srv.Record(mockToken, "2023-01-28", "2023-01-28")
 		assert.NotNil(t, err)
 		assert.Equal(t, []attendance.Core{}, res)
+		assert.ErrorContains(t, err, "server error")
+		data.AssertExpectations(t)
+	})
+}
+
+func TestGetPresenceToday(t *testing.T) {
+	data := mocks.NewAttendanceData(t)
+	resData := attendance.Core{
+
+		ClockIn:         "07:50",
+		ClockInLocation: "Jalan Soekarno hatta Bandung Jawa Barat",
+		ClockInOSM:      "https://www.openstreetmap.org/#map=16/-6.4096/106.8185",
+	}
+	t.Run("success presence", func(t *testing.T) {
+		data.On("GetPresenceToday", uint(1)).Return(resData, nil).Once()
+		srv := New(data)
+		_, token := helper.GenerateToken(1)
+		mockToken := token.(*jwt.Token)
+		mockToken.Valid = true
+		res, err := srv.GetPresenceToday(mockToken)
+		assert.Equal(t, res, resData)
+		assert.Nil(t, err)
+		data.AssertExpectations(t)
+	})
+
+	t.Run("data not found", func(t *testing.T) {
+		data.On("GetPresenceToday", uint(1)).Return(attendance.Core{}, errors.New("data not found")).Once()
+		srv := New(data)
+		_, token := helper.GenerateToken(1)
+		mockToken := token.(*jwt.Token)
+		mockToken.Valid = true
+		res, err := srv.GetPresenceToday(mockToken)
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "not found")
+		assert.NotEqual(t, 0, res.ID)
+		data.AssertExpectations(t)
+	})
+}
+
+func TestGetPresenceTotalToday(t *testing.T) {
+	data := mocks.NewAttendanceData(t)
+	resData := []attendance.Core{{
+
+		ClockIn:         "07:50",
+		ClockInLocation: "Jalan Soekarno hatta Bandung Jawa Barat",
+		ClockInOSM:      "https://www.openstreetmap.org/#map=16/-6.4096/106.8185",
+	}}
+	t.Run("success get total presence", func(t *testing.T) {
+		data.On("GetPresenceTotalToday", uint(1)).Return(resData, nil).Once()
+		srv := New(data)
+		_, token := helper.GenerateToken(1)
+		mockToken := token.(*jwt.Token)
+		mockToken.Valid = true
+		res, err := srv.GetPresenceTotalToday(mockToken)
+		assert.Equal(t, res, resData)
+		assert.Nil(t, err)
+		data.AssertExpectations(t)
+	})
+
+	t.Run("data not found", func(t *testing.T) {
+		data.On("GetPresenceTotalToday", uint(1)).Return([]attendance.Core{}, errors.New("data not found")).Once()
+		srv := New(data)
+		_, token := helper.GenerateToken(1)
+		mockToken := token.(*jwt.Token)
+		mockToken.Valid = true
+		res, err := srv.GetPresenceTotalToday(mockToken)
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "not found")
+		assert.Equal(t, []attendance.Core{}, res)
+		data.AssertExpectations(t)
+	})
+}
+
+func TestGetPresenceDetail(t *testing.T) {
+	data := mocks.NewAttendanceData(t)
+	resData := attendance.Core{
+
+		ClockIn:         "07:50",
+		ClockInLocation: "Jalan Soekarno hatta Bandung Jawa Barat",
+		ClockInOSM:      "https://www.openstreetmap.org/#map=16/-6.4096/106.8185",
+	}
+	t.Run("success get presence detail", func(t *testing.T) {
+		data.On("GetPresenceDetail", uint(1), uint(1)).Return(resData, nil).Once()
+		srv := New(data)
+		_, token := helper.GenerateToken(1)
+		mockToken := token.(*jwt.Token)
+		mockToken.Valid = true
+		res, err := srv.GetPresenceDetail(mockToken, uint(1))
+		assert.Equal(t, res, resData)
+		assert.Nil(t, err)
+		data.AssertExpectations(t)
+	})
+
+	t.Run("data not found", func(t *testing.T) {
+		data.On("GetPresenceDetail", uint(1), uint(1)).Return(attendance.Core{}, errors.New("data not found")).Once()
+		srv := New(data)
+		_, token := helper.GenerateToken(1)
+		mockToken := token.(*jwt.Token)
+		mockToken.Valid = true
+		res, err := srv.GetPresenceDetail(mockToken, uint(1))
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "not found")
+		assert.NotEqual(t, 0, res.ID)
+		data.AssertExpectations(t)
+	})
+}
+
+func TestRecordByID(t *testing.T) {
+	data := mocks.NewAttendanceData(t)
+	resData := []attendance.Core{
+		{
+			ClockIn:         "07:50",
+			ClockInLocation: "Jalan Soekarno hatta Bandung Jawa Barat",
+			ClockInOSM:      "https://www.openstreetmap.org/#map=16/-6.4096/106.8185",
+		},
+	}
+	t.Run("success get record by id", func(t *testing.T) {
+		data.On("Record", uint(1), "2023-01-28", "2023-01-28").Return(resData, "", nil).Once()
+		srv := New(data)
+		res, name, err := srv.RecordByID(uint(1), "2023-01-28", "2023-01-28")
+		assert.Equal(t, res, resData)
+		assert.NotEqual(t, name, resData)
+		assert.Nil(t, err)
+		data.AssertExpectations(t)
+	})
+
+	t.Run("wrong input", func(t *testing.T) {
+		data.On("Record", uint(1), "2023-01-28", "2023-01-28").Return([]attendance.Core{}, "", errors.New("wrong input format")).Once()
+		srv := New(data)
+		res, name, err := srv.RecordByID(uint(1), "2023-01-28", "2023-01-28")
+		assert.NotNil(t, err)
+		assert.Equal(t, []attendance.Core{}, res)
+		assert.NotEqual(t, name, resData)
+		assert.ErrorContains(t, err, "wrong input format")
+		data.AssertExpectations(t)
+	})
+	t.Run("server error", func(t *testing.T) {
+		data.On("Record", uint(1), "2023-01-28", "2023-01-28").Return([]attendance.Core{}, "", errors.New("server error")).Once()
+		srv := New(data)
+		res, name, err := srv.RecordByID(uint(1), "2023-01-28", "2023-01-28")
+		assert.NotNil(t, err)
+		assert.Equal(t, []attendance.Core{}, res)
+		assert.NotEqual(t, name, resData)
 		assert.ErrorContains(t, err, "server error")
 		data.AssertExpectations(t)
 	})
