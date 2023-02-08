@@ -178,12 +178,62 @@ func (ac *attendanceController) GetPresenceToday() echo.HandlerFunc {
 		}
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"data":    res,
-			"message": "success show records",
+			"message": "success show presence data today",
 		})
 	}
 }
 
 // GetPresenceTotalToday implements attendance.AttendanceHandler
 func (ac *attendanceController) GetPresenceTotalToday() echo.HandlerFunc {
-	panic("unimplemented")
+	return func(c echo.Context) error {
+		res, err := ac.srv.GetPresenceTotalToday(c.Get("user"))
+		if err != nil {
+			return c.JSON(http.StatusNotFound, map[string]interface{}{"message": "data not found"})
+		}
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"data":    res,
+			"message": "success show all employe presence data today",
+		})
+	}
+}
+
+// GetPresenceDetail implements attendance.AttendanceHandler
+func (ac *attendanceController) GetPresenceDetail() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		paramID := c.Param("id")
+		attendanceID, _ := strconv.Atoi(paramID)
+		res, err := ac.srv.GetPresenceDetail(c.Get("user"), uint(attendanceID))
+		if err != nil {
+			return c.JSON(http.StatusNotFound, map[string]interface{}{"message": "data not found"})
+		}
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"data":    res,
+			"message": "success show presence data detail",
+		})
+	}
+}
+
+// RecordByID implements attendance.AttendanceHandler
+func (ac *attendanceController) RecordByID() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		dateFrom := c.QueryParam("date_from")
+		dateTo := c.QueryParam("date_to")
+		paramID := c.Param("id")
+		employeeID, _ := strconv.Atoi(paramID)
+		res, nameUser, err := ac.srv.RecordByID(uint(employeeID), dateFrom, dateTo)
+		if err != nil {
+			if strings.Contains(err.Error(), "input format") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "input format inccorect"})
+			} else {
+				return c.JSON(http.StatusNotFound, map[string]interface{}{"message": "data not found"})
+			}
+		}
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"data": map[string]interface{}{
+				"record":        res,
+				"employee_name": nameUser,
+			},
+			"message": "success show records",
+		})
+	}
 }

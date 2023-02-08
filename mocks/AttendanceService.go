@@ -69,6 +69,27 @@ func (_m *AttendanceService) ClockOut(token interface{}, latitudeData string, lo
 	return r0, r1
 }
 
+// GetPresenceDetail provides a mock function with given fields: token, attendanceID
+func (_m *AttendanceService) GetPresenceDetail(token interface{}, attendanceID uint) (attendance.Core, error) {
+	ret := _m.Called(token, attendanceID)
+
+	var r0 attendance.Core
+	if rf, ok := ret.Get(0).(func(interface{}, uint) attendance.Core); ok {
+		r0 = rf(token, attendanceID)
+	} else {
+		r0 = ret.Get(0).(attendance.Core)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(interface{}, uint) error); ok {
+		r1 = rf(token, attendanceID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetPresenceToday provides a mock function with given fields: token
 func (_m *AttendanceService) GetPresenceToday(token interface{}) (attendance.Core, error) {
 	ret := _m.Called(token)
@@ -129,6 +150,29 @@ func (_m *AttendanceService) Record(token interface{}, dateFrom string, dateTo s
 	var r1 error
 	if rf, ok := ret.Get(1).(func(interface{}, string, string) error); ok {
 		r1 = rf(token, dateFrom, dateTo)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// RecordByID provides a mock function with given fields: employeeID, dateFrom, dateTo
+func (_m *AttendanceService) RecordByID(employeeID uint, dateFrom string, dateTo string) ([]attendance.Core, error) {
+	ret := _m.Called(employeeID, dateFrom, dateTo)
+
+	var r0 []attendance.Core
+	if rf, ok := ret.Get(0).(func(uint, string, string) []attendance.Core); ok {
+		r0 = rf(employeeID, dateFrom, dateTo)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]attendance.Core)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(uint, string, string) error); ok {
+		r1 = rf(employeeID, dateFrom, dateTo)
 	} else {
 		r1 = ret.Error(1)
 	}

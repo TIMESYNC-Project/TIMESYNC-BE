@@ -86,6 +86,9 @@ func main() {
 	e.POST("/attendances/:id", attendHdl.AttendanceFromAdmin(), middleware.JWT([]byte(config.JWTKey)))
 	e.GET("/attendances", attendHdl.Record(), middleware.JWT([]byte(config.JWTKey)))
 	e.GET("/presences", attendHdl.GetPresenceToday(), middleware.JWT([]byte(config.JWTKey)))
+	e.GET("/presences/total", attendHdl.GetPresenceTotalToday(), middleware.JWT([]byte(config.JWTKey)))
+	e.GET("/record/:id", attendHdl.RecordByID(), middleware.JWT([]byte(config.JWTKey)))
+	e.GET("/presences/detail/:id", attendHdl.GetPresenceDetail(), middleware.JWT([]byte(config.JWTKey)))
 
 	//setting
 	e.GET("/setting", setHdl.GetSetting())

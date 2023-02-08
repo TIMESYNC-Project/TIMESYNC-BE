@@ -69,6 +69,27 @@ func (_m *AttendanceData) ClockOut(employeeID uint, latitudeData string, longitu
 	return r0, r1
 }
 
+// GetPresenceDetail provides a mock function with given fields: adminID, attendanceID
+func (_m *AttendanceData) GetPresenceDetail(adminID uint, attendanceID uint) (attendance.Core, error) {
+	ret := _m.Called(adminID, attendanceID)
+
+	var r0 attendance.Core
+	if rf, ok := ret.Get(0).(func(uint, uint) attendance.Core); ok {
+		r0 = rf(adminID, attendanceID)
+	} else {
+		r0 = ret.Get(0).(attendance.Core)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(uint, uint) error); ok {
+		r1 = rf(adminID, attendanceID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetPresenceToday provides a mock function with given fields: employeeID
 func (_m *AttendanceData) GetPresenceToday(employeeID uint) (attendance.Core, error) {
 	ret := _m.Called(employeeID)
