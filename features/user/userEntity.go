@@ -53,6 +53,7 @@ type UserData interface {
 	Login(nip string) (Core, error)
 	Profile(userID uint) (Core, error)
 	Update(employeeID uint, updateData Core) (Core, error)
+	UpdateByAdmin(employeeID uint, updateData Core) (Core, error)
 	Delete(adminID uint, employeeID uint) error
 	Csv(newUserBatch []Core) error
 	GetAllEmployee() ([]Core, error)

@@ -2,7 +2,9 @@ package helper
 
 import (
 	"fmt"
+	"math/rand"
 	"mime/multipart"
+	"time"
 	"timesync-be/config"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -50,6 +52,20 @@ func UploadToS3(fileName string, src multipart.File) (string, error) {
 		return "", fmt.Errorf("failed to upload file, %v", err)
 	}
 	return result.Location, nil
+}
+
+func GenerateRandomString() string {
+	rand.Seed(time.Now().Unix())
+	str := "AsDfGhBvCX123456MnBp"
+	shuff := []rune(str)
+	// Shuffling the string
+	rand.Shuffle(len(shuff), func(i, j int) {
+		shuff[i], shuff[j] = shuff[j], shuff[i]
+	})
+
+	// Displaying the random string
+	// fmt.Println(string(shuff))
+	return string(shuff)
 }
 
 // Handler Controller

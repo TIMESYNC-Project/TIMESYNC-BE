@@ -112,6 +112,7 @@ func (uc *userControll) Update() echo.HandlerFunc {
 			}
 			input.FileHeader = *formHeader
 		}
+		// log.Println((input.FileHeader))
 		res, err := uc.srv.Update(c.Get("user"), input.FileHeader, *ReqToCore(input))
 		if err != nil {
 			if strings.Contains(err.Error(), "email") {

@@ -138,6 +138,37 @@ func (uq *userQuery) Update(employeeID uint, updateData user.Core) (user.Core, e
 	return result, nil
 }
 
+// UpdateByAdmin implements user.UserData
+func (uq *userQuery) UpdateByAdmin(employeeID uint, updateData user.Core) (user.Core, error) {
+	if employeeID == 1 {
+		log.Println("cannot modifed admin data")
+		return user.Core{}, errors.New("cannot modifed admin data")
+	}
+	if updateData.Email != "" {
+		dupEmail := User{}
+		err := uq.db.Where("email = ?", updateData.Email).First(&dupEmail).Error
+		if err == nil {
+			log.Println("duplicated")
+			return user.Core{}, errors.New("email duplicated")
+		}
+	}
+	cnv := CoreToData(updateData)
+	qry := uq.db.Model(&User{}).Where("id = ?", employeeID).Updates(&cnv)
+	affrows := qry.RowsAffected
+	if affrows == 0 {
+		log.Println("no rows affected")
+		return user.Core{}, errors.New("no data updated")
+	}
+	err := qry.Error
+	if err != nil {
+		log.Println("update user query error", err.Error())
+		return user.Core{}, errors.New("user not found")
+	}
+	result := ToCore(cnv)
+	result.ID = employeeID
+	return result, nil
+}
+
 // Csv implements user.UserData
 func (uq *userQuery) Csv(newUserBatch []user.Core) error {
 	if newUserBatch[0].Name == "" {

@@ -97,22 +97,30 @@ func (uuc *userUseCase) Update(token interface{}, fileData multipart.FileHeader,
 		hashed, _ := helper.GeneratePassword(updateData.Password)
 		updateData.Password = string(hashed)
 	}
-	if fileData.Size != 0 {
+	// log.Println("size:", fileData.Size)
+	if fileData.Filename != "" {
 		if fileData.Size > 500000 {
 			return user.Core{}, errors.New("size error")
 		}
-		fileName := uuid.NewV4().String()
-		fileData.Filename = fileName + fileData.Filename[(len(fileData.Filename)-5):len(fileData.Filename)]
-		src, err := fileData.Open()
+		file, err := fileData.Open()
 		if err != nil {
 			return user.Core{}, errors.New("error open fileData")
 		}
 		// Validasi Type
-		if !helper.TypeFile(src) {
+		tipeNameFile, err := helper.TypeFile(file)
+		if err != nil {
 			return user.Core{}, errors.New("file type error only jpg or png file can be upload")
 		}
-		defer src.Close()
-		uploadURL, err := helper.UploadToS3(fileData.Filename, src)
+
+		log.Println("size:", fileData.Filename, file)
+		namaFile := helper.GenerateRandomString()
+		namaFile = namaFile + tipeNameFile
+		fileData.Filename = namaFile
+		log.Println(namaFile)
+		defer file.Close()
+		file2, _ := fileData.Open()
+		defer file2.Close()
+		uploadURL, err := helper.UploadToS3(fileData.Filename, file2)
 		if err != nil {
 			return user.Core{}, errors.New("cannot upload to s3 server error")
 		}
@@ -185,7 +193,7 @@ func (uuc *userUseCase) AdminEditEmployee(employeeID uint, fileData multipart.Fi
 		hashed, _ := helper.GeneratePassword(updateData.Password)
 		updateData.Password = string(hashed)
 	}
-	if fileData.Size != 0 {
+	if fileData.Filename != "" {
 		if fileData.Size > 500000 {
 			return user.Core{}, errors.New("size error")
 		}
@@ -202,7 +210,7 @@ func (uuc *userUseCase) AdminEditEmployee(employeeID uint, fileData multipart.Fi
 		}
 		updateData.ProfilePicture = uploadURL
 	}
-	res, err := uuc.qry.Update(employeeID, updateData)
+	res, err := uuc.qry.UpdateByAdmin(employeeID, updateData)
 	if err != nil {
 		msg := ""
 		if strings.Contains(err.Error(), "not found") {

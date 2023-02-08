@@ -11,13 +11,19 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-func TypeFile(test multipart.File) bool {
+func TypeFile(test multipart.File) (string, error) {
 	fileByte, _ := io.ReadAll(test)
 	fileType := http.DetectContentType(fileByte)
-	if fileType == "image/png" || fileType == "image/jpeg" {
-		return true
+	TipenamaFile := ""
+	if fileType == "image/png" {
+		TipenamaFile = ".png"
+	} else {
+		TipenamaFile = ".jpg"
 	}
-	return false
+	if fileType == "image/png" || fileType == "image/jpeg" {
+		return TipenamaFile, nil
+	}
+	return "", errors.New("file type not match")
 }
 
 type UserValidate struct {
