@@ -6,12 +6,11 @@ import (
 )
 
 type PostApprovalRequest struct {
-	Title         string `json:"approval_title" form:"approval_title"`
-	StartDate     string `json:"approval_start_date" form:"approval_start_date"`
-	EndDate       string `json:"approval_end_date" form:"approval_end_date"`
-	Description   string `json:"approval_description" form:"approval_description"`
-	ApprovalImage string `json:"approval_image" form:"approval_image"`
-	FileHeader    multipart.FileHeader
+	Title       string `json:"approval_title" form:"approval_title"`
+	StartDate   string `json:"approval_start_date" form:"approval_start_date"`
+	EndDate     string `json:"approval_end_date" form:"approval_end_date"`
+	Description string `json:"approval_description" form:"approval_description"`
+	FileHeader  multipart.FileHeader
 }
 
 type UpdateApprovalRequest struct {
@@ -28,7 +27,6 @@ func ReqToCore(data interface{}) *approval.Core {
 		res.StartDate = cnv.StartDate
 		res.EndDate = cnv.EndDate
 		res.Description = cnv.Description
-		res.ApprovalImage = cnv.ApprovalImage
 	case UpdateApprovalRequest:
 		cnv := data.(UpdateApprovalRequest)
 		res.Status = cnv.Status

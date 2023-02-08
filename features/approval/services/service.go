@@ -27,17 +27,19 @@ func (auc *approvalUseCase) PostApproval(token interface{}, fileData multipart.F
 		if fileData.Size > 500000 {
 			return approval.Core{}, errors.New("size error")
 		}
-		fileName := uuid.NewV4().String()
-		fileData.Filename = fileName + fileData.Filename[(len(fileData.Filename)-5):len(fileData.Filename)]
-		src, err := fileData.Open()
+		file, err := fileData.Open()
 		if err != nil {
 			return approval.Core{}, errors.New("error open fileData")
 		}
+		defer file.Close()
 		// Validasi Type
-		_, err = helper.TypeFile(src)
+		_, err = helper.TypeFile(file)
 		if err != nil {
 			return approval.Core{}, errors.New("file type error only jpg or png file can be upload")
 		}
+		fileName := uuid.NewV4().String()
+		fileData.Filename = fileName + fileData.Filename[(len(fileData.Filename)-5):len(fileData.Filename)]
+		src, _ := fileData.Open()
 		defer src.Close()
 		uploadURL, err := helper.UploadToS3(fileData.Filename, src)
 		if err != nil {
