@@ -3,17 +3,17 @@ package attendance
 import "github.com/labstack/echo/v4"
 
 type Core struct {
-	ID               uint    `json:"id"`
-	AttendanceDate   string  `json:"attendance_date"`
-	ClockIn          string  `json:"clock_in"`
-	ClockInLocation  string  `json:"clock_in_location"`
-	ClockInOSM       string  `json:"clock_in_map_location"`
-	ClockOut         string  `json:"clock_out"`
-	ClockOutLocation string  `json:"clock_out_location"`
-	ClockOutOSM      string  `json:"clock_out_map_location"`
-	Attendance       string  `json:"attendance"`
-	AttendanceStatus string  `json:"attendance_status"`
-	WorkTime         float32 `json:"work_time"`
+	ID               uint   `json:"id"`
+	AttendanceDate   string `json:"attendance_date"`
+	ClockIn          string `json:"clock_in"`
+	ClockInLocation  string `json:"clock_in_location"`
+	ClockInOSM       string `json:"clock_in_map_location"`
+	ClockOut         string `json:"clock_out"`
+	ClockOutLocation string `json:"clock_out_location"`
+	ClockOutOSM      string `json:"clock_out_map_location"`
+	Attendance       string `json:"attendance"`
+	AttendanceStatus string `json:"attendance_status"`
+	WorkTime         string `json:"work_time"`
 }
 
 type AttendanceHandler interface {

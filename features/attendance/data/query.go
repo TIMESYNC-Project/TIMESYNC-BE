@@ -148,19 +148,32 @@ func (aq *attendanceQuery) ClockIn(employeeID uint, latitudeData string, longitu
 	clockOutHour, _ := strconv.Atoi(stg.End[:2])
 	clockInMinute, _ := strconv.Atoi(input.ClockIn[3:])
 	clockOutMinute, _ := strconv.Atoi(stg.End[3:])
-	var sum float32
+	var sum string
 	hourToMinClockIn := clockInHour * 60
 	hourToMinClockOut := clockOutHour * 60
 	totalMinClockIn := hourToMinClockIn + clockInMinute
 	totalMinClockOut := hourToMinClockOut + clockOutMinute
 	totalMin := totalMinClockOut - totalMinClockIn
-	bagi := float32(totalMin) / 60
-	temp := fmt.Sprintf("%.1f", bagi)
-	f, _ := strconv.ParseFloat(temp, 64)
-	if f == 0 {
-		f = 0.1
+	isTrue := true
+	res := totalMin
+	count := 0
+	for isTrue {
+		if res < 60 {
+			isTrue = false
+			break
+		}
+		res -= 60
+		count++
 	}
-	sum = float32(f)
+	hourString := strconv.Itoa(count)
+	minuteString := strconv.Itoa(res)
+	if len(hourString) == 1 {
+		hourString = "0" + hourString
+	}
+	if len(minuteString) == 1 {
+		minuteString = "0" + minuteString
+	}
+	sum = fmt.Sprintf("%sh %sm", hourString, minuteString)
 
 	input.WorkTime = sum
 	input.UserId = employeeID
@@ -265,20 +278,32 @@ func (aq *attendanceQuery) ClockOut(employeeID uint, latitudeData string, longit
 	clockInMinute, _ := strconv.Atoi(check.ClockIn[3:])
 	clockOutMinute, _ := strconv.Atoi(input.ClockOut[3:])
 
-	var sum float32
+	var sum string
 	hourToMinClockIn := clockInHour * 60
 	hourToMinClockOut := clockOutHour * 60
 	totalMinClockIn := hourToMinClockIn + clockInMinute
 	totalMinClockOut := hourToMinClockOut + clockOutMinute
 	totalMin := totalMinClockOut - totalMinClockIn
-	bagi := float32(totalMin) / 60
-
-	temp := fmt.Sprintf("%.1f", bagi)
-	f, _ := strconv.ParseFloat(temp, 64)
-	if f == 0 {
-		f = 0.1
+	isTrue := true
+	res := totalMin
+	count := 0
+	for isTrue {
+		if res < 60 {
+			isTrue = false
+			break
+		}
+		res -= 60
+		count++
 	}
-	sum = float32(f)
+	hourString := strconv.Itoa(count)
+	minuteString := strconv.Itoa(res)
+	if len(hourString) == 1 {
+		hourString = "0" + hourString
+	}
+	if len(minuteString) == 1 {
+		minuteString = "0" + minuteString
+	}
+	sum = fmt.Sprintf("%sh %sm", hourString, minuteString)
 	input.WorkTime = sum
 	//====================================================================
 	// Cek apakah clock out time sudah melebihi batas waktu clockout yang diberikan
