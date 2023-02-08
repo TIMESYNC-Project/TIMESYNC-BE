@@ -85,8 +85,8 @@ func (uc *userControll) Delete() echo.HandlerFunc {
 		}
 		err = uc.srv.Delete(token, uint(employeeID))
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-				"message": "internal server error, account fail to delete",
+			return c.JSON(http.StatusNotFound, map[string]interface{}{
+				"message": "data not found",
 			})
 		}
 		return c.JSON(http.StatusOK, map[string]interface{}{
