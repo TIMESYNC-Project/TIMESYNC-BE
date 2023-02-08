@@ -126,11 +126,19 @@ func (uc *userControll) Update() echo.HandlerFunc {
 			}
 		}
 
-		// log.Println(res)
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"data":    ToUpdateResponseEmployee(res),
-			"message": "update profile success",
-		})
+		result, err := ConvertEmployeeUpdateResponse(res)
+		if err != nil {
+			return c.JSON(http.StatusOK, map[string]interface{}{
+				"message": err.Error(),
+			})
+		} else {
+			// log.Println(res)
+			return c.JSON(http.StatusOK, map[string]interface{}{
+				"data":    result,
+				"message": "success update employee profile",
+			})
+		}
+
 	}
 }
 

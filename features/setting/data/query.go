@@ -37,5 +37,6 @@ func (sq *settingQuery) EditSetting(userID uint, updateSetting setting.Core) (se
 		log.Println("query error")
 		return setting.Core{}, errors.New("update fail")
 	}
+	updateSetting.ID = 1
 	return updateSetting, nil
 }

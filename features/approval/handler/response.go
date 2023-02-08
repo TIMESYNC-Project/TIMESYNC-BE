@@ -18,6 +18,7 @@ type ShowAllApproval struct {
 	Title         string `json:"approval_title"`
 	StartDate     string `json:"approval_start_date"`
 	EndDate       string `json:"approval_end_date"`
+	Description   string `json:"approval_description"`
 	Status        string `json:"approval_status"`
 	ApprovalImage string `json:"approval_image"`
 	ApprovalDate  string `json:"created_at"`
@@ -42,6 +43,7 @@ func ShowAllApprovalJson(data approval.Core) ShowAllApproval {
 		Title:         data.Title,
 		StartDate:     data.StartDate,
 		EndDate:       data.EndDate,
+		Description:   data.Description,
 		Status:        data.Status,
 		ApprovalImage: data.ApprovalImage,
 		ApprovalDate:  data.ApprovalDate,
