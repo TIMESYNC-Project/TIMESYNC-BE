@@ -135,7 +135,7 @@ func (_m *AttendanceData) GetPresenceTotalToday(adminID uint) ([]attendance.Core
 }
 
 // Record provides a mock function with given fields: employeeID, dateFrom, dateTo
-func (_m *AttendanceData) Record(employeeID uint, dateFrom string, dateTo string) ([]attendance.Core, error) {
+func (_m *AttendanceData) Record(employeeID uint, dateFrom string, dateTo string) ([]attendance.Core, string, error) {
 	ret := _m.Called(employeeID, dateFrom, dateTo)
 
 	var r0 []attendance.Core
@@ -147,14 +147,21 @@ func (_m *AttendanceData) Record(employeeID uint, dateFrom string, dateTo string
 		}
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(uint, string, string) error); ok {
+	var r1 string
+	if rf, ok := ret.Get(1).(func(uint, string, string) string); ok {
 		r1 = rf(employeeID, dateFrom, dateTo)
 	} else {
-		r1 = ret.Error(1)
+		r1 = ret.Get(1).(string)
 	}
 
-	return r0, r1
+	var r2 error
+	if rf, ok := ret.Get(2).(func(uint, string, string) error); ok {
+		r2 = rf(employeeID, dateFrom, dateTo)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
 }
 
 type mockConstructorTestingTNewAttendanceData interface {
