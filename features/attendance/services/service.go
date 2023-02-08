@@ -67,7 +67,7 @@ func (auc *attendanceUseCase) AttendanceFromAdmin(token interface{}, dateStart s
 // Record implements attendance.AttendanceService
 func (auc *attendanceUseCase) Record(token interface{}, dateFrom string, dateTo string) ([]attendance.Core, error) {
 	userID := helper.ExtractToken(token)
-	res, err := auc.qry.Record(uint(userID), dateFrom, dateTo)
+	res, _, err := auc.qry.Record(uint(userID), dateFrom, dateTo)
 	if err != nil {
 		if strings.Contains(err.Error(), "wrong input format") {
 			return []attendance.Core{}, errors.New("wrong input format")
@@ -92,5 +92,36 @@ func (auc *attendanceUseCase) GetPresenceToday(token interface{}) (attendance.Co
 
 // GetPresenceTotalToday implements attendance.AttendanceService
 func (auc *attendanceUseCase) GetPresenceTotalToday(token interface{}) ([]attendance.Core, error) {
-	panic("unimplemented")
+	adminID := helper.ExtractToken(token)
+	res, err := auc.qry.GetPresenceTotalToday(uint(adminID))
+	if err != nil {
+		log.Println("data not found", err.Error())
+		return []attendance.Core{}, errors.New("data not found")
+	}
+	return res, nil
+}
+
+// GetPresenceDetail implements attendance.AttendanceService
+func (auc *attendanceUseCase) GetPresenceDetail(token interface{}, attendanceID uint) (attendance.Core, error) {
+	adminID := helper.ExtractToken(token)
+	res, err := auc.qry.GetPresenceDetail(uint(adminID), attendanceID)
+	if err != nil {
+		log.Println("data not found", err.Error())
+		return attendance.Core{}, errors.New("data not found")
+	}
+	return res, nil
+}
+
+// RecordByID implements attendance.AttendanceService
+func (auc *attendanceUseCase) RecordByID(employeeID uint, dateFrom string, dateTo string) ([]attendance.Core, string, error) {
+	res, nameUser, err := auc.qry.Record(uint(employeeID), dateFrom, dateTo)
+	if err != nil {
+		if strings.Contains(err.Error(), "wrong input format") {
+			return []attendance.Core{}, "", errors.New("wrong input format")
+		} else {
+			return []attendance.Core{}, "", errors.New("server error")
+		}
+
+	}
+	return res, nameUser, nil
 }

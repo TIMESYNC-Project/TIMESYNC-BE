@@ -24,6 +24,9 @@ type AttendanceHandler interface {
 	Record() echo.HandlerFunc
 	GetPresenceToday() echo.HandlerFunc
 	GetPresenceTotalToday() echo.HandlerFunc
+	GetPresenceDetail() echo.HandlerFunc
+	RecordByID() echo.HandlerFunc
+	// Graph() echo.HandlerFunc
 }
 
 type AttendanceService interface {
@@ -33,13 +36,18 @@ type AttendanceService interface {
 	Record(token interface{}, dateFrom string, dateTo string) ([]Core, error)
 	GetPresenceToday(token interface{}) (Core, error)
 	GetPresenceTotalToday(token interface{}) ([]Core, error)
+	GetPresenceDetail(token interface{}, attendanceID uint) (Core, error)
+	RecordByID(employeeID uint, dateFrom string, dateTo string) ([]Core, string, error)
+	// Graph(param string) ([]Core, error)
 }
 
 type AttendanceData interface {
 	ClockIn(employeeID uint, latitudeData string, longitudeData string) (Core, error)
 	ClockOut(employeeID uint, latitudeData string, longitudeData string) (Core, error)
 	AttendanceFromAdmin(adminID uint, dateStart string, dateEnd string, attendanceType string, employeeID uint) error
-	Record(employeeID uint, dateFrom string, dateTo string) ([]Core, error)
+	Record(employeeID uint, dateFrom string, dateTo string) ([]Core, string, error)
 	GetPresenceToday(employeeID uint) (Core, error)
 	GetPresenceTotalToday(adminID uint) ([]Core, error)
+	GetPresenceDetail(adminID uint, attendanceID uint) (Core, error)
+	// Graph(param string) ([]Core, error)
 }

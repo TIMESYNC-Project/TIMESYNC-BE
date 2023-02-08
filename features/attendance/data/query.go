@@ -91,7 +91,9 @@ func (aq *attendanceQuery) ClockIn(employeeID uint, latitudeData string, longitu
 	// Cek apakah user udah clockin ?
 	//====================================================================
 	check := Attendance{}
+	log.Println(clockInDate, employeeID)
 	err = aq.db.Where("attendance_date = ? AND user_id = ?", clockInDate, employeeID).First(&check).Error
+	log.Println(check)
 	if err == nil {
 		return attendance.Core{}, errors.New("you already clock in today")
 	}
@@ -139,7 +141,13 @@ func (aq *attendanceQuery) ClockIn(employeeID uint, latitudeData string, longitu
 		log.Println("expired clockin time")
 		return attendance.Core{}, errors.New("clockin time was expired")
 	}
-
+	//====================================================================
+	//input working hour untuk jaga2 user lupa clock out
+	//====================================================================
+	clockInHour, _ := strconv.Atoi(input.ClockIn[:2])
+	clockOutHour, _ := strconv.Atoi(stg.End[:2])
+	sum := clockOutHour - clockInHour
+	input.WorkTime = sum
 	input.UserId = employeeID
 	err = aq.db.Create(&input).Error
 	if err != nil {
@@ -291,6 +299,13 @@ func (aq *attendanceQuery) AttendanceFromAdmin(adminID uint, dateStart string, d
 		log.Println("user is not admin")
 		return errors.New("user is not admin")
 	}
+	usr := User{}
+	err := aq.db.Where("id = ?", employeeID).First(&usr).Error
+	if err != nil {
+		log.Println("query error", err.Error())
+		return errors.New("server error, user not found")
+	}
+
 	yFr, _ := strconv.Atoi(dateStart[:4])
 	yTo, _ := strconv.Atoi(dateEnd[:4])
 	mFr, _ := strconv.Atoi(dateStart[5:7])
@@ -306,6 +321,7 @@ func (aq *attendanceQuery) AttendanceFromAdmin(adminID uint, dateStart string, d
 	mm, _ := strconv.Atoi(dateStart[5:7])
 	d, _ := strconv.Atoi(dateStart[8:])
 	m := time.Month(mm)
+
 	// log.Println(y, m, d)
 	fD := time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
 	x := 1
@@ -339,16 +355,42 @@ func (aq *attendanceQuery) AttendanceFromAdmin(adminID uint, dateStart string, d
 		x++
 		i++
 	}
-	err := aq.db.Create(&data).Error
+	//====================================================================
+	// cek apabila user melakukan izin annual leave tapi jatah annual leavenya sudah habis
+	//====================================================================
+	if usr.AnnualLeave < len(data) {
+		log.Println("annual leave has reach limit")
+		return errors.New("permit rejected, annual leave has reach limit")
+	}
+
+	//====================================================================
+	// beres bro saatnya create
+	//====================================================================
+	err = aq.db.Create(&data).Error
 	if err != nil {
 		log.Println("creating data error", err.Error())
 		return errors.New("creating data fail, server error")
+	}
+	if attendanceType == "annual_leave" {
+		annualUpd := User{}
+		annualUpd.AnnualLeave = usr.AnnualLeave - len(data)
+		upd := aq.db.Where("id = ?", employeeID).Updates(&annualUpd)
+		affrows := upd.RowsAffected
+		if affrows == 0 {
+			log.Println("no rows affected")
+			return errors.New("no data updated")
+		}
+		err = upd.Error
+		if err != nil {
+			log.Println("update error", err.Error())
+			return errors.New("update fail, server error")
+		}
 	}
 	return nil
 }
 
 // Record implements attendance.AttendanceData
-func (aq *attendanceQuery) Record(employeeID uint, dateFrom string, dateTo string) ([]attendance.Core, error) {
+func (aq *attendanceQuery) Record(employeeID uint, dateFrom string, dateTo string) ([]attendance.Core, string, error) {
 	yFr, _ := strconv.Atoi(dateFrom[:4])
 	yTo, _ := strconv.Atoi(dateTo[:4])
 	mFr, _ := strconv.Atoi(dateFrom[5:7])
@@ -358,13 +400,19 @@ func (aq *attendanceQuery) Record(employeeID uint, dateFrom string, dateTo strin
 	log.Println(yFr, yTo)
 	if dTo < dFr || yTo < yFr || mTo < mFr {
 		log.Println("wrong input format")
-		return []attendance.Core{}, errors.New("wrong input format")
+		return []attendance.Core{}, "", errors.New("wrong input format")
+	}
+	usrName := User{}
+	err := aq.db.Where("id = ?", employeeID).First(&usrName).Error
+	if err != nil {
+		log.Println("query error", err.Error())
+		return []attendance.Core{}, "", errors.New("server error, user not found")
 	}
 	data := []Attendance{}
-	err := aq.db.Where("user_id = ?", employeeID).Find(&data).Error //.Order("attendance_date desc")
+	err = aq.db.Where("user_id = ?", employeeID).Find(&data).Error //.Order("attendance_date desc")
 	if err != nil {
 		log.Println("query error data not found", err.Error())
-		return []attendance.Core{}, errors.New("data not found")
+		return []attendance.Core{}, "", errors.New("data not found")
 	}
 	result := []attendance.Core{}
 	for i := 0; i < len(data); i++ {
@@ -419,7 +467,7 @@ func (aq *attendanceQuery) Record(employeeID uint, dateFrom string, dateTo strin
 						final := (response[len(response)-1].AttendanceDate[:8]) + cnvS
 						temp.AttendanceDate = final
 					}
-					temp.Attendance = "NO DATA"
+					temp.Attendance = "no data"
 					response = append(response, temp)
 				} else {
 					temp := attendance.Core{}
@@ -436,7 +484,7 @@ func (aq *attendanceQuery) Record(employeeID uint, dateFrom string, dateTo strin
 						final := (response[len(response)-1].AttendanceDate[:8]) + cnvS
 						temp.AttendanceDate = final
 					}
-					temp.Attendance = "Absent"
+					temp.Attendance = "absent"
 					response = append(response, temp)
 				}
 			} else {
@@ -463,14 +511,54 @@ func (aq *attendanceQuery) Record(employeeID uint, dateFrom string, dateTo strin
 		}
 		if result[val].AttendanceDate == result[len(result)-1].AttendanceDate {
 			log.Println("data reach limit")
+			if createAt != dateTo {
+				cek := true
+				for cek {
+					temp := attendance.Core{}
+					createAt := date
+					if createAt == dateTo {
+						cek = false
+					}
+					//cari data attendance date
+					if len(response) == 0 {
+						temp.AttendanceDate = date
+					} else {
+						conv, _ := strconv.Atoi(response[len(response)-1].AttendanceDate[8:])
+						conv += 1
+						cnvS := strconv.Itoa(conv)
+						if len(cnvS) == 1 {
+							cnvS = "0" + cnvS
+						}
+						final := (response[len(response)-1].AttendanceDate[:8]) + cnvS
+						temp.AttendanceDate = final
+					}
+					temp.Attendance = "absent"
+					response = append(response, temp)
+
+					tomorrow := fD.AddDate(0, 0, x)
+					year := strconv.Itoa(tomorrow.Year())
+					monthCnv := int(tomorrow.Month())
+					month := strconv.Itoa(monthCnv)
+					day := strconv.Itoa(tomorrow.Day())
+					if len(month) == 1 {
+						month = "0" + month
+					}
+					if len(day) == 1 {
+						day = "0" + day
+					}
+					date = fmt.Sprintf("%s-%s-%s", year, month, day)
+					x++
+					i++
+				}
+			}
 			break
-			// return []attendance.Core{}, errors.New("data reach limit")
+			// return []attendance.Core{}, "",errors.New("data reach limit")
 		}
 		val++
 	}
 	// log.Println(response)
 
-	return response, nil
+	return response, usrName.Name, nil
 }
 
 // GetPresenceToday implements attendance.AttendanceData
@@ -500,5 +588,47 @@ func (aq *attendanceQuery) GetPresenceToday(employeeID uint) (attendance.Core, e
 
 // GetPresenceTotalToday implements attendance.AttendanceData
 func (aq *attendanceQuery) GetPresenceTotalToday(adminID uint) ([]attendance.Core, error) {
-	panic("unimplemented")
+	if adminID != 1 {
+		log.Println("access denied")
+		return []attendance.Core{}, errors.New("access denied")
+	}
+	t := time.Now().Add(time.Hour * 7)
+	year := strconv.Itoa(t.Year())
+	monthConv := t.Month()
+	monthInt := int(monthConv)
+	month := fmt.Sprintf("%d", monthInt)
+	day := strconv.Itoa(t.Day())
+	if len(month) == 1 {
+		month = "0" + month
+	}
+	if len(day) == 1 {
+		day = "0" + day
+	}
+	dates := fmt.Sprintf("%s-%s-%s", year, month, day)
+	prs := []Attendance{}
+	err := aq.db.Where("attendance_date = ? ", dates).Find(&prs).Error
+	if err != nil {
+		log.Println("query error")
+		return []attendance.Core{}, errors.New("data not found")
+	}
+	result := []attendance.Core{}
+	for i := 0; i < len(prs); i++ {
+		result = append(result, DataToCore(prs[i]))
+	}
+	return result, nil
+}
+
+// GetPresenceDetail implements attendance.AttendanceData
+func (aq *attendanceQuery) GetPresenceDetail(adminID uint, attendanceID uint) (attendance.Core, error) {
+	if adminID != 1 {
+		log.Println("access denied")
+		return attendance.Core{}, errors.New("access denied")
+	}
+	atDetail := Attendance{}
+	err := aq.db.Where("id = ? ", attendanceID).First(&atDetail).Error
+	if err != nil {
+		log.Println("query error")
+		return attendance.Core{}, errors.New("data not found")
+	}
+	return DataToCore(atDetail), nil
 }

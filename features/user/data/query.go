@@ -273,7 +273,9 @@ func (uq *userQuery) Search(adminID uint, quote string) ([]user.Core, error) {
 	}
 	result := []user.Core{}
 	for i := 0; i < len(find); i++ {
-		result = append(result, ToCore(find[i]))
+		if find[i].Nip != "admin" {
+			result = append(result, ToCore(find[i]))
+		}
 	}
 	return result, nil
 }

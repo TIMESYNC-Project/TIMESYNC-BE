@@ -76,6 +76,22 @@ func (_m *AttendanceHandler) GetLL() echo.HandlerFunc {
 	return r0
 }
 
+// GetPresenceDetail provides a mock function with given fields:
+func (_m *AttendanceHandler) GetPresenceDetail() echo.HandlerFunc {
+	ret := _m.Called()
+
+	var r0 echo.HandlerFunc
+	if rf, ok := ret.Get(0).(func() echo.HandlerFunc); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(echo.HandlerFunc)
+		}
+	}
+
+	return r0
+}
+
 // GetPresenceToday provides a mock function with given fields:
 func (_m *AttendanceHandler) GetPresenceToday() echo.HandlerFunc {
 	ret := _m.Called()
@@ -110,6 +126,22 @@ func (_m *AttendanceHandler) GetPresenceTotalToday() echo.HandlerFunc {
 
 // Record provides a mock function with given fields:
 func (_m *AttendanceHandler) Record() echo.HandlerFunc {
+	ret := _m.Called()
+
+	var r0 echo.HandlerFunc
+	if rf, ok := ret.Get(0).(func() echo.HandlerFunc); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(echo.HandlerFunc)
+		}
+	}
+
+	return r0
+}
+
+// RecordByID provides a mock function with given fields:
+func (_m *AttendanceHandler) RecordByID() echo.HandlerFunc {
 	ret := _m.Called()
 
 	var r0 echo.HandlerFunc
