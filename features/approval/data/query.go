@@ -52,10 +52,11 @@ func (aq *approvalQuery) GetApproval() ([]approval.Core, error) {
 		user := User{}
 		if val.UserID != 0 {
 			if err := aq.db.Where("id = ?", val.UserID).First(&user).Error; err != nil {
-				log.Println("get user by id query error : ", err.Error())
-				return []approval.Core{}, errors.New("get user by id error")
+				result[i].Name = "user was deactivated"
+			} else {
+				result[i].Name = user.Name
 			}
-			result[i].Name = user.Name
+
 		}
 		i++
 	}
@@ -82,6 +83,7 @@ func (aq *approvalQuery) ApprovalDetail(approvalID uint) (approval.Core, error) 
 	m := int(res.CreatedAt.Month())
 	d := res.CreatedAt.Day()
 	result.ApprovalDate = fmt.Sprintf("%d-%d-%d", y, m, d)
+	result.Description = res.Description
 
 	return result, nil
 }

@@ -128,6 +128,8 @@ func (ac *announcementControll) DeleteAnnouncement() echo.HandlerFunc {
 			return c.JSON(helper.PrintErrorResponse(err.Error()))
 		}
 
-		return c.JSON(http.StatusAccepted, "success delete announcement")
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"message": "success delete announcement",
+		})
 	}
 }

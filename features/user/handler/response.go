@@ -194,12 +194,34 @@ type Search struct {
 
 func SearchResponse(data user.Core) Search {
 	return Search{
-		ID:       data.ID,
-		Name:     data.Name,
-		Nip:      data.Nip,
-		Position: data.Position,
+		ID:             data.ID,
+		ProfilePicture: data.ProfilePicture,
+		Name:           data.Name,
+		Nip:            data.Nip,
+		Position:       data.Position,
 	}
 }
+
+func ConvertEmployeeUpdateResponse(inputan user.Core) (interface{}, error) {
+	ResponseFilter := user.Core{}
+	ResponseFilter = inputan
+	result := make(map[string]interface{})
+	if ResponseFilter.ID != 0 {
+		result["id"] = ResponseFilter.ID
+	}
+	if ResponseFilter.ProfilePicture != "" {
+		result["profile_picture"] = ResponseFilter.ProfilePicture
+	}
+	if ResponseFilter.Password != "" {
+		result["password"] = ResponseFilter.Password
+	}
+
+	if len(result) <= 1 {
+		return user.Core{}, errors.New("no data was change")
+	}
+	return result, nil
+}
+
 func ConvertUpdateResponse(inputan user.Core) (interface{}, error) {
 	ResponseFilter := user.Core{}
 	ResponseFilter = inputan

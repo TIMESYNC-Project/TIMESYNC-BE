@@ -21,6 +21,7 @@ func New(db *gorm.DB) announcement.AnnouncementData {
 
 func (aq *announcementQuery) PostAnnouncement(adminID uint, newAnnouncement announcement.Core) (announcement.Core, error) {
 	data := CoreToData(newAnnouncement)
+
 	if newAnnouncement.Nip != "" {
 		//query untuk mencari userID berdasarkan NIP
 		userData := User{}
@@ -46,7 +47,11 @@ func (aq *announcementQuery) PostAnnouncement(adminID uint, newAnnouncement anno
 
 	newAnnouncement.ID = data.ID
 	newAnnouncement.Type = data.Type
-
+	y := data.CreatedAt.Year()
+	m := int(data.CreatedAt.Month())
+	d := data.CreatedAt.Day()
+	data.AnnouncementDate = fmt.Sprintf("%d-%d-%d", y, m, d)
+	newAnnouncement.AnnouncementDate = data.AnnouncementDate
 	return newAnnouncement, nil
 }
 
