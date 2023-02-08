@@ -23,11 +23,7 @@ func New(ad approval.ApprovalData) approval.ApprovalService {
 func (auc *approvalUseCase) PostApproval(token interface{}, fileData multipart.FileHeader, newApproval approval.Core) (approval.Core, error) {
 	employeeID := helper.ExtractToken(token)
 
-	if employeeID <= 0 {
-		return approval.Core{}, errors.New("data not found")
-	}
-
-	if fileData.Size != 0 {
+	if fileData.Filename != "" {
 		if fileData.Size > 500000 {
 			return approval.Core{}, errors.New("size error")
 		}

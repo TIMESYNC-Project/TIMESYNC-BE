@@ -21,7 +21,6 @@ func ReqToCore(data interface{}) *company.Core {
 	switch data.(type) {
 	case EditRequest:
 		cnv := data.(EditRequest)
-		res.Picture = cnv.Picture
 		res.Name = cnv.Name
 		res.Email = cnv.Email
 		res.SocialMedia = cnv.SocialMedia
