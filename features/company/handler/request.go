@@ -6,7 +6,6 @@ import (
 )
 
 type EditRequest struct {
-	Picture        string `json:"company_picture" form:"company_picture"`
 	Name           string `json:"company_name" form:"company_name"`
 	Email          string `json:"company_email" form:"company_email"`
 	SocialMedia    string `json:"sosmed" form:"sosmed"`
