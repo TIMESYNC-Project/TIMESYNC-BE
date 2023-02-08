@@ -14,7 +14,7 @@ type Attendance struct {
 	AttendanceDate   string
 	Attendance       string
 	AttendanceStatus string
-	WorkTime         int
+	WorkTime         float32
 	ClockInLocation  string
 	ClockOutLocation string
 	ClockInOSM       string

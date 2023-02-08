@@ -33,6 +33,7 @@ type UserHandler interface {
 	AdminEditEmployee() echo.HandlerFunc
 	GetAllEmployee() echo.HandlerFunc
 	Search() echo.HandlerFunc
+	// Graph() echo.HandlerFunc
 }
 
 type UserService interface {
@@ -46,6 +47,7 @@ type UserService interface {
 	AdminEditEmployee(employeeID uint, fileData multipart.FileHeader, updateData Core) (Core, error)
 	GetAllEmployee() ([]Core, error)
 	Search(token interface{}, quote string) ([]Core, error)
+	// Graph(param string) ([]Core, error)
 }
 
 type UserData interface {
@@ -58,4 +60,5 @@ type UserData interface {
 	Csv(newUserBatch []Core) error
 	GetAllEmployee() ([]Core, error)
 	Search(adminID uint, quote string) ([]Core, error)
+	// Graph(param string) ([]Core, error)
 }

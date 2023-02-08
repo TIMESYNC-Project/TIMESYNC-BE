@@ -67,7 +67,7 @@ func ConvertCSV(csvInput multipart.File) []user.Core {
 			}
 			if j == 7 {
 				res[i-1].Password = data[i][j]
-				if len(res[i-1].Password) == 0 {
+				if len(res[i-1].Password) != 0 {
 					res[i-1].Password, _ = GeneratePassword(res[i-1].Password)
 				}
 

@@ -366,7 +366,6 @@ func TestCsv(t *testing.T) {
 			Position:    "backendengineer",
 			Phone:       "0813456",
 			Address:     "bandung",
-			Password:    "$2a$10$zdYUgJmywnCr.SojT9IhfO3oCTTEELwmbs9zoEAXd8BvMiWED89kO",
 		},
 	}
 
@@ -398,15 +397,10 @@ func TestCsv(t *testing.T) {
 	if err != nil {
 		log.Panic("content type", err.Error())
 	}
-
-	// csvReader := csv.NewReader(csvTrue)
-	// data, _ := csvReader.ReadAll()
-	// inputData := helper.ConvertCSV(data)
-	// csvTrueCnv := &multipart.FileHeader{
-	// 	Filename: csvTrue.Name(),
-	// }
-	value, _ := header.Open()
-	inputData = helper.ConvertCSV(value)
+	if header.Filename != "" {
+		value, _ := header.Open()
+		inputData = helper.ConvertCSV(value)
+	}
 	t.Run("success creating account from csv", func(t *testing.T) {
 		repo.On("Csv", inputData).Return(nil).Once()
 		err = srv.Csv(*header)
