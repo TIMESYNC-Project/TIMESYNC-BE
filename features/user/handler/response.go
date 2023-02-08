@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 	"timesync-be/features/user"
@@ -199,3 +200,54 @@ func SearchResponse(data user.Core) Search {
 		Position: data.Position,
 	}
 }
+func ConvertUpdateResponse(inputan user.Core) (interface{}, error) {
+	ResponseFilter := user.Core{}
+	ResponseFilter = inputan
+	result := make(map[string]interface{})
+	if ResponseFilter.ID != 0 {
+		result["id"] = ResponseFilter.ID
+	}
+	if ResponseFilter.ProfilePicture != "" {
+		result["profile_picture"] = ResponseFilter.ProfilePicture
+	}
+	if ResponseFilter.Name != "" {
+		result["name"] = ResponseFilter.Name
+	}
+	if ResponseFilter.BirthOfDate != "" {
+		result["birth_of_date"] = ResponseFilter.BirthOfDate
+	}
+	if ResponseFilter.Email != "" {
+		result["email"] = ResponseFilter.Email
+	}
+	if ResponseFilter.Gender != "" {
+		result["gender"] = ResponseFilter.Gender
+	}
+	if ResponseFilter.Position != "" {
+		result["position"] = ResponseFilter.Position
+	}
+	if ResponseFilter.Phone != "" {
+		result["phone"] = ResponseFilter.Phone
+	}
+	if ResponseFilter.Address != "" {
+		result["address"] = ResponseFilter.Address
+	}
+	if ResponseFilter.Password != "" {
+		result["password"] = ResponseFilter.Password
+	}
+
+	if len(result) <= 1 {
+		return user.Core{}, errors.New("no data was change")
+	}
+	return result, nil
+}
+
+// ID:             data.ID,
+// ProfilePicture: data.ProfilePicture,
+// Name:           data.Name,
+// BirthOfDate:    data.BirthOfDate,
+// Email:          data.Email,
+// Gender:         data.Gender,
+// Position:       data.Position,
+// Phone:          data.Phone,
+// Address:        data.Address,
+// Password:       data.Password,

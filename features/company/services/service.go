@@ -33,9 +33,17 @@ func (cuc *companyUseCase) GetProfile() (company.Core, error) {
 // EditProfile implements company.CompanyService
 func (cuc *companyUseCase) EditProfile(token interface{}, fileData multipart.FileHeader, updateData company.Core) (company.Core, error) {
 	adminID := helper.ExtractToken(token)
-	if fileData.Size != 0 {
+	if fileData.Filename != "" {
 		if fileData.Size > 500000 {
 			return company.Core{}, errors.New("size error")
+		}
+		file, err := fileData.Open()
+		if err != nil {
+			return company.Core{}, errors.New("error open fileData")
+		}
+		_, err = helper.TypeFile(file)
+		if err != nil {
+			return company.Core{}, errors.New("error open fileData")
 		}
 		fileName := uuid.NewV4().String()
 		fileData.Filename = fileName + fileData.Filename[(len(fileData.Filename)-5):len(fileData.Filename)]

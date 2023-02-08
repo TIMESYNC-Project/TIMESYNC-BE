@@ -146,7 +146,22 @@ func (aq *attendanceQuery) ClockIn(employeeID uint, latitudeData string, longitu
 	//====================================================================
 	clockInHour, _ := strconv.Atoi(input.ClockIn[:2])
 	clockOutHour, _ := strconv.Atoi(stg.End[:2])
-	sum := clockOutHour - clockInHour
+	clockInMinute, _ := strconv.Atoi(input.ClockIn[3:])
+	clockOutMinute, _ := strconv.Atoi(stg.End[3:])
+	var sum float32
+	hourToMinClockIn := clockInHour * 60
+	hourToMinClockOut := clockOutHour * 60
+	totalMinClockIn := hourToMinClockIn + clockInMinute
+	totalMinClockOut := hourToMinClockOut + clockOutMinute
+	totalMin := totalMinClockOut - totalMinClockIn
+	bagi := float32(totalMin) / 60
+	temp := fmt.Sprintf("%.1f", bagi)
+	f, _ := strconv.ParseFloat(temp, 64)
+	if f == 0 {
+		f = 0.1
+	}
+	sum = float32(f)
+
 	input.WorkTime = sum
 	input.UserId = employeeID
 	err = aq.db.Create(&input).Error
@@ -249,11 +264,21 @@ func (aq *attendanceQuery) ClockOut(employeeID uint, latitudeData string, longit
 	clockOutHour, _ := strconv.Atoi(input.ClockOut[:2])
 	clockInMinute, _ := strconv.Atoi(check.ClockIn[3:])
 	clockOutMinute, _ := strconv.Atoi(input.ClockOut[3:])
-	log.Println(clockInMinute, clockOutMinute)
-	sum := clockOutHour - clockInHour
-	if clockOutMinute < clockInMinute {
-		sum -= 1
+
+	var sum float32
+	hourToMinClockIn := clockInHour * 60
+	hourToMinClockOut := clockOutHour * 60
+	totalMinClockIn := hourToMinClockIn + clockInMinute
+	totalMinClockOut := hourToMinClockOut + clockOutMinute
+	totalMin := totalMinClockOut - totalMinClockIn
+	bagi := float32(totalMin) / 60
+
+	temp := fmt.Sprintf("%.1f", bagi)
+	f, _ := strconv.ParseFloat(temp, 64)
+	if f == 0 {
+		f = 0.1
 	}
+	sum = float32(f)
 	input.WorkTime = sum
 	//====================================================================
 	// Cek apakah clock out time sudah melebihi batas waktu clockout yang diberikan

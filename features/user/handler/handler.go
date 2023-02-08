@@ -125,6 +125,7 @@ func (uc *userControll) Update() echo.HandlerFunc {
 				return c.JSON(http.StatusNotFound, map[string]interface{}{"message": "account not registered"})
 			}
 		}
+
 		// log.Println(res)
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"data":    ToUpdateResponseEmployee(res),
@@ -209,16 +210,23 @@ func (uc *userControll) AdminEditEmployee() echo.HandlerFunc {
 			} else if strings.Contains(err.Error(), "type") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
 			} else if strings.Contains(err.Error(), "admin") {
-				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "cannot modifed admin data"})
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
 			} else {
 				return c.JSON(http.StatusNotFound, map[string]interface{}{"message": "account not registered"})
 			}
 		}
-		// log.Println(res)
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"data":    ToUpdateResponse(res),
-			"message": "update profile success",
-		})
+		result, err := ConvertUpdateResponse(res)
+		if err != nil {
+			return c.JSON(http.StatusOK, map[string]interface{}{
+				"message": err.Error(),
+			})
+		} else {
+			// log.Println(res)
+			return c.JSON(http.StatusOK, map[string]interface{}{
+				"data":    result,
+				"message": "update profile success",
+			})
+		}
 	}
 }
 
