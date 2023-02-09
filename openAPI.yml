@@ -100,39 +100,6 @@ paths:
                 file:
                   type: string
                   format: binary
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                birth_of_date:
-                  type: string
-                nip:
-                  type: string
-                email:
-                  type: string
-                  format: email
-                gender:
-                  type: string
-                position:
-                  type: string
-                phone:
-                  type: string
-                address:
-                  type: string
-                password:
-                  type: string
-                  format: password
-            example:
-              name: "Fauzi Sofyan"
-              birth_of_date: "2000-01-31"
-              email: "fauzilax@gmail.com"
-              gender: "male"
-              position: "backend engineer"
-              phone: "0813456"
-              address: bdg
-              password: "123"
       responses:
         201:
           description: "success insert data"
@@ -166,8 +133,8 @@ paths:
                   type: string
                   format: password
             example:
-              nip: "21"
-              password: "123"
+              nip: "23001"
+              password: "12323"
       responses:
         200:
           description: "login success"
@@ -177,16 +144,29 @@ paths:
                 $ref: "#/components/schemas/responseObject"
               example:
                 data:
-                  id: 1
+                  id: 2
                   name: "Fauzi Sofyan"
-                  nip: 21
+                  email: "fauzilax@gmail.com"
+                  nip: "23001"
                   gender: "male"
                   postion: "backend engineer"
                   role: "employee"
-                  token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJ1c2VySUQiOjR9.QTZxERh4CwC_UnL_eJvTi_A_qdLeBZ-IjR4nqoxjodk"
                 message: "login success"
+                token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJ1c2VySUQiOjR9.QTZxERh4CwC_UnL_eJvTi_A_qdLeBZ-IjR4nqoxjodk"
+                token_expired_at: "2023-02-09 00:52"
         400:
           $ref: "#/components/responses/400"
+        404:
+          description: data not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  message: "account not registered"
         500:
           $ref: "#/components/responses/500"
   /companies:
@@ -232,7 +212,7 @@ paths:
             schema:
               type: object
               properties:
-                image:
+                company_picture:
                   type: string
                   format: binary
             example:
@@ -241,8 +221,6 @@ paths:
             schema:
               type: object
               properties:
-                company_picture:
-                  type: string
                 company_name:
                   type: string
                 company_email:
@@ -281,7 +259,7 @@ paths:
                   company_adress: "Jl. Raya Tidar No.23, Karangbesuki, Kec. Sukun, Kota Malang, Jawa Timur 65146"
                   company_phone: "0813456"
                   sosmed: "@timesync"
-                message: Succes Update Company Profile
+                message: success update company profile
         400:
           $ref: "#/components/responses/400"
         500:
@@ -301,7 +279,7 @@ paths:
             schema:
               type: object
               properties:
-                image:
+                profile_picture:
                   type: string
                   format: binary
             example:
@@ -322,8 +300,8 @@ paths:
                 data:
                   id: 1
                   profile_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-                  password: "test123"
-                message: Succes Update Employee Profile
+                  password: "$2a$10$byKkieP4Js.Ioe.rcWiKiuFfFDGhRJUIzIqTtjyDtpjHVGTiyOeEW"
+                message: "success update employee profile"
         400:
           $ref: "#/components/responses/400"
         404:
@@ -357,21 +335,21 @@ paths:
                 data:
                   [
                     {
-                      id: 1,
+                      id: 2,
                       profile_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg",
                       name: "Fauzi Sofyan",
                       nip: "21",
                       postion: "backend engineer",
                     },
                     {
-                      id: 2,
+                      id: 3,
                       profile_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg",
                       name: "Aryo Yudhanto",
                       nip: "22",
                       postion: "frontend engineer",
                     },
                   ]
-                message: success show employee profile
+                message: success show all employee
         400:
           $ref: "#/components/responses/400"
         500:
@@ -399,12 +377,12 @@ paths:
                   birth_of_date: "2000-01-31"
                   nip: "23001"
                   email: "fauzilax@gmail.com"
-                  geneder: "Male"
+                  gender: "Male"
                   position: "Backend Engineer"
                   phone: "00888"
                   address: "bdg"
                   annual_leave: 14
-                message: success show employee profile
+                message: "success show profile"
         400:
           $ref: "#/components/responses/400"
         500:
@@ -462,9 +440,8 @@ paths:
                   postion: "backend engineer"
                   phone: "0813456"
                   address: "bandung"
-                  password: "123"
-                  annual_leave: 14
-                message: Succes Update Employee Profile
+                  password: "$2a$10$ZgX2yxsERa7LEqBfSJTI3uyRROxvzlDvq5zTwiCq3CxSWEQWe7H16"
+                message: update profile success
         400:
           $ref: "#/components/responses/400"
         404:
@@ -477,7 +454,7 @@ paths:
                   message:
                     type: string
                 example:
-                  message: "data not found"
+                  message: "account not registered"
         500:
           $ref: "#/components/responses/500"
     get:
@@ -502,7 +479,7 @@ paths:
                 $ref: "#/components/schemas/responseObject"
               example:
                 data:
-                  id: 1
+                  id: 2
                   profile_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
                   name: "Fauzi Sofyan"
                   birth_of_date: "2000-01-31"
@@ -513,7 +490,7 @@ paths:
                   phone: "0813456"
                   address: "bandung"
                   annual_leave: 14
-                message: success show employee profile
+                message: success show profile
         400:
           $ref: "#/components/responses/400"
         500:
@@ -542,7 +519,7 @@ paths:
                   message:
                     type: string
               example:
-                message: "succes deactivate"
+                message: "success deactivate employee profile"
         400:
           $ref: "#/components/responses/400"
         404:
@@ -578,10 +555,10 @@ paths:
                 working_hour_end:
                   type: string
                   example: "17:00"
-                tollerance:
+                tolerance:
                   type: integer
                   example: 30
-                annual_leave_settings:
+                annual_leave:
                   type: integer
                   example: 14
       responses:
@@ -595,9 +572,9 @@ paths:
                 data:
                   working_hour_start: "08:00"
                   working_hour_end: "17:00"
-                  tollerance: 30
-                  annual_leave_settings: 14
-                message: "update working hour schedule and annual leave for employee success"
+                  tolerance: 30
+                  annual_leave: 14
+                message: "success change setting"
         400:
           $ref: "#/components/responses/400"
         500:
@@ -616,11 +593,12 @@ paths:
                 $ref: "#/components/schemas/responseObject"
               example:
                 data:
-                  working_hour_start: "08:00"
-                  working_hour_end: "17:00"
-                  tollerance: "30:00"
-                  annual_leave_settings: 14
-                message: "success get working hour schedule for employee"
+                  id: 1
+                  working_hour_start: "19:00"
+                  working_hour_end: "20:30"
+                  tolerance: 20
+                  annual_leave: 14
+                message: "success show setting"
         400:
           $ref: "#/components/responses/400"
         500:
@@ -639,17 +617,17 @@ paths:
             schema:
               type: object
               properties:
-                to:
-                  type: string
-                  example: "2303"
                 announcement_title:
                   type: string
                   example: "Libur"
                 announcement_description:
                   type: string
                   example: "Karena besok ada rapat atasan mendadak, jadi kantor diliburkan"
+                to:
+                  type: string
+                  example: "2303"
       responses:
-        200:
+        201:
           description: "success send announcement message to employee"
           content:
             application/json:
@@ -659,8 +637,10 @@ paths:
                 data:
                   id: 1
                   to: "2303"
+                  type: "personal"
                   announcement_title: "Libur"
                   announcement_description: "Karena besok ada rapat atasan mendadak, jadi kantor diliburkan"
+                  created_at: "2023-02-02"
                 message: "send announcement message to employee success"
         400:
           $ref: "#/components/responses/400"
@@ -685,16 +665,22 @@ paths:
                   [
                     {
                       id: 1,
+                      to: "",
+                      nip: "",
                       announcement_title: "Libur",
                       announcement_description: "Karena besok ada rapat atasan mendadak, jadi kantor diliburkan",
+                      created_at: "2023-02-02",
                     },
                     {
                       id: 2,
+                      to: "Fauzi",
+                      nip: "23011",
                       announcement_title: "Wajib Masuk",
                       announcement_description: "Karena sabtu nanti ada agenda kerja bakti, jadi semua karyawan diharapkan untuk hadir",
+                      created_at: "2023-02-02",
                     },
                   ]
-                message: "get all announcement message for admin success"
+                message: "get all announcement"
         400:
           $ref: "#/components/responses/400"
         500:
@@ -722,9 +708,12 @@ paths:
                 $ref: "#/components/schemas/responseObject"
               example:
                 data:
-                  id: 1
+                  id: 2
+                  to: "Fauzi"
+                  nip: "23010"
                   announcement_title: "Libur"
                   announcement_description: "Karena besok ada rapat atasan mendadak, jadi kantor diliburkan"
+                  created_at: "2023-02-02"
                 message: "success get announcement details"
         400:
           $ref: "#/components/responses/400"
@@ -754,7 +743,7 @@ paths:
                   message:
                     type: string
               example:
-                message: "succes delete announcement message"
+                message: "success delete announcement"
         400:
           $ref: "#/components/responses/400"
         404:
@@ -787,8 +776,36 @@ paths:
                 $ref: "#/components/schemas/responseObject"
               example:
                 data:
-                  total_employee_presences: 9
-                message: "get total employee precences success"
+                  [
+                    {
+                      id: 1,
+                      attendance_date: "2023-02-08",
+                      clock_in: "01:05",
+                      clock_in_location: "Jalan Duren Sawit Baru Daerah Khusus Ibukota Jakarta,,13440,Indonesia",
+                      clock_in_map_location: "https://www.openstreetmap.org/#map=19/-6.232191/106.915202",
+                      clock_out: "01:10",
+                      clock_out_location: "Jalan 25 Daerah Khusus Ibukota Jakarta,,13440,Indonesia",
+                      clock_out_map_location: "https://www.openstreetmap.org/#map=19/-6.235400/106.919860",
+                      attendance: "present",
+                      attendance_status: "ontime",
+                      work_time: "07h 25m",
+                    },
+                    {
+                      id: 2,
+                      attendance_date: "2023-02-08",
+                      clock_in: "01:05",
+                      clock_in_location: "Jalan Duren Sawit Baru Daerah Khusus Ibukota Jakarta,,13440,Indonesia",
+                      clock_in_map_location: "https://www.openstreetmap.org/#map=19/-6.232191/106.915202",
+                      clock_out: "01:10",
+                      clock_out_location: "Jalan 25 Daerah Khusus Ibukota Jakarta,,13440,Indonesia",
+                      clock_out_map_location: "https://www.openstreetmap.org/#map=19/-6.235400/106.919860",
+                      attendance: "present",
+                      attendance_status: "ontime",
+                      work_time: "07h 25m",
+                    },
+                  ]
+
+                message: "success show all employe presence data today"
         400:
           $ref: "#/components/responses/400"
         500:
@@ -810,18 +827,28 @@ paths:
                 $ref: "#/components/schemas/responseObject"
               example:
                 data:
-                  employee_presences: 1
-                message: "get total precences in a day per employee success"
+                  id: 1
+                  attendace_date: "2023-02-02"
+                  clock_in: "04:58"
+                  clock_in_location: "Jln.Jalan"
+                  clock_in_map_location: "https://www.openstreetmap.org/#map=19/-2.8837/104.6896"
+                  clock_out: "05:00"
+                  clock_out_location: "Jln.Jalan"
+                  clock_out_map_location: "https://www.openstreetmap.org/#map=19/-2.8837/104.6896"
+                  attendace: "present"
+                  attendance_status: "ontime"
+                  work_time: "00h 04m"
+                message: "success show presence data today"
         400:
           $ref: "#/components/responses/400"
         500:
           $ref: "#/components/responses/500"
-  /attendance/{id}:
-    put:
+  /attendances/{id}:
+    post:
       tags:
         - "Admin"
-      description : edit employee attendance status
-      summary : edit employee attendance status
+      description: edit employee attendance status
+      summary: edit employee attendance status
       security:
         - JWTAuth: []
       parameters:
@@ -839,10 +866,10 @@ paths:
                 attendance:
                   type: object
                   example: ["annual leave", "on leave", "sick leave"]
-                start_date:
+                date_start:
                   type: string
                   example: "2023-02-01"
-                end_date:
+                date_end:
                   type: string
                   example: "2023-02-04"
       responses:
@@ -853,17 +880,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/responseObject"
               example:
-                data:
-                  id: 1
-                  attendance: "annual leave"
-                  start_date: "2023-02-01"
-                  end_date: "2023-02-04"
-                message: "edit employee attendance status success"
+                message: "success create attendance"
         400:
           $ref: "#/components/responses/400"
         500:
           $ref: "#/components/responses/500"
-  /attendance:
+  /attendances:
     post:
       tags:
         - "Employee"
@@ -894,13 +916,18 @@ paths:
                 $ref: "#/components/schemas/responseObject"
               example:
                 data:
+                  data:
                   id: 1
-                  clock_in_location: "Jalan Cagar Alam,Depok,Jawa Barat,10550"
-                  clock_out_location: ""
-                  clock_in_map_location: "https://www.openstreetmap.org/#map=16/-6.4096/106.8185"
-                  clock_out_map_location: ""
-                  clock_in: "07:50"
+                  attendace_date: "2023-02-02"
+                  clock_in: "04:58"
+                  clock_in_location: "Jln.Jalan"
+                  clock_in_map_location: "https://www.openstreetmap.org/#map=19/-2.8837/104.6896"
                   clock_out: ""
+                  clock_out_location: ""
+                  clock_out_map_location: ""
+                  attendace: "present"
+                  attendance_status: "ontime"
+                  work_time: "01h 40m"
                 message: "clock in success"
         400:
           $ref: "#/components/responses/400"
@@ -936,13 +963,18 @@ paths:
                 $ref: "#/components/schemas/responseObject"
               example:
                 data:
+                  data:
                   id: 1
-                  clock_in_location: "Jalan Cagar Alam,Depok,Jawa Barat,10550"
-                  clock_out_location: "Jalan Cagar Alam,Depok,Jawa Barat,10550"
-                  clock_in_map_location: "https://www.openstreetmap.org/#map=16/-6.4096/106.8185"
-                  clock_out_map_location: "https://www.openstreetmap.org/#map=16/-6.4096/106.8185"
-                  clock_in: "07:50"
-                  clock_out: "17:00"
+                  attendace_date: "2023-02-02"
+                  clock_in: "04:58"
+                  clock_in_location: "Jln.Jalan"
+                  clock_in_map_location: "https://www.openstreetmap.org/#map=19/-2.8837/104.6896"
+                  clock_out: "05:00"
+                  clock_out_location: "Jln.Jalan"
+                  clock_out_map_location: "https://www.openstreetmap.org/#map=19/-2.8837/104.6896"
+                  attendace: "present"
+                  attendance_status: "ontime"
+                  work_time: "00h 04m"
                 message: "clock out success"
         400:
           $ref: "#/components/responses/400"
@@ -981,35 +1013,40 @@ paths:
                       attendace_date: "2023-02-01",
                       clock_in: "07:50",
                       clock_out: "17:00",
-                      attendace_status: "Presence",
+                      attendance: "presence",
+                      attendance_status: "late",
                     },
                     {
                       id: 2,
                       attendace_date: "2023-02-02",
                       clock_in: "08:00",
                       clock_out: "17:20",
-                      attendace_status: "Presence",
+                      attendance: "presence",
+                      attendance_status: "ontime",
                     },
                     {
                       id: 3,
                       attendace_date: "2023-02-03",
                       clock_in: "",
                       clock_out: "",
-                      attendace_status: "Absence",
+                      attendance: "presence",
+                      attendance_status: "late",
                     },
                     {
                       id: 4,
                       attendace_date: "2023-02-04",
                       clock_in: "",
                       clock_out: "",
-                      attendace_status: "On Leave",
+                      attendance: "presence",
+                      attendance_status: "ontime",
                     },
                     {
-                      id: 5,
+                      id: 0,
                       attendace_date: "2023-02-05",
                       clock_in: "",
                       clock_out: "",
-                      attendace_status: "Absence",
+                      attendance: "absent",
+                      attendance_status: "",
                     },
                   ]
                 message: success show employee attendance record
@@ -1052,9 +1089,6 @@ paths:
                 approval_description:
                   type: string
                   example: "i am going to hospital today, my body didn't feel so good for work"
-                approval_status:
-                  type: string
-                  example: "pending"
       responses:
         200:
           description: "success send an approval"
@@ -1099,8 +1133,10 @@ paths:
                       approval_title: "Izin",
                       approval_start_date: "2023-02-01",
                       approval_end_date: "2023-02-04",
-                      approval_status: "Pending",
-                      created_at : "2023-02-1"
+                      approval_description: "Cakit",
+                      approval_status: "pending",
+                      approval_image: "",
+                      created_at: "2023-02-1",
                     },
                     {
                       id: 2,
@@ -1108,8 +1144,10 @@ paths:
                       approval_title: "Izin",
                       approval_start_date: "2023-02-04",
                       approval_end_date: "2023-02-06",
-                      approval_status: "Pending",
-                      created_at : "2023-02-4"
+                      approval_description: "izin",
+                      approval_status: "approved",
+                      approval_image: "https://fauziawsbucket.s3.ap-southeast-1.amazonaws.com/50afe12c-b4f8-4e7e-a25d-217afda264edo.png",
+                      created_at: "2023-02-1",
                     },
                     {
                       id: 3,
@@ -1117,8 +1155,10 @@ paths:
                       approval_title: "Izin",
                       approval_start_date: "2023-02-04",
                       approval_end_date: "2023-02-06",
-                      approval_status: "Pending",
-                      created_at : "2023-02-4"
+                      approval_description: "Izin",
+                      approval_status: "rejected",
+                      approval_image: "https://fauziawsbucket.s3.ap-southeast-1.amazonaws.com/50afe12c-b4f8-4e7e-a25d-217afda264edo.png",
+                      created_at: "2023-02-1",
                     },
                     {
                       id: 4,
@@ -1126,11 +1166,13 @@ paths:
                       approval_title: "Sakit",
                       approval_start_date: "2023-02-04",
                       approval_end_date: "2023-02-06",
-                      approval_status: "Approved",
-                      created_at : "2023-02-4"
+                      approval_description: "Cakit",
+                      approval_status: "pending",
+                      approval_image: "",
+                      created_at: "2023-02-1",
                     },
                   ]
-                message: success show all employee approval record
+                message: "success show all employee approval record"
         400:
           $ref: "#/components/responses/400"
         500:
@@ -1158,10 +1200,11 @@ paths:
                 data:
                   id: 1
                   approval_title: "sick"
-                  approval_date: "2023-02-01"
+                  approval_start_date: "2023-02-01"
+                  approval_end_date: "2023-02-05"
                   approval_description: "i am going to hospital today, my body didn't feel so good for work"
-                  approval_image: "https://1.bp.blogspot.com/-e8s4FEI8wKs/WgpNDkIWdhI/AAAAAAAAAyQ/SUryjPXhJ28zqb32zPCyGZLjXCT0khK2wCLcBGAs/s1600/Contoh%2BSurat%2BKeterangan%2BSakit.png"
                   approval_status: "approved"
+                  approval_image: "https://1.bp.blogspot.com/-e8s4FEI8wKs/WgpNDkIWdhI/AAAAAAAAAyQ/SUryjPXhJ28zqb32zPCyGZLjXCT0khK2wCLcBGAs/s1600/Contoh%2BSurat%2BKeterangan%2BSakit.png"
                 message: "success get approval detail"
         400:
           $ref: "#/components/responses/400"
@@ -1186,18 +1229,6 @@ paths:
             schema:
               type: object
               properties:
-                approval_title:
-                  type: string
-                  example: "sick"
-                approval_date:
-                  type: string
-                  example: "2023-02-01"
-                approval_description:
-                  type: string
-                  example: "i am going to hospital today, my body didn't feel so good for work"
-                approval_image:
-                  type: string
-                  example: "https://1.bp.blogspot.com/-e8s4FEI8wKs/WgpNDkIWdhI/AAAAAAAAAyQ/SUryjPXhJ28zqb32zPCyGZLjXCT0khK2wCLcBGAs/s1600/Contoh%2BSurat%2BKeterangan%2BSakit.png"
                 approval_status:
                   type: string
                   example: "approved"
@@ -1212,11 +1243,12 @@ paths:
                 data:
                   id: 1
                   approval_title: "sick"
-                  approval_date: "2023-02-01"
+                  approval_start_date: "2023-02-01"
+                  approval_end_date: "2023-02-05"
                   approval_description: "i am going to hospital today, my body didn't feel so good for work"
                   approval_image: "https://1.bp.blogspot.com/-e8s4FEI8wKs/WgpNDkIWdhI/AAAAAAAAAyQ/SUryjPXhJ28zqb32zPCyGZLjXCT0khK2wCLcBGAs/s1600/Contoh%2BSurat%2BKeterangan%2BSakit.png"
                   approval_status: "approved"
-                message: "success approve employee permission success"
+                message: "success approve employee permission"
         400:
           $ref: "#/components/responses/400"
         500:
@@ -1245,8 +1277,10 @@ paths:
                       approval_title: "sakit",
                       approval_start_date: "2023-02-01",
                       approval_end_date: "2023-02-04",
+                      approval_description: "Saya Pusing pak, saya izin mengirim surat dari dokter sebagai bukti",
                       approval_status: "Pending",
-                      created_at : "2023-02-1"
+                      approval_image: "",
+                      created_at: "2023-02-1",
                     },
                     {
                       id: 2,
@@ -1254,8 +1288,10 @@ paths:
                       approval_title: "leave",
                       approval_start_date: "2023-02-04",
                       approval_end_date: "2023-02-06",
+                      approval_description: "pengen liburan pak",
                       approval_status: "Pending",
-                      created_at : "2023-02-4"
+                      approval_image: "https://fauziawsbucket.s3.ap-southeast-1.amazonaws.com/c8b84b6e-ceec-4d79-86de-206a7eb5c750o.png",
+                      created_at: "2023-02-4",
                     },
                   ]
                 message: success show employee approval record
@@ -1283,15 +1319,19 @@ paths:
                   [
                     {
                       id: 1,
-                      inbox_date: "2023-02-01",
-                      inbox_title: "Libur",
-                      inbox_description: "Karena besok ada rapat atasan mendadak, jadi kantor diliburkan",
+                      to: "alif",
+                      nip: "23002",
+                      announcement_title: "Peringatan",
+                      announcement_description: "Silahkan menghadap saya ke kantor HRD, segera",
+                      created_at: "2023-02-02",
                     },
                     {
                       id: 2,
-                      inbox_date: "2023-02-03",
-                      inbox_title: "Wajib Masuk",
-                      inbox_description: "Karena sabtu nanti ada agenda kerja bakti, jadi semua karyawan diharapkan untuk hadir",
+                      to: "",
+                      nip: "",
+                      announcement_title: "Libur",
+                      announcement_description: "Karena besok ada rapat atasan mendadak, jadi kantor diliburkan",
+                      created_at: "2023-02-01",
                     },
                   ]
                 message: success show employee inbox message
@@ -1303,23 +1343,23 @@ paths:
     get:
       tags:
         - "Admin"
-      summary: find employee
-      description: searching employee by their name,nip or position
+      summary: employee graph data
+      description: to show graph by employee working hour and employee late data
       security:
         - JWTAuth: []
       parameters:
         - in: query
-          name: wwh
+          name: mtwh
           schema:
-            example: "wwh"
+            example: "mtwh"
             type: string
-          description: the keyword used to find employee weekly working hour graph
+          description: the keyword used to find employee monthly working hour graph
         - in: query
-          name: wle
+          name: mtel
           schema:
-            example: "wle"
+            example: "mtel"
             type: string
-          description: the keyword used to find weekly late employee graph
+          description: the keyword used to find monthly late employee graph
       responses:
         200:
           description: success show graph data for employee weekly working hour
@@ -1328,23 +1368,22 @@ paths:
               schema:
                 $ref: "#/components/schemas/responseObject"
               example:
+                desc: mtel
                 data:
-                  [{
-                  desc: "weekly working hour",
-                  w1: 300,
-                  w2: 320,
-                  w3: 290,
-                  w4: 340},
-                  {
-                  desc: "weekly late employee",
-                  w1: 3,
-                  w2: 4,
-                  w3: 10,
-                  w4: 5
-                  }
+                  [
+                    {
+                      employee_name: "Fauzi",
+                      employee_nip: 23003,
+                      monthly_total_employee_late: 10,
+                    },
+                    {
+                      employee_name: "Alif",
+                      employee_nip: 23006,
+                      monthly_total_employee_late: 2,
+                    },
                   ]
+                message: success show graph data
 
-                message: success show graph data for employee weekly working hour and weekly late employee
         400:
           $ref: "#/components/responses/400"
         500:
@@ -1358,11 +1397,6 @@ paths:
       security:
         - JWTAuth: []
       parameters:
-        - in: query
-          name: offset
-          schema:
-            type: string
-          description: the numbers of result user
         - in: query
           name: q
           schema:
@@ -1384,11 +1418,125 @@ paths:
                       id: 1,
                       profile_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg",
                       name: "Fauzi Sofyan",
-                      nip: "21",
+                      nip: "23010",
                       postion: "backend engineer",
                     },
                   ]
-                message: success show employee profile
+                message: "searching success"
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+  /record/{id}:
+    get:
+      tags:
+        - "Admin"
+      summary: get employee attendance history
+      description: to get employee attendance history
+      security:
+        - JWTAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: success show employee attendance history
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  {
+                    employee_name: "Fauzi",
+                    record:
+                      [
+                        {
+                          id: 1,
+                          attendace_date: "2023-02-01",
+                          clock_in: "07:50",
+                          clock_out: "17:00",
+                          attendance: "presence",
+                          attendance_status: "late",
+                        },
+                        {
+                          id: 2,
+                          attendace_date: "2023-02-02",
+                          clock_in: "08:00",
+                          clock_out: "17:20",
+                          attendance: "presence",
+                          attendance_status: "ontime",
+                        },
+                        {
+                          id: 3,
+                          attendace_date: "2023-02-03",
+                          clock_in: "",
+                          clock_out: "",
+                          attendance: "presence",
+                          attendance_status: "late",
+                        },
+                        {
+                          id: 4,
+                          attendace_date: "2023-02-04",
+                          clock_in: "",
+                          clock_out: "",
+                          attendance: "presence",
+                          attendance_status: "ontime",
+                        },
+                        {
+                          id: 0,
+                          attendace_date: "2023-02-05",
+                          clock_in: "",
+                          clock_out: "",
+                          attendance: "absent",
+                          attendance_status: "",
+                        },
+                      ],
+                  }
+                message: success show employee attendance record
+        400:
+          $ref: "#/components/responses/400"
+        500:
+          $ref: "#/components/responses/500"
+
+  /presences/detail/{id}:
+    get:
+      tags:
+        - "Admin"
+      summary: get employee presence detail
+      description: get employee presence detail
+      security:
+        - JWTAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: success show employee profile
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 1
+                  attendace_date: "2023-02-01"
+                  clock_in: "10:39"
+                  clock_in_location: "Depok,Jawa Barat"
+                  clock_in_map_location: "https://www.openstreetmap.org/#map=19/-5.322/104.322"
+                  clock_out: "10:55"
+                  clock_out_location: "Depok,Jawa Barat"
+                  clock_out_map_location: "https://www.openstreetmap.org/#map=19/-5.322/104.322"
+                  attendance: "present"
+                  attendance_status: "late"
+                  work_time: "00h 16m"
+                message: success show presence data detail
         400:
           $ref: "#/components/responses/400"
         500:
