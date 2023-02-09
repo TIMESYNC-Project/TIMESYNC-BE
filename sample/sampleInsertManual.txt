@@ -1,0 +1,23 @@
+INSERT INTO attendances VALUES(null,null,null,null,3,'07:30','17:10','2023-01-02','present','ontime','08h 00m','Jalan Jakarta','Jalan Jakarta','','' );
+INSERT INTO attendances VALUES(null,null,null,null,3,'08:10','17:10','2023-01-03','present','ontime','06h 30m','Jalan Jakarta','Jalan Jakarta','','' );
+INSERT INTO attendances VALUES(null,null,null,null,3,'09:30','17:10','2023-01-04','present','late','08h 00m','Jalan Jakarta','Jalan Jakarta','','' );
+INSERT INTO attendances VALUES(null,null,null,null,3,'07:30','17:10','2023-01-05','present','ontime','05h 40m','Jalan Jakarta','Jalan Jakarta','','' );
+INSERT INTO attendances VALUES(null,null,null,null,3,'08:32','17:10','2023-01-06','present','late','07h 00m','Jalan Jakarta','Jalan Jakarta','','' );
+
+INSERT INTO attendances VALUES(null,null,null,null,3,'07:59','17:10','2023-01-09','present','ontime','08h 00m','Jalan Jakarta','Jalan Jakarta','','' );
+INSERT INTO attendances VALUES(null,null,null,null,3,'08:00','17:10','2023-01-10','present','ontime','08h 00m','Jalan Jakarta','Jalan Jakarta','','' );
+INSERT INTO attendances VALUES(null,null,null,null,3,'08:10','17:10','2023-01-11','present','ontime','05h 00m','Jalan Jakarta','Jalan Jakarta','','' );
+INSERT INTO attendances VALUES(null,null,null,null,3,'07:55','17:10','2023-01-12','present','ontime','08h 00m','Jalan Jakarta','Jalan Jakarta','','' );
+INSERT INTO attendances VALUES(null,null,null,null,3,'08:12','17:10','2023-01-13','present','ontime','08h 00m','Jalan Jakarta','Jalan Jakarta','','' );
+
+INSERT INTO attendances VALUES(null,null,null,null,3,'07:59','17:10','2023-01-16','present','ontime','08h 00m','Jalan Jakarta','Jalan Jakarta','','' );
+INSERT INTO attendances VALUES(null,null,null,null,3,'08:00','17:10','2023-01-17','present','late','08h 00m','Jalan Jakarta','Jalan Jakarta','','' );
+INSERT INTO attendances VALUES(null,null,null,null,3,'08:10','17:10','2023-01-18','present','ontime','08h 00m','Jalan Jakarta','Jalan Jakarta','','' );
+INSERT INTO attendances VALUES(null,null,null,null,3,'07:55','17:10','2023-01-19','present','ontime','08h 00m','Jalan Jakarta','Jalan Jakarta','','' );
+INSERT INTO attendances VALUES(null,null,null,null,3,'08:12','17:10','2023-01-20','present','ontime','08h 00m','Jalan Jakarta','Jalan Jakarta','','' );
+
+INSERT INTO attendances VALUES(null,null,null,null,3,'07:59','17:10','2023-01-23','present','ontime','08h 00m','Jalan Jakarta','Jalan Jakarta','','' );
+INSERT INTO attendances VALUES(null,null,null,null,3,'08:00','17:10','2023-01-24','present','ontime','08h 00m','Jalan Jakarta','Jalan Jakarta','','' );
+INSERT INTO attendances VALUES(null,null,null,null,3,'08:10','17:10','2023-01-25','present','ontime','08h 00m','Jalan Jakarta','Jalan Jakarta','','' );
+INSERT INTO attendances VALUES(null,null,null,null,3,'07:55','17:10','2023-01-26','present','ontime','08h 00m','Jalan Jakarta','Jalan Jakarta','','' );
+INSERT INTO attendances VALUES(null,null,null,null,3,'08:12','17:10','2023-01-27','present','ontime','08h 00m','Jalan Jakarta','Jalan Jakarta','','' );
