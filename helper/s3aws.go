@@ -1,7 +1,9 @@
 package helper
 
 import (
+	"errors"
 	"fmt"
+	"log"
 	"math/rand"
 	"mime/multipart"
 	"time"
@@ -15,6 +17,9 @@ import (
 
 var theSession *session.Session
 
+// ======================================================================
+// INIT SESSION KEY CREDENTIAL S3 BUCKET AWS
+// ======================================================================
 // GetConfig Initiatilize config in singleton way
 func GetSession() *session.Session {
 	if theSession == nil {
@@ -34,6 +39,41 @@ type UploadResult struct {
 	Path string `json:"path" xml:"path"`
 }
 
+// ======================================================================
+// UPLOAD IMAGE PROGRESS
+// ======================================================================
+func GetUrlImagesFromAWS(fileData multipart.FileHeader) (string, error) {
+	if fileData.Size > 500000 {
+		return "", errors.New("size error")
+	}
+	file, err := fileData.Open()
+	if err != nil {
+		return "", errors.New("error open fileData")
+	}
+	// Validasi Type
+	tipeNameFile, err := TypeFile(file)
+	if err != nil {
+		return "", errors.New("file type error only jpg or png file can be upload")
+	}
+	defer file.Close()
+
+	log.Println("size:", fileData.Filename, file)
+	namaFile := GenerateRandomString()
+	namaFile = namaFile + tipeNameFile
+	fileData.Filename = namaFile
+	log.Println(namaFile)
+	file2, _ := fileData.Open()
+	defer file2.Close()
+	uploadURL, err := UploadToS3(fileData.Filename, file2)
+	if err != nil {
+		return "", errors.New("cannot upload to s3 server error")
+	}
+	return uploadURL, nil
+}
+
+// ======================================================================
+// UPLOAD TO S3
+// ======================================================================
 // Helper
 func UploadToS3(fileName string, src multipart.File) (string, error) {
 	// The session the S3 Uploader will use
@@ -56,7 +96,7 @@ func UploadToS3(fileName string, src multipart.File) (string, error) {
 
 func GenerateRandomString() string {
 	rand.Seed(time.Now().Unix())
-	str := "AsDfGhBvCX123456MnBp"
+	str := "AsDfzGhBvCX123456MnBp"
 	shuff := []rune(str)
 	// Shuffling the string
 	rand.Shuffle(len(shuff), func(i, j int) {

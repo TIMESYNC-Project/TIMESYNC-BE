@@ -43,8 +43,10 @@ func (auc *attendanceUseCase) ClockOut(token interface{}, latitude string, longi
 			return attendance.Core{}, errors.New("you already clock out today")
 		} else if strings.Contains(err.Error(), "clock out time expired") {
 			return attendance.Core{}, errors.New("invalid clock out time request")
-		} else {
+		} else if strings.Contains(err.Error(), "server") {
 			return attendance.Core{}, errors.New("server error")
+		} else {
+			return attendance.Core{}, err
 		}
 	}
 	return res, nil

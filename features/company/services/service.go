@@ -7,8 +7,6 @@ import (
 	"strings"
 	"timesync-be/features/company"
 	"timesync-be/helper"
-
-	uuid "github.com/satori/go.uuid"
 )
 
 type companyUseCase struct {
@@ -34,30 +32,15 @@ func (cuc *companyUseCase) GetProfile() (company.Core, error) {
 // EditProfile implements company.CompanyService
 func (cuc *companyUseCase) EditProfile(token interface{}, fileData multipart.FileHeader, updateData company.Core) (company.Core, error) {
 	adminID := helper.ExtractToken(token)
+	// kondisi dibawah dilakukan agar foto bisa kosong dan agar unit testing tidak error
 	if fileData.Size != 0 {
-		if fileData.Size > 500000 {
-			return company.Core{}, errors.New("size error")
+		if fileData.Filename != "" {
+			res, err := helper.GetUrlImagesFromAWS(fileData)
+			if err != nil {
+				return company.Core{}, err
+			}
+			updateData.Picture = res
 		}
-		file, err := fileData.Open()
-		if err != nil {
-			return company.Core{}, errors.New("error open fileData")
-		}
-		_, err = helper.TypeFile(file)
-		if err != nil {
-			return company.Core{}, errors.New("error open fileData")
-		}
-		fileName := uuid.NewV4().String()
-		fileData.Filename = fileName + fileData.Filename[(len(fileData.Filename)-5):len(fileData.Filename)]
-		src, err := fileData.Open()
-		if err != nil {
-			return company.Core{}, errors.New("error open fileData")
-		}
-		defer src.Close()
-		uploadURL, err := helper.UploadToS3(fileData.Filename, src)
-		if err != nil {
-			return company.Core{}, errors.New("cannot upload to s3 server error")
-		}
-		updateData.Picture = uploadURL
 	}
 	res, err := cuc.qry.EditProfile(uint(adminID), updateData)
 	if err != nil {

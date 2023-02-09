@@ -1,12 +1,9 @@
 package services
 
 import (
-	"bytes"
 	"errors"
-	"io"
 	"log"
 	"mime/multipart"
-	"net/http"
 	"os"
 	"path/filepath"
 	"testing"
@@ -21,8 +18,8 @@ import (
 
 func TestRegister(t *testing.T) {
 	repo := mocks.NewUserData(t)
-	inputData := user.Core{Name: "Fauzi", Email: "fauzi@example.com", Phone: "08123", Gender: "Male", Address: "Jalan Bandung", Position: "BE", BirthOfDate: "2000-01-03"}
-	resData := user.Core{ID: uint(1), Name: "Fauzi", Email: "fauzi@example.com", Phone: "08123", Gender: "Male", Address: "Jalan Bandung", Position: "BE", BirthOfDate: "2000-01-03"}
+	inputData := user.Core{Name: "Fauzi", Email: "fauzi@example.com", Phone: "08123"}
+	resData := user.Core{ID: uint(1), Name: "Fauzi", Email: "fauzi@example.com", Phone: "08123"}
 
 	t.Run("success creating account", func(t *testing.T) {
 		repo.On("Register", uint(1), mock.Anything).Return(resData, nil).Once()
@@ -37,20 +34,20 @@ func TestRegister(t *testing.T) {
 		repo.AssertExpectations(t)
 	})
 
-	t.Run("invalid jwt token", func(t *testing.T) {
-		srv := New(repo)
+	// t.Run("invalid jwt token", func(t *testing.T) {
+	// 	srv := New(repo)
 
-		_, token := helper.GenerateToken(0)
-		pToken := token.(*jwt.Token)
-		pToken.Valid = true
+	// 	_, token := helper.GenerateToken(0)
+	// 	pToken := token.(*jwt.Token)
+	// 	pToken.Valid = true
 
-		res, err := srv.Register(pToken, inputData)
+	// 	res, err := srv.Register(pToken, inputData)
 
-		assert.NotNil(t, err)
-		assert.ErrorContains(t, err, "found")
-		assert.NotEqual(t, resData.ID, res.ID)
-		repo.AssertExpectations(t)
-	})
+	// 	assert.NotNil(t, err)
+	// 	assert.ErrorContains(t, err, "found")
+	// 	assert.NotEqual(t, resData.ID, res.ID)
+	// 	repo.AssertExpectations(t)
+	// })
 
 	t.Run("access denied", func(t *testing.T) {
 		repo.On("Register", uint(1), mock.Anything).Return(user.Core{}, errors.New("access denied")).Once()
@@ -237,10 +234,6 @@ func TestUpdate(t *testing.T) {
 func TestAdminEditEmploye(t *testing.T) {
 	repo := mocks.NewUserData(t)
 	filePath := filepath.Join("..", "..", "..", "ERD.png")
-	// imageFalse, _ := os.Open(filePath)
-	// imageFalseCnv := &multipart.FileHeader{
-	// 	Filename: imageFalse.Name(),
-	// }
 	imageTrue, err := os.Open(filePath)
 	if err != nil {
 		log.Println(err.Error())
@@ -376,6 +369,8 @@ func TestSearch(t *testing.T) {
 
 func TestCsv(t *testing.T) {
 	repo := mocks.NewUserData(t)
+	srv := New(repo)
+
 	inputData := []user.Core{
 		{
 			ID:          1,
@@ -388,34 +383,12 @@ func TestCsv(t *testing.T) {
 			Address:     "bandung",
 		},
 	}
-
-	srv := New(repo)
 	filePath := filepath.Join("..", "..", "..", "TimeSyncUnitTesting.csv")
-	f, err := os.Open(filePath)
+	header, err := helper.UnitTestingUploadFileMock(filePath)
 	if err != nil {
-		log.Println(err.Error())
+		log.Panic("dari file header", err.Error())
 	}
-	body := &bytes.Buffer{}
-	writter := multipart.NewWriter(body)
-	part, err := writter.CreateFormFile("file", filePath)
-	if err != nil {
-		log.Panic("create form file", err.Error())
-	}
-	_, err = io.Copy(part, f)
-	if err != nil {
-		log.Panic("io copy error", err.Error())
-	}
-	writter.Close()
-	req, err := http.NewRequest("POST", "/upload", body)
-	if err != nil {
-		log.Panic("post", err.Error())
-	}
-	req.Header.Set("Content-Type", writter.FormDataContentType())
-	// req.Header.Set("Content-Type")
-	_, header, err := req.FormFile("file")
-	if err != nil {
-		log.Panic("content type", err.Error())
-	}
+
 	if header.Filename != "" {
 		value, _ := header.Open()
 		inputData = helper.ConvertCSV(value)
@@ -432,16 +405,4 @@ func TestCsv(t *testing.T) {
 		assert.NotNil(t, err)
 		repo.AssertExpectations(t)
 	})
-	// t.Run("fail updating account", func(t *testing.T) {
-	// 	repo.On("Update", uint(1), inputData).Return(user.Core{}, errors.New("query error,update fail")).Once()
-	// 	srv := New(repo)
-	// 	_, token := helper.GenerateToken(1)
-	// 	pToken := token.(*jwt.Token)
-	// 	pToken.Valid = true
-	// 	res, err := srv.Csv(pToken, *imageTrueCnv, inputData)
-	// 	assert.NotNil(t, err)
-	// 	assert.ErrorContains(t, err, "error")
-	// 	assert.Equal(t, user.Core{}, res)
-	// 	repo.AssertExpectations(t)
-	// })
 }

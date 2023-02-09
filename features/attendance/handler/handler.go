@@ -37,8 +37,10 @@ func (ac *attendanceController) ClockIn() echo.HandlerFunc {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "clock in fail, you already clock in today"})
 			} else if strings.Contains(err.Error(), "invalid") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "clock in session has ended"})
-			} else {
+			} else if strings.Contains(err.Error(), "server") {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
+			} else {
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": err})
 			}
 		}
 		return c.JSON(http.StatusCreated, map[string]interface{}{

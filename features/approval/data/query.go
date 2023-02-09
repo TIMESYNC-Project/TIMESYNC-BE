@@ -26,7 +26,7 @@ func (aq *approvalQuery) PostApproval(employeeID uint, newApproval approval.Core
 	err := aq.db.Create(&cnv).Error
 	if err != nil {
 		log.Println("query error", err.Error())
-		return approval.Core{}, errors.New("server error")
+		return approval.Core{}, errors.New("server error, failed to query")
 	}
 
 	newApproval.ID = cnv.ID
