@@ -121,6 +121,8 @@ func (uc *userControll) Update() echo.HandlerFunc {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
 			} else if strings.Contains(err.Error(), "admin") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "cannot modifed admin data"})
+			} else if strings.Contains(err.Error(), "size") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "file size is too big"})
 			} else {
 				return c.JSON(http.StatusNotFound, map[string]interface{}{"message": "account not registered"})
 			}
@@ -218,6 +220,8 @@ func (uc *userControll) AdminEditEmployee() echo.HandlerFunc {
 			} else if strings.Contains(err.Error(), "type") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
 			} else if strings.Contains(err.Error(), "admin") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
+			} else if strings.Contains(err.Error(), "size") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
 			} else {
 				return c.JSON(http.StatusNotFound, map[string]interface{}{"message": "account not registered"})

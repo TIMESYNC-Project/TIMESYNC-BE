@@ -37,6 +37,21 @@ func TestRegister(t *testing.T) {
 		repo.AssertExpectations(t)
 	})
 
+	t.Run("invalid jwt token", func(t *testing.T) {
+		srv := New(repo)
+
+		_, token := helper.GenerateToken(0)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+
+		res, err := srv.Register(pToken, inputData)
+
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "found")
+		assert.NotEqual(t, resData.ID, res.ID)
+		repo.AssertExpectations(t)
+	})
+
 	t.Run("access denied", func(t *testing.T) {
 		repo.On("Register", uint(1), mock.Anything).Return(user.Core{}, errors.New("access denied")).Once()
 		srv := New(repo)

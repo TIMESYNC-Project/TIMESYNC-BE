@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strings"
 	"timesync-be/features/company"
 
 	"github.com/labstack/echo/v4"
@@ -36,7 +37,12 @@ func (cc *companyController) EditProfile() echo.HandlerFunc {
 		}
 		res, err := cc.srv.EditProfile(c.Get("user"), input.FileHeader, *ReqToCore(input))
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
+			if strings.Contains(err.Error(), "size") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "file size is too big"})
+			} else {
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
+			}
+
 		}
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"data":    res,

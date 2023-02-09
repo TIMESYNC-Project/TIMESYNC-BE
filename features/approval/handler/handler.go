@@ -42,9 +42,11 @@ func (ac *approvalControll) PostApproval() echo.HandlerFunc {
 		if err != nil {
 			if strings.Contains(err.Error(), "type") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "only jpg or png file can be upload"})
+			} else {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "file size is too big"})
 			}
-			log.Println("error post approval : ", err.Error())
-			return c.JSON(http.StatusInternalServerError, "unable to process the data")
+			// log.Println("error post approval : ", err.Error())
+			// return c.JSON(http.StatusInternalServerError, "unable to process the data")
 
 		}
 
