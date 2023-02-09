@@ -1,6 +1,6 @@
 <div align="center">
   <a href="https://github.com/orgs/TIMESYNC-Project/repositories">
-    <img src="images/logo.png" width="304" height="297">
+    <img src="sample/images/logo.png" width="304" height="297">
   </a>
 
   <p align="center">
@@ -36,7 +36,7 @@
 ![Discord](https://img.shields.io/badge/Discord-%237289DA.svg?style=for-the-badge&logo=discord&logoColor=white)
 
 # 🔗 ERD
-<img src="images/TimeSync_ERD.jpg">
+<img src="ERD.png">
 
 # 🔥 Open API
 
