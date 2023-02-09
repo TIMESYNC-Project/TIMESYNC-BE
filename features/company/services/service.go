@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"mime/multipart"
+	"strings"
 	"timesync-be/features/company"
 	"timesync-be/helper"
 
@@ -33,7 +34,7 @@ func (cuc *companyUseCase) GetProfile() (company.Core, error) {
 // EditProfile implements company.CompanyService
 func (cuc *companyUseCase) EditProfile(token interface{}, fileData multipart.FileHeader, updateData company.Core) (company.Core, error) {
 	adminID := helper.ExtractToken(token)
-	if fileData.Filename != "" {
+	if fileData.Size != 0 {
 		if fileData.Size > 500000 {
 			return company.Core{}, errors.New("size error")
 		}
@@ -60,8 +61,12 @@ func (cuc *companyUseCase) EditProfile(token interface{}, fileData multipart.Fil
 	}
 	res, err := cuc.qry.EditProfile(uint(adminID), updateData)
 	if err != nil {
-		log.Println("data not found")
-		return company.Core{}, errors.New("query error, problem with server")
+		log.Println("query error")
+		if strings.Contains(err.Error(), "access") {
+			return company.Core{}, errors.New("access denied")
+		} else {
+			return company.Core{}, errors.New("query error, problem with server")
+		}
 	}
 	return res, nil
 }

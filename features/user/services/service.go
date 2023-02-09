@@ -98,7 +98,7 @@ func (uuc *userUseCase) Update(token interface{}, fileData multipart.FileHeader,
 		updateData.Password = string(hashed)
 	}
 	// log.Println("size:", fileData.Size)
-	if fileData.Filename != "" {
+	if fileData.Size != 0 {
 		if fileData.Size > 500000 {
 			return user.Core{}, errors.New("size error")
 		}
@@ -111,13 +111,13 @@ func (uuc *userUseCase) Update(token interface{}, fileData multipart.FileHeader,
 		if err != nil {
 			return user.Core{}, errors.New("file type error only jpg or png file can be upload")
 		}
+		defer file.Close()
 
 		log.Println("size:", fileData.Filename, file)
 		namaFile := helper.GenerateRandomString()
 		namaFile = namaFile + tipeNameFile
 		fileData.Filename = namaFile
 		log.Println(namaFile)
-		defer file.Close()
 		file2, _ := fileData.Open()
 		defer file2.Close()
 		uploadURL, err := helper.UploadToS3(fileData.Filename, file2)
@@ -152,13 +152,23 @@ func (uuc *userUseCase) Csv(fileData multipart.FileHeader) error {
 			log.Println("open file error", err.Error())
 			return errors.New("can't open file")
 		}
-		result = helper.ConvertCSV(src)
+		err = helper.CsvTypeFile(src)
+		if err != nil {
+			return errors.New("file type error, only csv can be upload")
+		}
+
+		file, _ := fileData.Open()
+		result = helper.ConvertCSV(file)
 	} else {
 		log.Panic(result)
 	}
 	err := uuc.qry.Csv(result)
 	if err != nil {
-		log.Println("query error")
+		log.Println("service read error")
+		if strings.Contains(err.Error(), "Duplicate") {
+			log.Println("baca")
+			return errors.New("some email already registered in data entry")
+		}
 		return errors.New("server error")
 	}
 
@@ -188,21 +198,28 @@ func (uuc *userUseCase) ProfileEmployee(userID uint) (user.Core, error) {
 }
 
 // AdminEditEmployee implements user.UserService
-func (uuc *userUseCase) AdminEditEmployee(employeeID uint, fileData multipart.FileHeader, updateData user.Core) (user.Core, error) {
+func (uuc *userUseCase) AdminEditEmployee(token interface{}, employeeID uint, fileData multipart.FileHeader, updateData user.Core) (user.Core, error) {
+	adminID := helper.ExtractToken(token)
 	if updateData.Password != "" {
 		hashed, _ := helper.GeneratePassword(updateData.Password)
 		updateData.Password = string(hashed)
 	}
-	if fileData.Filename != "" {
+	if fileData.Size != 0 {
 		if fileData.Size > 500000 {
 			return user.Core{}, errors.New("size error")
 		}
-		fileName := uuid.NewV4().String()
-		fileData.Filename = fileName + fileData.Filename[(len(fileData.Filename)-5):len(fileData.Filename)]
-		src, err := fileData.Open()
+		file, err := fileData.Open()
 		if err != nil {
 			return user.Core{}, errors.New("error open fileData")
 		}
+		// Validasi Type
+		_, err = helper.TypeFile(file)
+		if err != nil {
+			return user.Core{}, errors.New("file type error only jpg or png file can be upload")
+		}
+		fileName := uuid.NewV4().String()
+		fileData.Filename = fileName + fileData.Filename[(len(fileData.Filename)-5):len(fileData.Filename)]
+		src, _ := fileData.Open()
 		defer src.Close()
 		uploadURL, err := helper.UploadToS3(fileData.Filename, src)
 		if err != nil {
@@ -210,15 +227,15 @@ func (uuc *userUseCase) AdminEditEmployee(employeeID uint, fileData multipart.Fi
 		}
 		updateData.ProfilePicture = uploadURL
 	}
-	res, err := uuc.qry.UpdateByAdmin(employeeID, updateData)
+	res, err := uuc.qry.UpdateByAdmin(uint(adminID), employeeID, updateData)
 	if err != nil {
 		msg := ""
 		if strings.Contains(err.Error(), "not found") {
 			msg = "data not found"
 		} else if strings.Contains(err.Error(), "email") {
 			msg = "email duplicated"
-		} else if strings.Contains(err.Error(), "cannot modifed admin data") {
-			msg = "cannot modifed admin data"
+		} else if strings.Contains(err.Error(), "access") {
+			msg = "access denied"
 		} else {
 			msg = "account not registered"
 		}

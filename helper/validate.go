@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"timesync-be/features/user"
@@ -20,25 +21,20 @@ func TypeFile(test multipart.File) (string, error) {
 	} else {
 		TipenamaFile = ".jpg"
 	}
-	if fileType == "image/png" || fileType == "image/jpeg" {
+	if fileType == "image/png" || fileType == "image/jpeg" || fileType == "image/jpg" {
 		return TipenamaFile, nil
 	}
 	return "", errors.New("file type not match")
 }
 
-func CsvTypeFile(test multipart.File) (string, error) {
+func CsvTypeFile(test multipart.File) error {
 	fileByte, _ := io.ReadAll(test)
 	fileType := http.DetectContentType(fileByte)
-	TipenamaFile := ""
-	if fileType == "image/png" {
-		TipenamaFile = ".png"
-	} else {
-		TipenamaFile = ".jpg"
+	log.Println("|", fileType, "|")
+	if fileType == "text/plain; charset=utf-8" {
+		return nil
 	}
-	if fileType == "image/png" || fileType == "image/jpeg" {
-		return TipenamaFile, nil
-	}
-	return "", errors.New("file type not match")
+	return errors.New("file type not match")
 }
 
 type UserValidate struct {

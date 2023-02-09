@@ -171,20 +171,20 @@ func (_m *UserData) Update(employeeID uint, updateData user.Core) (user.Core, er
 	return r0, r1
 }
 
-// UpdateByAdmin provides a mock function with given fields: employeeID, updateData
-func (_m *UserData) UpdateByAdmin(employeeID uint, updateData user.Core) (user.Core, error) {
-	ret := _m.Called(employeeID, updateData)
+// UpdateByAdmin provides a mock function with given fields: adminID, employeeID, updateData
+func (_m *UserData) UpdateByAdmin(adminID uint, employeeID uint, updateData user.Core) (user.Core, error) {
+	ret := _m.Called(adminID, employeeID, updateData)
 
 	var r0 user.Core
-	if rf, ok := ret.Get(0).(func(uint, user.Core) user.Core); ok {
-		r0 = rf(employeeID, updateData)
+	if rf, ok := ret.Get(0).(func(uint, uint, user.Core) user.Core); ok {
+		r0 = rf(adminID, employeeID, updateData)
 	} else {
 		r0 = ret.Get(0).(user.Core)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(uint, user.Core) error); ok {
-		r1 = rf(employeeID, updateData)
+	if rf, ok := ret.Get(1).(func(uint, uint, user.Core) error); ok {
+		r1 = rf(adminID, employeeID, updateData)
 	} else {
 		r1 = ret.Error(1)
 	}

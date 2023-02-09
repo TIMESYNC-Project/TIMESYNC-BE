@@ -43,7 +43,7 @@ type UserService interface {
 	Profile(token interface{}) (Core, error)
 	ProfileEmployee(userID uint) (Core, error)
 	Update(token interface{}, fileData multipart.FileHeader, updateData Core) (Core, error)
-	AdminEditEmployee(employeeID uint, fileData multipart.FileHeader, updateData Core) (Core, error)
+	AdminEditEmployee(token interface{}, employeeID uint, fileData multipart.FileHeader, updateData Core) (Core, error)
 	GetAllEmployee() ([]Core, error)
 	Search(token interface{}, quote string) ([]Core, error)
 }
@@ -53,7 +53,7 @@ type UserData interface {
 	Login(nip string) (Core, error)
 	Profile(userID uint) (Core, error)
 	Update(employeeID uint, updateData Core) (Core, error)
-	UpdateByAdmin(employeeID uint, updateData Core) (Core, error)
+	UpdateByAdmin(adminID uint, employeeID uint, updateData Core) (Core, error)
 	Delete(adminID uint, employeeID uint) error
 	Csv(newUserBatch []Core) error
 	GetAllEmployee() ([]Core, error)
