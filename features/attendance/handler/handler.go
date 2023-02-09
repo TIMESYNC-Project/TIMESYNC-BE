@@ -255,7 +255,7 @@ func (ac *attendanceController) Graph() echo.HandlerFunc {
 		}
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"data":    res,
-			"message": "success show records",
+			"message": "success show graph data",
 		})
 	}
 }
