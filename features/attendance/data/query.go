@@ -682,3 +682,108 @@ func (aq *attendanceQuery) GetPresenceDetail(adminID uint, attendanceID uint) (a
 	}
 	return DataToCore(atDetail), nil
 }
+
+// Graph implements attendance.AttendanceData
+func (aq *attendanceQuery) Graph(adminID uint, param string, yearMonth string) (interface{}, error) {
+	if adminID != 1 {
+		log.Println("access denied")
+		return attendance.Core{}, errors.New("access denied")
+	}
+	usr := []User{}
+	err := aq.db.Find(&usr).Error
+	if err != nil {
+		log.Println("no user found", err.Error())
+		return []attendance.Core{}, errors.New("data not found")
+	}
+	filterUser := []User{}
+	for f := 0; f < len(usr); f++ {
+		if usr[f].ID != 1 {
+			filterUser = append(filterUser, (usr[f]))
+		}
+	}
+
+	result := make([]map[string]interface{}, len(usr))
+	if param == "mtwh" {
+		for i := 0; i < len(filterUser); i++ {
+			data := make(map[string]interface{})
+			wHour := []Attendance{}
+			err = aq.db.Where("attendance_date LIKE ? AND user_id = ?", "%"+yearMonth+"%", filterUser[i].ID).Find(&wHour).Error
+			if err != nil {
+				log.Println("no user found", err.Error())
+				return []attendance.Core{}, errors.New("data not found")
+
+			}
+			if len(wHour) == 0 {
+				data["employee_name"] = filterUser[i].Name
+				data["employee_nip"] = filterUser[i].Nip
+				data["monthly_total_working_hour"] = 0
+				result[i] = data
+
+			} else {
+				data["employee_name"] = filterUser[i].Name
+				data["employee_nip"] = filterUser[i].Nip
+				minTotal := 0
+				for j := 0; j < len(wHour); j++ {
+					workTimeHour, _ := strconv.Atoi(wHour[j].WorkTime[:2])
+					workTimeMinute, _ := strconv.Atoi(wHour[j].WorkTime[4:6])
+					// log.Println(workTimeHour, workTimeMinute, wHour[j].WorkTime[4:6])
+					workTimeHour = workTimeHour * 60
+					timeMinuteTotal := workTimeHour + workTimeMinute
+
+					minTotal += timeMinuteTotal
+					// log.Println(minTotal)
+
+				}
+				count := 0
+				isTrue := true
+				for isTrue {
+					if minTotal < 60 {
+						break
+					}
+					minTotal -= 60
+					count++
+				}
+				if minTotal > 45 {
+					count += 1
+				}
+				hourTotal := count
+				data["monthly_total_working_hour"] = hourTotal
+				result[i] = data
+			}
+		}
+	} else if param == "mtel" {
+		for i := 0; i < len(filterUser); i++ {
+			data := make(map[string]interface{})
+			wHour := []Attendance{}
+			err = aq.db.Where("attendance_date LIKE ? AND user_id = ?", "%"+yearMonth+"%", filterUser[i].ID).Find(&wHour).Error
+			if err != nil {
+				log.Println("no user found", err.Error())
+				return []attendance.Core{}, errors.New("data not found")
+
+			}
+			if len(wHour) == 0 {
+				data["employee_name"] = filterUser[i].Name
+				data["employee_nip"] = filterUser[i].Nip
+				data["monthly_total_employee_late"] = 0
+				result[i] = data
+
+			} else {
+				data["employee_name"] = filterUser[i].Name
+				data["employee_nip"] = filterUser[i].Nip
+				late := 0
+				for j := 0; j < len(wHour); j++ {
+					if wHour[j].AttendanceStatus == "late" {
+						late++
+					}
+
+				}
+				data["monthly_total_employee_late"] = late
+				result[i] = data
+			}
+		}
+	} else {
+		return []attendance.Core{}, errors.New("wrong type parameter")
+	}
+	return result, nil
+
+}

@@ -98,6 +98,9 @@ func main() {
 	e.GET("/companies", cmHdl.GetProfile(), middleware.JWT([]byte(config.JWTKey)))
 	e.PUT("/companies", cmHdl.EditProfile(), middleware.JWT([]byte(config.JWTKey)))
 
+	//graph
+	e.GET("/graph", attendHdl.Graph(), middleware.JWT([]byte(config.JWTKey)))
+
 	if err := e.Start(":8000"); err != nil {
 		log.Println(err.Error())
 	}

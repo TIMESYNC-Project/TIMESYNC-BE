@@ -237,3 +237,25 @@ func (ac *attendanceController) RecordByID() echo.HandlerFunc {
 		})
 	}
 }
+
+// Graph implements attendance.AttendanceHandler
+func (ac *attendanceController) Graph() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		typeGrapgh := c.QueryParam("type")
+		yearMonth := c.QueryParam("year_month")
+		res, err := ac.srv.Graph(c.Get("user"), typeGrapgh, yearMonth)
+		if err != nil {
+			if strings.Contains(err.Error(), "access denied") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
+			} else if strings.Contains(err.Error(), "type") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
+			} else {
+				return c.JSON(http.StatusNotFound, map[string]interface{}{"message": "data not found"})
+			}
+		}
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"data":    res,
+			"message": "success show records",
+		})
+	}
+}
