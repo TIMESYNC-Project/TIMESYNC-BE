@@ -134,6 +134,29 @@ func (_m *AttendanceService) GetPresenceTotalToday(token interface{}) ([]attenda
 	return r0, r1
 }
 
+// Graph provides a mock function with given fields: token, param, yearMonth
+func (_m *AttendanceService) Graph(token interface{}, param string, yearMonth string) (interface{}, error) {
+	ret := _m.Called(token, param, yearMonth)
+
+	var r0 interface{}
+	if rf, ok := ret.Get(0).(func(interface{}, string, string) interface{}); ok {
+		r0 = rf(token, param, yearMonth)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(interface{})
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(interface{}, string, string) error); ok {
+		r1 = rf(token, param, yearMonth)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // Record provides a mock function with given fields: token, dateFrom, dateTo
 func (_m *AttendanceService) Record(token interface{}, dateFrom string, dateTo string) ([]attendance.Core, error) {
 	ret := _m.Called(token, dateFrom, dateTo)
