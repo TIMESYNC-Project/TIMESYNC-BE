@@ -151,9 +151,16 @@ func (uc *userControll) Csv() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "Select a file to upload"})
 		}
+
 		err = uc.srv.Csv(*formHeader)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
+			if strings.Contains(err.Error(), "type") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
+			} else if strings.Contains(err.Error(), "email") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
+			} else {
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
+			}
 		}
 
 		return c.JSON(http.StatusCreated, map[string]interface{}{"message": "success create account from csv"})
@@ -213,13 +220,13 @@ func (uc *userControll) AdminEditEmployee() echo.HandlerFunc {
 			}
 			input.FileHeader = *formHeader
 		}
-		res, err := uc.srv.AdminEditEmployee(uint(employeeID), input.FileHeader, *ReqToCore(input))
+		res, err := uc.srv.AdminEditEmployee(c.Get("user"), uint(employeeID), input.FileHeader, *ReqToCore(input))
 		if err != nil {
 			if strings.Contains(err.Error(), "email") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "email already used"})
 			} else if strings.Contains(err.Error(), "type") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
-			} else if strings.Contains(err.Error(), "admin") {
+			} else if strings.Contains(err.Error(), "access") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
 			} else if strings.Contains(err.Error(), "size") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})

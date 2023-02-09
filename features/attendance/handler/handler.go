@@ -168,7 +168,7 @@ func (ac *attendanceController) Record() echo.HandlerFunc {
 		}
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"data":    result,
-			"message": "success show records",
+			"message": "success show employee attendance record",
 		})
 	}
 }
@@ -232,12 +232,16 @@ func (ac *attendanceController) RecordByID() echo.HandlerFunc {
 				return c.JSON(http.StatusNotFound, map[string]interface{}{"message": "data not found"})
 			}
 		}
+		result := []RecordResponse{}
+		for _, val := range res {
+			result = append(result, RecordResponseCenvert(val))
+		}
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"data": map[string]interface{}{
-				"record":        res,
 				"employee_name": nameUser,
+				"record":        result,
 			},
-			"message": "success show records",
+			"message": "success show employee attendance record",
 		})
 	}
 }

@@ -21,8 +21,8 @@ func New(db *gorm.DB) company.CompanyData {
 // EditProfile implements company.CompanyData
 func (cq *companyQuery) EditProfile(adminID uint, updateData company.Core) (company.Core, error) {
 	if adminID != 1 {
-		log.Println("cannot modifed admin data")
-		return company.Core{}, errors.New("cannot modifed admin data")
+		log.Println("access denied")
+		return company.Core{}, errors.New("access denied")
 	}
 	cnv := CoreToData(updateData)
 	qry := cq.db.Model(&Company{}).Where("id = ?", 1).Updates(&cnv)

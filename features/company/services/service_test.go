@@ -72,7 +72,6 @@ func TestEditProfile(t *testing.T) {
 	}
 	inputData := company.Core{
 		ID:             1,
-		Picture:        "ERD.png",
 		Name:           "Timesync Company",
 		Email:          "timesync@company.co.id",
 		Description:    "IT Company",
@@ -82,7 +81,6 @@ func TestEditProfile(t *testing.T) {
 	}
 	resData := company.Core{
 		ID:             1,
-		Picture:        imageTrueCnv.Filename,
 		Name:           "Timesync Company",
 		Email:          "timesync@company.co.id",
 		Description:    "IT Company",
@@ -114,6 +112,19 @@ func TestEditProfile(t *testing.T) {
 		assert.NotNil(t, err)
 		assert.Equal(t, uint(0), res.ID)
 		assert.ErrorContains(t, err, "server")
+		repo.AssertExpectations(t)
+	})
+	t.Run("access denied", func(t *testing.T) {
+		repo.On("EditProfile", uint(2), inputData).Return(company.Core{}, errors.New("access denied"))
+		srv := New(repo)
+
+		_, token := helper.GenerateToken(2)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.EditProfile(pToken, *imageTrueCnv, inputData)
+		assert.NotNil(t, err)
+		assert.Equal(t, uint(0), res.ID)
+		assert.ErrorContains(t, err, "denied")
 		repo.AssertExpectations(t)
 	})
 }

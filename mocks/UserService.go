@@ -15,20 +15,20 @@ type UserService struct {
 	mock.Mock
 }
 
-// AdminEditEmployee provides a mock function with given fields: employeeID, fileData, updateData
-func (_m *UserService) AdminEditEmployee(employeeID uint, fileData multipart.FileHeader, updateData user.Core) (user.Core, error) {
-	ret := _m.Called(employeeID, fileData, updateData)
+// AdminEditEmployee provides a mock function with given fields: token, employeeID, fileData, updateData
+func (_m *UserService) AdminEditEmployee(token interface{}, employeeID uint, fileData multipart.FileHeader, updateData user.Core) (user.Core, error) {
+	ret := _m.Called(token, employeeID, fileData, updateData)
 
 	var r0 user.Core
-	if rf, ok := ret.Get(0).(func(uint, multipart.FileHeader, user.Core) user.Core); ok {
-		r0 = rf(employeeID, fileData, updateData)
+	if rf, ok := ret.Get(0).(func(interface{}, uint, multipart.FileHeader, user.Core) user.Core); ok {
+		r0 = rf(token, employeeID, fileData, updateData)
 	} else {
 		r0 = ret.Get(0).(user.Core)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(uint, multipart.FileHeader, user.Core) error); ok {
-		r1 = rf(employeeID, fileData, updateData)
+	if rf, ok := ret.Get(1).(func(interface{}, uint, multipart.FileHeader, user.Core) error); ok {
+		r1 = rf(token, employeeID, fileData, updateData)
 	} else {
 		r1 = ret.Error(1)
 	}

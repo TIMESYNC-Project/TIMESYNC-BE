@@ -205,6 +205,7 @@ func TestUpdate(t *testing.T) {
 	imageTrueCnv := &multipart.FileHeader{
 		Filename: imageTrue.Name(),
 	}
+	// log.Panic(imageTrueCnv.Header)
 	inputData := user.Core{ID: 1, Name: "Alif", Phone: "08123", ProfilePicture: "ERD.png"}
 	resData := user.Core{ID: 1, Name: "Alif", Phone: "08123", ProfilePicture: imageTrueCnv.Filename}
 	t.Run("success updating account", func(t *testing.T) {
@@ -227,7 +228,7 @@ func TestUpdate(t *testing.T) {
 		pToken.Valid = true
 		res, err := srv.Update(pToken, *imageTrueCnv, inputData)
 		assert.NotNil(t, err)
-		assert.ErrorContains(t, err, "error")
+		assert.ErrorContains(t, err, "not registered")
 		assert.Equal(t, user.Core{}, res)
 		repo.AssertExpectations(t)
 	})
@@ -250,23 +251,26 @@ func TestAdminEditEmploye(t *testing.T) {
 	inputData := user.Core{ID: 1, Name: "Alif", Phone: "08123", ProfilePicture: "ERD.png"}
 	resData := user.Core{ID: 1, Name: "Alif", Phone: "08123", ProfilePicture: imageTrueCnv.Filename}
 	t.Run("success updating account", func(t *testing.T) {
-		repo.On("Update", uint(1), inputData).Return(resData, nil).Once()
+		repo.On("UpdateByAdmin", uint(1), uint(1), inputData).Return(resData, nil).Once()
 		srv := New(repo)
 		_, token := helper.GenerateToken(1)
 		pToken := token.(*jwt.Token)
 		pToken.Valid = true
-		res, err := srv.AdminEditEmployee(uint(1), *imageTrueCnv, inputData)
+		res, err := srv.AdminEditEmployee(pToken, uint(1), *imageTrueCnv, inputData)
 		assert.Nil(t, err)
 		assert.Equal(t, resData.ID, res.ID)
 		repo.AssertExpectations(t)
 	})
 
 	t.Run("fail updating account", func(t *testing.T) {
-		repo.On("Update", uint(1), inputData).Return(user.Core{}, errors.New("query error,update fail")).Once()
+		repo.On("UpdateByAdmin", uint(1), uint(1), inputData).Return(user.Core{}, errors.New("query error,update fail")).Once()
 		srv := New(repo)
-		res, err := srv.AdminEditEmployee(uint(1), *imageTrueCnv, inputData)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.AdminEditEmployee(pToken, uint(1), *imageTrueCnv, inputData)
 		assert.NotNil(t, err)
-		assert.ErrorContains(t, err, "error")
+		assert.ErrorContains(t, err, "registered")
 		assert.Equal(t, user.Core{}, res)
 		repo.AssertExpectations(t)
 	})
@@ -371,6 +375,7 @@ func TestSearch(t *testing.T) {
 }
 
 func TestCsv(t *testing.T) {
+	repo := mocks.NewUserData(t)
 	inputData := []user.Core{
 		{
 			ID:          1,
@@ -384,7 +389,6 @@ func TestCsv(t *testing.T) {
 		},
 	}
 
-	repo := mocks.NewUserData(t)
 	srv := New(repo)
 	filePath := filepath.Join("..", "..", "..", "TimeSyncUnitTesting.csv")
 	f, err := os.Open(filePath)
@@ -423,9 +427,10 @@ func TestCsv(t *testing.T) {
 		repo.AssertExpectations(t)
 	})
 	t.Run("cannot insert empty file", func(t *testing.T) {
-		repo.On("Csv", []user.Core{}).Return(errors.New("cannot insert empty file"))
+		repo.On("Csv", inputData).Return(errors.New("cannot insert empty file")).Once()
 		err = srv.Csv(*header)
-		assert.Error(t, err)
+		assert.NotNil(t, err)
+		repo.AssertExpectations(t)
 	})
 	// t.Run("fail updating account", func(t *testing.T) {
 	// 	repo.On("Update", uint(1), inputData).Return(user.Core{}, errors.New("query error,update fail")).Once()

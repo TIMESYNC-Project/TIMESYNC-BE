@@ -39,6 +39,8 @@ func (cc *companyController) EditProfile() echo.HandlerFunc {
 		if err != nil {
 			if strings.Contains(err.Error(), "size") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "file size is too big"})
+			} else if strings.Contains(err.Error(), "access") {
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": err.Error()})
 			} else {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
 			}

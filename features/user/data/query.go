@@ -139,10 +139,14 @@ func (uq *userQuery) Update(employeeID uint, updateData user.Core) (user.Core, e
 }
 
 // UpdateByAdmin implements user.UserData
-func (uq *userQuery) UpdateByAdmin(employeeID uint, updateData user.Core) (user.Core, error) {
+func (uq *userQuery) UpdateByAdmin(adminID uint, employeeID uint, updateData user.Core) (user.Core, error) {
+	if adminID != 1 {
+		log.Println("admin only")
+		return user.Core{}, errors.New("access denied")
+	}
 	if employeeID == 1 {
-		log.Println("cannot modifed admin data")
-		return user.Core{}, errors.New("cannot modifed admin data")
+		log.Println("access denied")
+		return user.Core{}, errors.New("access denied")
 	}
 	if updateData.Email != "" {
 		dupEmail := User{}
@@ -223,8 +227,8 @@ func (uq *userQuery) Csv(newUserBatch []user.Core) error {
 	}
 	err = uq.db.Create(&batch).Error
 	if err != nil {
-		log.Println("query error")
-		return errors.New("server error")
+		log.Println("query error", err.Error())
+		return err
 	}
 	return nil
 }
