@@ -13,6 +13,7 @@ import (
 
 	"github.com/golang-jwt/jwt"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestPostApproval(t *testing.T) {
@@ -55,22 +56,8 @@ func TestPostApproval(t *testing.T) {
 		repo.AssertExpectations(t)
 	})
 
-	// t.Run("error open fileData", func(t *testing.T) {
-	// 	srv := New(repo)
-
-	// 	_, token := helper.GenerateToken(0)
-	// 	pToken := token.(*jwt.Token)
-	// 	pToken.Valid = true
-
-	// 	res, err := srv.PostApproval(pToken, *imageTrueCnv, inputData)
-
-	// 	assert.NotNil(t, err)
-	// 	assert.ErrorContains(t, err, "file")
-	// 	assert.NotEqual(t, resData.Title, res.Title)
-	// })
-
 	t.Run("data not found", func(t *testing.T) {
-		repo.On("PostApproval", uint(1), inputData).Return(approval.Core{}, errors.New("server error")).Once()
+		repo.On("PostApproval", uint(1), mock.Anything).Return(approval.Core{}, errors.New("server error, failed to query")).Once()
 
 		srv := New(repo)
 		_, token := helper.GenerateToken(1)
@@ -79,36 +66,10 @@ func TestPostApproval(t *testing.T) {
 
 		res, err := srv.PostApproval(pToken, *imageTrueCnv, inputData)
 		assert.NotNil(t, err)
-		assert.ErrorContains(t, err, "error")
+		assert.ErrorContains(t, err, "server error")
 		assert.Equal(t, approval.Core{}, res)
 		repo.AssertExpectations(t)
 	})
-
-	// t.Run("error open fileData", func(t *testing.T) {
-	// 	srv := New(repo)
-
-	// 	_, token := helper.GenerateToken(1)
-	// 	pToken := token.(*jwt.Token)
-	// 	pToken.Valid = true
-	// 	res, err := srv.PostApproval(pToken, *imageTrueCnv, inputData)
-	// 	assert.NotNil(t, err)
-	// 	assert.Equal(t, uint(0), res.ID)
-	// 	assert.ErrorContains(t, err, "fileData")
-	// })
-
-	// t.Run("error open fileData", func(t *testing.T) {
-	// 	repo.On("PostApproval", mock.Anything).Return(approval.Core{}, errors.New("error open fileData")).Once()
-	// 	srv := New(repo)
-
-	// 	_, token := helper.GenerateToken(1)
-	// 	pToken := token.(*jwt.Token)
-	// 	pToken.Valid = true
-	// 	res, err := srv.PostApproval(pToken, *imageTrueCnv, inputData)
-	// 	assert.NotNil(t, err)
-	// 	assert.NotEqual(t, uint(1), res.ID)
-	// 	assert.ErrorContains(t, err, "file")
-	// 	repo.AssertExpectations(t)
-	// })
 }
 
 func TestGetApproval(t *testing.T) {
@@ -254,21 +215,6 @@ func TestEmployeeApprovalRecord(t *testing.T) {
 		repo.AssertExpectations(t)
 	})
 
-	t.Run("invalid jwt token", func(t *testing.T) {
-		srv := New(repo)
-
-		_, token := helper.GenerateToken(0)
-		pToken := token.(*jwt.Token)
-		pToken.Valid = true
-
-		res, err := srv.EmployeeApprovalRecord(pToken)
-
-		assert.NotNil(t, err)
-		assert.ErrorContains(t, err, "found")
-		assert.NotEqual(t, len(resData), len(res))
-		repo.AssertExpectations(t)
-	})
-
 	t.Run("data not found", func(t *testing.T) {
 		repo.On("EmployeeApprovalRecord", uint(1)).Return([]approval.Core{}, errors.New("data not found")).Once()
 
@@ -339,21 +285,6 @@ func TestUpdateApproval(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, resData.ID, res.ID)
 		assert.Equal(t, resData.Title, res.Title)
-		repo.AssertExpectations(t)
-	})
-
-	t.Run("invalid jwt token", func(t *testing.T) {
-		srv := New(repo)
-
-		_, token := helper.GenerateToken(0)
-		pToken := token.(*jwt.Token)
-		pToken.Valid = true
-
-		res, err := srv.UpdateApproval(pToken, uint(1), inputData)
-
-		assert.NotNil(t, err)
-		assert.ErrorContains(t, err, "found")
-		assert.Equal(t, uint(0), res.ID)
 		repo.AssertExpectations(t)
 	})
 

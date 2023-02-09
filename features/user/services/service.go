@@ -11,7 +11,6 @@ import (
 	"timesync-be/helper"
 
 	"github.com/golang-jwt/jwt"
-	uuid "github.com/satori/go.uuid"
 )
 
 type userUseCase struct {
@@ -99,32 +98,13 @@ func (uuc *userUseCase) Update(token interface{}, fileData multipart.FileHeader,
 	}
 	// log.Println("size:", fileData.Size)
 	if fileData.Size != 0 {
-		if fileData.Size > 500000 {
-			return user.Core{}, errors.New("size error")
+		if fileData.Filename != "" {
+			res, err := helper.GetUrlImagesFromAWS(fileData)
+			if err != nil {
+				return user.Core{}, err
+			}
+			updateData.ProfilePicture = res
 		}
-		file, err := fileData.Open()
-		if err != nil {
-			return user.Core{}, errors.New("error open fileData")
-		}
-		// Validasi Type
-		tipeNameFile, err := helper.TypeFile(file)
-		if err != nil {
-			return user.Core{}, errors.New("file type error only jpg or png file can be upload")
-		}
-		defer file.Close()
-
-		log.Println("size:", fileData.Filename, file)
-		namaFile := helper.GenerateRandomString()
-		namaFile = namaFile + tipeNameFile
-		fileData.Filename = namaFile
-		log.Println(namaFile)
-		file2, _ := fileData.Open()
-		defer file2.Close()
-		uploadURL, err := helper.UploadToS3(fileData.Filename, file2)
-		if err != nil {
-			return user.Core{}, errors.New("cannot upload to s3 server error")
-		}
-		updateData.ProfilePicture = uploadURL
 	}
 	res, err := uuc.qry.Update(uint(employeeID), updateData)
 	if err != nil {
@@ -205,27 +185,13 @@ func (uuc *userUseCase) AdminEditEmployee(token interface{}, employeeID uint, fi
 		updateData.Password = string(hashed)
 	}
 	if fileData.Size != 0 {
-		if fileData.Size > 500000 {
-			return user.Core{}, errors.New("size error")
+		if fileData.Filename != "" {
+			res, err := helper.GetUrlImagesFromAWS(fileData)
+			if err != nil {
+				return user.Core{}, err
+			}
+			updateData.ProfilePicture = res
 		}
-		file, err := fileData.Open()
-		if err != nil {
-			return user.Core{}, errors.New("error open fileData")
-		}
-		// Validasi Type
-		_, err = helper.TypeFile(file)
-		if err != nil {
-			return user.Core{}, errors.New("file type error only jpg or png file can be upload")
-		}
-		fileName := uuid.NewV4().String()
-		fileData.Filename = fileName + fileData.Filename[(len(fileData.Filename)-5):len(fileData.Filename)]
-		src, _ := fileData.Open()
-		defer src.Close()
-		uploadURL, err := helper.UploadToS3(fileData.Filename, src)
-		if err != nil {
-			return user.Core{}, errors.New("cannot upload to s3 server error")
-		}
-		updateData.ProfilePicture = uploadURL
 	}
 	res, err := uuc.qry.UpdateByAdmin(uint(adminID), employeeID, updateData)
 	if err != nil {

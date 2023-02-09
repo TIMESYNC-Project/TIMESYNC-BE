@@ -126,6 +126,18 @@ func TestClockOut(t *testing.T) {
 		assert.Equal(t, uint(0), res.ID)
 		data.AssertExpectations(t)
 	})
+	t.Run(" Undefined", func(t *testing.T) {
+		data.On("ClockOut", uint(1), "-6.4096", "106.8185").Return(attendance.Core{}, errors.New("data not found")).Once()
+		srv := New(data)
+		_, token := helper.GenerateToken(1)
+		mockToken := token.(*jwt.Token)
+		mockToken.Valid = true
+		res, err := srv.ClockOut(mockToken, "-6.4096", "106.8185")
+		assert.NotNil(t, err)
+		assert.Error(t, err)
+		assert.Equal(t, uint(0), res.ID)
+		data.AssertExpectations(t)
+	})
 }
 
 func TestAttendanceFromAdmin(t *testing.T) {
@@ -351,6 +363,65 @@ func TestRecordByID(t *testing.T) {
 		assert.NotNil(t, err)
 		assert.Equal(t, []attendance.Core{}, res)
 		assert.NotEqual(t, name, resData)
+		assert.ErrorContains(t, err, "server error")
+		data.AssertExpectations(t)
+	})
+}
+
+func TestGraph(t *testing.T) {
+	data := mocks.NewAttendanceData(t)
+	resData := []attendance.Core{
+		{
+			ClockIn:         "07:50",
+			ClockInLocation: "Jalan Soekarno hatta Bandung Jawa Barat",
+			ClockInOSM:      "https://www.openstreetmap.org/#map=16/-6.4096/106.8185",
+		},
+	}
+	t.Run("success get record by id", func(t *testing.T) {
+		data.On("Graph", uint(1), "mtwh", "2023-01").Return(resData, nil).Once()
+		srv := New(data)
+		_, token := helper.GenerateToken(1)
+		mockToken := token.(*jwt.Token)
+		mockToken.Valid = true
+		res, err := srv.Graph(mockToken, "mtwh", "2023-01")
+		assert.Equal(t, res, resData)
+		assert.Nil(t, err)
+		data.AssertExpectations(t)
+	})
+
+	t.Run("access denied", func(t *testing.T) {
+		data.On("Graph", uint(1), "mtwh", "2023-01").Return([]attendance.Core{}, errors.New("access denied")).Once()
+		srv := New(data)
+		_, token := helper.GenerateToken(1)
+		mockToken := token.(*jwt.Token)
+		mockToken.Valid = true
+		res, err := srv.Graph(mockToken, "mtwh", "2023-01")
+		assert.Equal(t, res, []attendance.Core{})
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "access")
+		data.AssertExpectations(t)
+	})
+	t.Run("wrong type parameter", func(t *testing.T) {
+		data.On("Graph", uint(1), "mtwh", "2023-01").Return([]attendance.Core{}, errors.New("wrong type parameter")).Once()
+		srv := New(data)
+		_, token := helper.GenerateToken(1)
+		mockToken := token.(*jwt.Token)
+		mockToken.Valid = true
+		res, err := srv.Graph(mockToken, "mtwh", "2023-01")
+		assert.Equal(t, res, []attendance.Core{})
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "wrong type parameter")
+		data.AssertExpectations(t)
+	})
+	t.Run("wrong type parameter", func(t *testing.T) {
+		data.On("Graph", uint(1), "mtwh", "2023-01").Return([]attendance.Core{}, errors.New("data not found")).Once()
+		srv := New(data)
+		_, token := helper.GenerateToken(1)
+		mockToken := token.(*jwt.Token)
+		mockToken.Valid = true
+		res, err := srv.Graph(mockToken, "mtwh", "2023-01")
+		assert.Equal(t, res, []attendance.Core{})
+		assert.NotNil(t, err)
 		assert.ErrorContains(t, err, "server error")
 		data.AssertExpectations(t)
 	})
