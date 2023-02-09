@@ -74,6 +74,7 @@ func TestPostApproval(t *testing.T) {
 
 func TestGetApproval(t *testing.T) {
 	repo := mocks.NewApprovalData(t)
+	srv := New(repo)
 	filePath := filepath.Join("..", "..", "..", "ERD.png")
 	imageTrue, err := os.Open(filePath)
 	if err != nil {
@@ -94,7 +95,6 @@ func TestGetApproval(t *testing.T) {
 
 	t.Run("success get approval record", func(t *testing.T) {
 		repo.On("GetApproval").Return(resData, nil).Once()
-		srv := New(repo)
 		_, token := helper.GenerateToken(1)
 		pToken := token.(*jwt.Token)
 		pToken.Valid = true
@@ -106,9 +106,6 @@ func TestGetApproval(t *testing.T) {
 
 	t.Run("data not found", func(t *testing.T) {
 		repo.On("GetApproval").Return([]approval.Core{}, errors.New("data not found")).Once()
-
-		srv := New(repo)
-
 		res, err := srv.GetApproval()
 		assert.NotNil(t, err)
 		assert.ErrorContains(t, err, "not found")
@@ -118,9 +115,6 @@ func TestGetApproval(t *testing.T) {
 
 	t.Run("server problem", func(t *testing.T) {
 		repo.On("GetApproval").Return([]approval.Core{}, errors.New("server problem")).Once()
-
-		srv := New(repo)
-
 		res, err := srv.GetApproval()
 		assert.NotNil(t, err)
 		assert.ErrorContains(t, err, "server")
@@ -157,7 +151,6 @@ func TestApprovalDetail(t *testing.T) {
 		assert.Equal(t, resData.ID, res.ID)
 		repo.AssertExpectations(t)
 	})
-
 	t.Run("data not found", func(t *testing.T) {
 		repo.On("ApprovalDetail", uint(1)).Return(approval.Core{}, errors.New("data not found")).Once()
 
@@ -169,7 +162,6 @@ func TestApprovalDetail(t *testing.T) {
 		assert.NotEqual(t, 0, res.ID)
 		repo.AssertExpectations(t)
 	})
-
 	t.Run("server problem", func(t *testing.T) {
 		repo.On("ApprovalDetail", uint(1)).Return(approval.Core{}, errors.New("server problem")).Once()
 
