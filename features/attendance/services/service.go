@@ -57,6 +57,8 @@ func (auc *attendanceUseCase) AttendanceFromAdmin(token interface{}, dateStart s
 	if err != nil {
 		if strings.Contains(err.Error(), "wrong input format") {
 			return errors.New("wrong input format")
+		} else if strings.Contains(err.Error(), "access denied") {
+			return errors.New("access denied")
 		} else {
 			return errors.New("server error")
 		}

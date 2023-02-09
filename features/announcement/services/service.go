@@ -21,10 +21,6 @@ func New(ad announcement.AnnouncementData) announcement.AnnouncementService {
 func (auc *announcementUseCase) PostAnnouncement(token interface{}, newAnnouncement announcement.Core) (announcement.Core, error) {
 	userID := helper.ExtractToken(token)
 
-	if userID <= 0 {
-		return announcement.Core{}, errors.New("user not found")
-	}
-
 	res, err := auc.qry.PostAnnouncement(uint(userID), newAnnouncement)
 	if err != nil {
 		log.Println("query error", err.Error())
@@ -49,11 +45,6 @@ func (auc *announcementUseCase) GetAnnouncement() ([]announcement.Core, error) {
 
 func (auc *announcementUseCase) GetAnnouncementDetail(token interface{}, announcementID uint) (announcement.Core, error) {
 	id := helper.ExtractToken(token)
-
-	if id <= 0 {
-		return announcement.Core{}, errors.New("data not found")
-	}
-
 	res, err := auc.qry.GetAnnouncementDetail(uint(id), announcementID)
 	if err != nil {
 		msg := ""
@@ -70,10 +61,6 @@ func (auc *announcementUseCase) GetAnnouncementDetail(token interface{}, announc
 
 func (auc *announcementUseCase) EmployeeInbox(token interface{}) ([]announcement.Core, error) {
 	id := helper.ExtractToken(token)
-
-	if id <= 0 {
-		return []announcement.Core{}, errors.New("data not found")
-	}
 	res, err := auc.qry.EmployeeInbox(uint(id))
 
 	if err != nil {

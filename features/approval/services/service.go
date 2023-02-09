@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"log"
 	"mime/multipart"
 	"strings"
 	"timesync-be/features/approval"
@@ -23,7 +24,7 @@ func New(ad approval.ApprovalData) approval.ApprovalService {
 func (auc *approvalUseCase) PostApproval(token interface{}, fileData multipart.FileHeader, newApproval approval.Core) (approval.Core, error) {
 	employeeID := helper.ExtractToken(token)
 
-	if fileData.Filename != "" {
+	if fileData.Size != 0 {
 		if fileData.Size > 500000 {
 			return approval.Core{}, errors.New("size error")
 		}
@@ -49,13 +50,8 @@ func (auc *approvalUseCase) PostApproval(token interface{}, fileData multipart.F
 	}
 	res, err := auc.qry.PostApproval(uint(employeeID), newApproval)
 	if err != nil {
-		msg := ""
-		if strings.Contains(err.Error(), "not found") {
-			msg = "data not found"
-		} else {
-			msg = "server error"
-		}
-		return approval.Core{}, errors.New(msg)
+		log.Println("query error", err.Error())
+		return approval.Core{}, errors.New("server error")
 	}
 	return res, nil
 }

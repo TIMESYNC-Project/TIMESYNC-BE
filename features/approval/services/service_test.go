@@ -13,7 +13,6 @@ import (
 
 	"github.com/golang-jwt/jwt"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestPostApproval(t *testing.T) {
@@ -27,34 +26,32 @@ func TestPostApproval(t *testing.T) {
 		Filename: imageTrue.Name(),
 	}
 	inputData := approval.Core{
-		ID:            1,
-		Title:         "Sakit",
-		StartDate:     "2023-02-01",
-		EndDate:       "2023-02-04",
-		Description:   "maaf pak tidak bisa hadir karena sakit",
-		ApprovalImage: "ERD.png",
-		Status:        "pending",
+		ID:          0,
+		Title:       "Sakit",
+		StartDate:   "2023-02-01",
+		EndDate:     "2023-02-04",
+		Description: "maaf pak tidak bisa hadir karena sakit",
+		Status:      "pending",
 	}
 	resData := approval.Core{
-		ID:            1,
-		Title:         "Sakit",
-		StartDate:     "2023-02-01",
-		EndDate:       "2023-02-04",
-		Description:   "maaf pak tidak bisa hadir karena sakit",
-		ApprovalImage: imageTrueCnv.Filename,
-		Status:        "pending",
+		ID:          1,
+		Title:       "Sakit",
+		StartDate:   "2023-02-01",
+		EndDate:     "2023-02-04",
+		Description: "maaf pak tidak bisa hadir karena sakit",
+		Status:      "pending",
 	}
 
 	t.Run("success post approval", func(t *testing.T) {
-		repo.On("PostApproval", mock.Anything).Return(resData, nil).Once()
+		repo.On("PostApproval", uint(1), inputData).Return(resData, nil).Once()
 		srv := New(repo)
 		_, token := helper.GenerateToken(1)
 		pToken := token.(*jwt.Token)
 		pToken.Valid = true
 
 		res, err := srv.PostApproval(pToken, *imageTrueCnv, inputData)
-		assert.NotNil(t, err)
-		assert.NotEqual(t, resData.ID, res.ID)
+		assert.Nil(t, err)
+		assert.Equal(t, resData.ID, res.ID)
 		repo.AssertExpectations(t)
 	})
 
@@ -73,7 +70,7 @@ func TestPostApproval(t *testing.T) {
 	// })
 
 	t.Run("data not found", func(t *testing.T) {
-		repo.On("PostApproval", mock.Anything).Return(approval.Core{}, errors.New("data not found")).Once()
+		repo.On("PostApproval", uint(1), inputData).Return(approval.Core{}, errors.New("server error")).Once()
 
 		srv := New(repo)
 		_, token := helper.GenerateToken(1)
@@ -82,8 +79,8 @@ func TestPostApproval(t *testing.T) {
 
 		res, err := srv.PostApproval(pToken, *imageTrueCnv, inputData)
 		assert.NotNil(t, err)
-		assert.ErrorContains(t, err, "not found")
-		assert.Equal(t, uint(0), res)
+		assert.ErrorContains(t, err, "error")
+		assert.Equal(t, approval.Core{}, res)
 		repo.AssertExpectations(t)
 	})
 
