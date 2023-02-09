@@ -134,6 +134,29 @@ func (_m *AttendanceData) GetPresenceTotalToday(adminID uint) ([]attendance.Core
 	return r0, r1
 }
 
+// Graph provides a mock function with given fields: adminID, param, yearMonth
+func (_m *AttendanceData) Graph(adminID uint, param string, yearMonth string) (interface{}, error) {
+	ret := _m.Called(adminID, param, yearMonth)
+
+	var r0 interface{}
+	if rf, ok := ret.Get(0).(func(uint, string, string) interface{}); ok {
+		r0 = rf(adminID, param, yearMonth)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(interface{})
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(uint, string, string) error); ok {
+		r1 = rf(adminID, param, yearMonth)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // Record provides a mock function with given fields: employeeID, dateFrom, dateTo
 func (_m *AttendanceData) Record(employeeID uint, dateFrom string, dateTo string) ([]attendance.Core, string, error) {
 	ret := _m.Called(employeeID, dateFrom, dateTo)
