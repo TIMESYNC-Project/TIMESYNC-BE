@@ -27,7 +27,7 @@ func (auc *approvalUseCase) PostApproval(token interface{}, fileData multipart.F
 		if fileData.Filename != "" {
 			res, err := helper.GetUrlImagesFromAWS(fileData)
 			if err != nil {
-				return approval.Core{}, err
+				return approval.Core{}, errors.New("validate: " + err.Error())
 			}
 			newApproval.ApprovalImage = res
 		}

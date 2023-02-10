@@ -27,14 +27,22 @@ func TypeFile(test multipart.File) (string, error) {
 	return "", errors.New("file type not match")
 }
 
-func CsvTypeFile(test multipart.File) error {
-	fileByte, _ := io.ReadAll(test)
+func CsvTypeFile(fileHeader multipart.FileHeader) error {
+	if fileHeader.Size == 0 {
+		return errors.New("file empty")
+	}
+	src, err := fileHeader.Open()
+	if err != nil {
+		log.Println("open file error", err.Error())
+		return errors.New("can't open file")
+	}
+	fileByte, _ := io.ReadAll(src)
 	fileType := http.DetectContentType(fileByte)
 	log.Println("|", fileType, "|")
 	if fileType == "text/plain; charset=utf-8" {
 		return nil
 	}
-	return errors.New("file type not match")
+	return errors.New("file type error, only csv can be upload")
 }
 
 type UserValidate struct {

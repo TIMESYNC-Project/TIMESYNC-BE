@@ -584,7 +584,7 @@ func (aq *attendanceQuery) GetPresenceDetail(adminID uint, attendanceID uint) (a
 }
 
 // Graph implements attendance.AttendanceData
-func (aq *attendanceQuery) Graph(adminID uint, param string, yearMonth string) (interface{}, error) {
+func (aq *attendanceQuery) Graph(adminID uint, param string, yearMonth string, limit int) (interface{}, error) {
 	if adminID != 1 {
 		log.Println("access denied")
 		return attendance.Core{}, errors.New("access denied")
@@ -600,11 +600,16 @@ func (aq *attendanceQuery) Graph(adminID uint, param string, yearMonth string) (
 		if usr[f].ID != 1 {
 			filterUser = append(filterUser, (usr[f]))
 		}
+		if limit > 0 {
+			if f == limit {
+				break
+			}
+		}
 	}
-
-	result := make([]map[string]interface{}, len(usr))
+	result := make([]map[string]interface{}, len(filterUser))
 	if param == "mtwh" {
 		for i := 0; i < len(filterUser); i++ {
+
 			data := make(map[string]interface{})
 			wHour := []Attendance{}
 			err = aq.db.Where("attendance_date LIKE ? AND user_id = ?", "%"+yearMonth+"%", filterUser[i].ID).Find(&wHour).Error
@@ -684,6 +689,7 @@ func (aq *attendanceQuery) Graph(adminID uint, param string, yearMonth string) (
 	} else {
 		return []attendance.Core{}, errors.New("wrong type parameter")
 	}
+	log.Println(result)
 	return result, nil
 
 }

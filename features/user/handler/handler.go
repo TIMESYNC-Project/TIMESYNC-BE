@@ -119,10 +119,10 @@ func (uc *userControll) Update() echo.HandlerFunc {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "email already used"})
 			} else if strings.Contains(err.Error(), "type") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
-			} else if strings.Contains(err.Error(), "admin") {
-				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "cannot modifed admin data"})
+			} else if strings.Contains(err.Error(), "access denied") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "access denied"})
 			} else if strings.Contains(err.Error(), "size") {
-				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "file size is too big"})
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "file size max 500kb"})
 			} else {
 				return c.JSON(http.StatusNotFound, map[string]interface{}{"message": "account not registered"})
 			}
@@ -159,7 +159,7 @@ func (uc *userControll) Csv() echo.HandlerFunc {
 			} else if strings.Contains(err.Error(), "email") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
 			} else {
-				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": err.Error()})
 			}
 		}
 

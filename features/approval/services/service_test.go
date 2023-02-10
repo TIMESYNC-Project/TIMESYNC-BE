@@ -70,6 +70,22 @@ func TestPostApproval(t *testing.T) {
 		assert.Equal(t, approval.Core{}, res)
 		repo.AssertExpectations(t)
 	})
+	t.Run("invalid file validation", func(t *testing.T) {
+		filePathFake := filepath.Join("..", "..", "..", "TimeSyncUnitTesting.csv")
+		headerFake, err := helper.UnitTestingUploadFileMock(filePathFake)
+		if err != nil {
+			log.Panic("dari file header unit testing approval", err.Error())
+		}
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.PostApproval(pToken, *headerFake, inputData)
+		assert.ErrorContains(t, err, "validate")
+		assert.Equal(t, uint(0), res.ID)
+		repo.AssertExpectations(t)
+
+	})
 }
 
 func TestGetApproval(t *testing.T) {

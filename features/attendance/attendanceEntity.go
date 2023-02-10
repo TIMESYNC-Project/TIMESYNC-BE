@@ -38,7 +38,7 @@ type AttendanceService interface {
 	GetPresenceTotalToday(token interface{}) ([]Core, error)
 	GetPresenceDetail(token interface{}, attendanceID uint) (Core, error)
 	RecordByID(employeeID uint, dateFrom string, dateTo string) ([]Core, string, error)
-	Graph(token interface{}, param string, yearMonth string) (interface{}, error)
+	Graph(token interface{}, param string, yearMonth string, limit int) (interface{}, error)
 }
 
 type AttendanceData interface {
@@ -49,5 +49,5 @@ type AttendanceData interface {
 	GetPresenceToday(employeeID uint) (Core, error)
 	GetPresenceTotalToday(adminID uint) ([]Core, error)
 	GetPresenceDetail(adminID uint, attendanceID uint) (Core, error)
-	Graph(adminID uint, param string, yearMonth string) (interface{}, error)
+	Graph(adminID uint, param string, yearMonth string, limit int) (interface{}, error)
 }

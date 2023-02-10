@@ -403,48 +403,48 @@ func TestGraph(t *testing.T) {
 		},
 	}
 	t.Run("success get record by id", func(t *testing.T) {
-		data.On("Graph", uint(1), "mtwh", "2023-01").Return(resData, nil).Once()
+		data.On("Graph", uint(1), "mtwh", "2023-01", 2).Return(resData, nil).Once()
 		srv := New(data)
 		_, token := helper.GenerateToken(1)
 		mockToken := token.(*jwt.Token)
 		mockToken.Valid = true
-		res, err := srv.Graph(mockToken, "mtwh", "2023-01")
+		res, err := srv.Graph(mockToken, "mtwh", "2023-01", 2)
 		assert.Equal(t, res, resData)
 		assert.Nil(t, err)
 		data.AssertExpectations(t)
 	})
 
 	t.Run("access denied", func(t *testing.T) {
-		data.On("Graph", uint(1), "mtwh", "2023-01").Return([]attendance.Core{}, errors.New("access denied")).Once()
+		data.On("Graph", uint(1), "mtwh", "2023-01", 2).Return([]attendance.Core{}, errors.New("access denied")).Once()
 		srv := New(data)
 		_, token := helper.GenerateToken(1)
 		mockToken := token.(*jwt.Token)
 		mockToken.Valid = true
-		res, err := srv.Graph(mockToken, "mtwh", "2023-01")
+		res, err := srv.Graph(mockToken, "mtwh", "2023-01", 2)
 		assert.Equal(t, res, []attendance.Core{})
 		assert.NotNil(t, err)
 		assert.ErrorContains(t, err, "access")
 		data.AssertExpectations(t)
 	})
 	t.Run("wrong type parameter", func(t *testing.T) {
-		data.On("Graph", uint(1), "mtwh", "2023-01").Return([]attendance.Core{}, errors.New("wrong type parameter")).Once()
+		data.On("Graph", uint(1), "mtwh", "2023-01", 2).Return([]attendance.Core{}, errors.New("wrong type parameter")).Once()
 		srv := New(data)
 		_, token := helper.GenerateToken(1)
 		mockToken := token.(*jwt.Token)
 		mockToken.Valid = true
-		res, err := srv.Graph(mockToken, "mtwh", "2023-01")
+		res, err := srv.Graph(mockToken, "mtwh", "2023-01", 2)
 		assert.Equal(t, res, []attendance.Core{})
 		assert.NotNil(t, err)
 		assert.ErrorContains(t, err, "wrong type parameter")
 		data.AssertExpectations(t)
 	})
 	t.Run("wrong type parameter", func(t *testing.T) {
-		data.On("Graph", uint(1), "mtwh", "2023-01").Return([]attendance.Core{}, errors.New("data not found")).Once()
+		data.On("Graph", uint(1), "mtwh", "2023-01", 2).Return([]attendance.Core{}, errors.New("data not found")).Once()
 		srv := New(data)
 		_, token := helper.GenerateToken(1)
 		mockToken := token.(*jwt.Token)
 		mockToken.Valid = true
-		res, err := srv.Graph(mockToken, "mtwh", "2023-01")
+		res, err := srv.Graph(mockToken, "mtwh", "2023-01", 2)
 		assert.Equal(t, res, []attendance.Core{})
 		assert.NotNil(t, err)
 		assert.ErrorContains(t, err, "server error")
