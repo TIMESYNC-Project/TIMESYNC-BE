@@ -220,7 +220,7 @@ func (aq *attendanceQuery) ClockOut(employeeID uint, latitudeData string, longit
 	check := Attendance{}
 	err := aq.db.Where("attendance_date = ? AND user_id = ?", clockInDate, employeeID).First(&check).Error
 	if err != nil {
-		log.Println("query not found", err)
+		log.Println("query not found, hihhaw", err.Error())
 		return attendance.Core{}, errors.New("you dont have clock in data today,you must clock in first")
 	}
 	// cek apakah data clockout sudah terisi berarti user sudah melakukan clock in dan clock out

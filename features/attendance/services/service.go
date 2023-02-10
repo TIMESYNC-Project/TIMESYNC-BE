@@ -39,10 +39,11 @@ func (auc *attendanceUseCase) ClockOut(token interface{}, latitude string, longi
 	employeeID := helper.ExtractToken(token)
 	res, err := auc.qry.ClockOut(uint(employeeID), latitude, longitude)
 	if err != nil {
-		if strings.Contains(err.Error(), "already clock out today") {
+		if strings.Contains(err.Error(), "already") {
 			return attendance.Core{}, errors.New("you already clock out today")
-		} else if strings.Contains(err.Error(), "clock out time expired") {
-			return attendance.Core{}, errors.New("invalid clock out time request")
+		} else if strings.Contains(err.Error(), "you dont have clock in data") {
+			log.Println("must clock in")
+			return attendance.Core{}, err
 		} else if strings.Contains(err.Error(), "server") {
 			return attendance.Core{}, errors.New("server error")
 		} else {
