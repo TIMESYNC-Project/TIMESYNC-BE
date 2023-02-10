@@ -38,7 +38,7 @@ func (cc *companyController) EditProfile() echo.HandlerFunc {
 		res, err := cc.srv.EditProfile(c.Get("user"), input.FileHeader, *ReqToCore(input))
 		if err != nil {
 			if strings.Contains(err.Error(), "size") {
-				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "file size is too big"})
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "file size max 500 kb"})
 			} else if strings.Contains(err.Error(), "access") {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": err.Error()})
 			} else {

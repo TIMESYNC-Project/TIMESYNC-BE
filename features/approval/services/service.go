@@ -22,6 +22,12 @@ func New(ad approval.ApprovalData) approval.ApprovalService {
 func (auc *approvalUseCase) PostApproval(token interface{}, fileData multipart.FileHeader, newApproval approval.Core) (approval.Core, error) {
 	employeeID := helper.ExtractToken(token)
 
+	//validation
+	err := helper.ApprovalValidation(newApproval)
+	if err != nil {
+		return approval.Core{}, errors.New("validate: " + err.Error())
+	}
+
 	// kondisi dibawah dilakukan agar foto bisa kosong dan agar unit testing tidak error
 	if fileData.Size != 0 {
 		if fileData.Filename != "" {

@@ -7,6 +7,7 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
+	"timesync-be/features/approval"
 	"timesync-be/features/user"
 
 	"github.com/go-playground/validator/v10"
@@ -85,6 +86,35 @@ func CoreToRegVal(data user.Core) UserValidate {
 func RegistrationValidate(data user.Core) error {
 	validate := validator.New()
 	val := CoreToRegVal(data)
+	if err := validate.Struct(val); err != nil {
+		for _, e := range err.(validator.ValidationErrors) {
+			vlderror := fmt.Sprintf("%s is %s", e.Field(), e.Tag())
+			return errors.New(vlderror)
+		}
+	}
+
+	return nil
+}
+
+type ApprovalValidate struct {
+	Title       string `validate:"required"`
+	StartDate   string `validate:"required"`
+	EndDate     string `validate:"required"`
+	Description string `validate:"required"`
+}
+
+func CoreToApprovalVal(data approval.Core) ApprovalValidate {
+	return ApprovalValidate{
+		Title:       data.Title,
+		StartDate:   data.StartDate,
+		EndDate:     data.EndDate,
+		Description: data.Description,
+	}
+}
+
+func ApprovalValidation(data approval.Core) error {
+	validate := validator.New()
+	val := CoreToApprovalVal(data)
 	if err := validate.Struct(val); err != nil {
 		for _, e := range err.(validator.ValidationErrors) {
 			vlderror := fmt.Sprintf("%s is %s", e.Field(), e.Tag())
