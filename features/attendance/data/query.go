@@ -346,8 +346,8 @@ func (aq *attendanceQuery) ClockOut(employeeID uint, latitudeData string, longit
 // AttendanceFromAdmin implements attendance.AttendanceData
 func (aq *attendanceQuery) AttendanceFromAdmin(adminID uint, dateStart string, dateEnd string, attendanceType string, employeeID uint) error {
 	if adminID != 1 {
-		log.Println("user is not admin")
-		return errors.New("user is not admin")
+		log.Println("access denied")
+		return errors.New("access denied")
 	}
 	usr := User{}
 	err := aq.db.Where("id = ?", employeeID).First(&usr).Error

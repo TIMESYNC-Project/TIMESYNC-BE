@@ -44,8 +44,8 @@ func (auc *attendanceUseCase) ClockOut(token interface{}, latitude string, longi
 		} else if strings.Contains(err.Error(), "you dont have clock in data") {
 			log.Println("must clock in")
 			return attendance.Core{}, err
-		} else if strings.Contains(err.Error(), "server") {
-			return attendance.Core{}, errors.New("server error")
+		} else if strings.Contains(err.Error(), "clock out time expired") {
+			return attendance.Core{}, err
 		} else {
 			return attendance.Core{}, err
 		}

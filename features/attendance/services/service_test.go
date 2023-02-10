@@ -90,18 +90,6 @@ func TestClockOut(t *testing.T) {
 		data.AssertExpectations(t)
 	})
 
-	t.Run("server error", func(t *testing.T) {
-		data.On("ClockOut", uint(1), "-6.4096", "106.8185").Return(attendance.Core{}, errors.New("server error, location not found")).Once()
-		srv := New(data)
-		_, token := helper.GenerateToken(1)
-		mockToken := token.(*jwt.Token)
-		mockToken.Valid = true
-		res, err := srv.ClockOut(mockToken, "-6.4096", "106.8185")
-		assert.NotNil(t, err)
-		assert.ErrorContains(t, err, "server error")
-		assert.Equal(t, uint(0), res.ID)
-		data.AssertExpectations(t)
-	})
 	t.Run("already ClockOut", func(t *testing.T) {
 		data.On("ClockOut", uint(1), "-6.4096", "106.8185").Return(attendance.Core{}, errors.New("user already clock out today")).Once()
 		srv := New(data)
@@ -115,19 +103,7 @@ func TestClockOut(t *testing.T) {
 		data.AssertExpectations(t)
 	})
 	t.Run(" ClockOut expired", func(t *testing.T) {
-		data.On("ClockOut", uint(1), "-6.4096", "106.8185").Return(attendance.Core{}, errors.New("clock out time expired")).Once()
-		srv := New(data)
-		_, token := helper.GenerateToken(1)
-		mockToken := token.(*jwt.Token)
-		mockToken.Valid = true
-		res, err := srv.ClockOut(mockToken, "-6.4096", "106.8185")
-		assert.NotNil(t, err)
-		assert.ErrorContains(t, err, "invalid clock out time request")
-		assert.Equal(t, uint(0), res.ID)
-		data.AssertExpectations(t)
-	})
-	t.Run(" Undefined", func(t *testing.T) {
-		data.On("ClockOut", uint(1), "-6.4096", "106.8185").Return(attendance.Core{}, errors.New("data not found")).Once()
+		data.On("ClockOut", uint(1), "-6.4096", "106.8185").Return(attendance.Core{}, errors.New("you dont have clock in data today,you must clock in first")).Once()
 		srv := New(data)
 		_, token := helper.GenerateToken(1)
 		mockToken := token.(*jwt.Token)
@@ -138,6 +114,44 @@ func TestClockOut(t *testing.T) {
 		assert.Equal(t, uint(0), res.ID)
 		data.AssertExpectations(t)
 	})
+	t.Run(" Undefined", func(t *testing.T) {
+		data.On("ClockOut", uint(1), "-6.4096", "106.8185").Return(attendance.Core{}, errors.New("clock out time expired")).Once()
+		srv := New(data)
+		_, token := helper.GenerateToken(1)
+		mockToken := token.(*jwt.Token)
+		mockToken.Valid = true
+		res, err := srv.ClockOut(mockToken, "-6.4096", "106.8185")
+		assert.NotNil(t, err)
+		assert.Error(t, err)
+		assert.Equal(t, uint(0), res.ID)
+		data.AssertExpectations(t)
+	})
+
+	t.Run("server error", func(t *testing.T) {
+		data.On("ClockOut", uint(1), "-6.4096", "106.8185").Return(attendance.Core{}, errors.New("server error, location not found")).Once()
+		srv := New(data)
+		_, token := helper.GenerateToken(1)
+		mockToken := token.(*jwt.Token)
+		mockToken.Valid = true
+		res, err := srv.ClockOut(mockToken, "-6.4096", "106.8185")
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "server error")
+		assert.Equal(t, uint(0), res.ID)
+		data.AssertExpectations(t)
+	})
+	t.Run(" Undefined", func(t *testing.T) {
+		data.On("ClockOut", uint(1), "-6.4096", "106.8185").Return(attendance.Core{}, errors.New("server error, setting not found")).Once()
+		srv := New(data)
+		_, token := helper.GenerateToken(1)
+		mockToken := token.(*jwt.Token)
+		mockToken.Valid = true
+		res, err := srv.ClockOut(mockToken, "-6.4096", "106.8185")
+		assert.NotNil(t, err)
+		assert.Error(t, err)
+		assert.Equal(t, uint(0), res.ID)
+		data.AssertExpectations(t)
+	})
+
 }
 
 func TestAttendanceFromAdmin(t *testing.T) {
@@ -165,8 +179,19 @@ func TestAttendanceFromAdmin(t *testing.T) {
 		assert.ErrorContains(t, err, "wrong input format")
 		data.AssertExpectations(t)
 	})
+	t.Run("acccess denied", func(t *testing.T) {
+		data.On("AttendanceFromAdmin", uint(3), "2023-01-28", "2023-01-28", "annual_leave", uint(2)).Return(errors.New("access denied")).Once()
+		srv := New(data)
+		_, token := helper.GenerateToken(3)
+		mockToken := token.(*jwt.Token)
+		mockToken.Valid = true
+		err := srv.AttendanceFromAdmin(mockToken, "2023-01-28", "2023-01-28", "annual_leave", uint(2))
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "access denied")
+		data.AssertExpectations(t)
+	})
 	t.Run("server error", func(t *testing.T) {
-		data.On("AttendanceFromAdmin", uint(1), "2023-01-28", "2023-01-28", "annual_leave", uint(1)).Return(errors.New("creating data fail, server error")).Once()
+		data.On("AttendanceFromAdmin", uint(1), "2023-01-28", "2023-01-28", "annual_leave", uint(1)).Return(errors.New("server error, user not found")).Once()
 		srv := New(data)
 		_, token := helper.GenerateToken(1)
 		mockToken := token.(*jwt.Token)

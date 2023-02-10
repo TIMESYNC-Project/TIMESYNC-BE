@@ -145,7 +145,13 @@ func (ac *attendanceController) AttendanceFromAdmin() echo.HandlerFunc {
 		}
 		err = ac.srv.AttendanceFromAdmin(c.Get("user"), input.DateStart, input.DateEnd, input.Attendance, uint(employeeID))
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "user is not admin"})
+			if strings.Contains(err.Error(), "access denied") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "access denied"})
+			} else if strings.Contains(err.Error(), "wrong input format") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "wrong input format"})
+			} else {
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "server error"})
+			}
 		}
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"message": "success create attendance",
