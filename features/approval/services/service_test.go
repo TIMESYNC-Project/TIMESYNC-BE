@@ -86,6 +86,24 @@ func TestPostApproval(t *testing.T) {
 		repo.AssertExpectations(t)
 
 	})
+
+	t.Run("invalid input validation", func(t *testing.T) {
+		inputDataFake := approval.Core{
+			Title:       "",
+			StartDate:   "2023-02-01",
+			EndDate:     "2023-02-04",
+			Description: "",
+		}
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.PostApproval(pToken, *imageTrueCnv, inputDataFake)
+		assert.ErrorContains(t, err, "validate")
+		assert.Equal(t, uint(0), res.ID)
+		repo.AssertExpectations(t)
+
+	})
 }
 
 func TestGetApproval(t *testing.T) {
