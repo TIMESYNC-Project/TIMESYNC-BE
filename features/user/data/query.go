@@ -110,8 +110,8 @@ func (uq *userQuery) Delete(AdminID uint, employeeID uint) error {
 // Update implements user.UserData
 func (uq *userQuery) Update(employeeID uint, updateData user.Core) (user.Core, error) {
 	if employeeID == 1 {
-		log.Println("cannot modifed admin data")
-		return user.Core{}, errors.New("cannot modifed admin data")
+		log.Println("access denied")
+		return user.Core{}, errors.New("access denied")
 	}
 	if updateData.Email != "" {
 		dupEmail := User{}

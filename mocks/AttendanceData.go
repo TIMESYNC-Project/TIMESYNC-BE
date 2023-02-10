@@ -134,13 +134,13 @@ func (_m *AttendanceData) GetPresenceTotalToday(adminID uint) ([]attendance.Core
 	return r0, r1
 }
 
-// Graph provides a mock function with given fields: adminID, param, yearMonth
-func (_m *AttendanceData) Graph(adminID uint, param string, yearMonth string) (interface{}, error) {
-	ret := _m.Called(adminID, param, yearMonth)
+// Graph provides a mock function with given fields: adminID, param, yearMonth, limit
+func (_m *AttendanceData) Graph(adminID uint, param string, yearMonth string, limit int) (interface{}, error) {
+	ret := _m.Called(adminID, param, yearMonth, limit)
 
 	var r0 interface{}
-	if rf, ok := ret.Get(0).(func(uint, string, string) interface{}); ok {
-		r0 = rf(adminID, param, yearMonth)
+	if rf, ok := ret.Get(0).(func(uint, string, string, int) interface{}); ok {
+		r0 = rf(adminID, param, yearMonth, limit)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(interface{})
@@ -148,8 +148,8 @@ func (_m *AttendanceData) Graph(adminID uint, param string, yearMonth string) (i
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(uint, string, string) error); ok {
-		r1 = rf(adminID, param, yearMonth)
+	if rf, ok := ret.Get(1).(func(uint, string, string, int) error); ok {
+		r1 = rf(adminID, param, yearMonth, limit)
 	} else {
 		r1 = ret.Error(1)
 	}

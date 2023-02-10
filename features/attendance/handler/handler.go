@@ -261,7 +261,9 @@ func (ac *attendanceController) Graph() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		typeGrapgh := c.QueryParam("type")
 		yearMonth := c.QueryParam("year_month")
-		res, err := ac.srv.Graph(c.Get("user"), typeGrapgh, yearMonth)
+		limitParam := c.QueryParam("limit")
+		limit, _ := strconv.Atoi(limitParam)
+		res, err := ac.srv.Graph(c.Get("user"), typeGrapgh, yearMonth, limit)
 		if err != nil {
 			if strings.Contains(err.Error(), "access denied") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})

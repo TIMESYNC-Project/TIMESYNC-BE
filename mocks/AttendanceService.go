@@ -134,13 +134,13 @@ func (_m *AttendanceService) GetPresenceTotalToday(token interface{}) ([]attenda
 	return r0, r1
 }
 
-// Graph provides a mock function with given fields: token, param, yearMonth
-func (_m *AttendanceService) Graph(token interface{}, param string, yearMonth string) (interface{}, error) {
-	ret := _m.Called(token, param, yearMonth)
+// Graph provides a mock function with given fields: token, param, yearMonth, limit
+func (_m *AttendanceService) Graph(token interface{}, param string, yearMonth string, limit int) (interface{}, error) {
+	ret := _m.Called(token, param, yearMonth, limit)
 
 	var r0 interface{}
-	if rf, ok := ret.Get(0).(func(interface{}, string, string) interface{}); ok {
-		r0 = rf(token, param, yearMonth)
+	if rf, ok := ret.Get(0).(func(interface{}, string, string, int) interface{}); ok {
+		r0 = rf(token, param, yearMonth, limit)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(interface{})
@@ -148,8 +148,8 @@ func (_m *AttendanceService) Graph(token interface{}, param string, yearMonth st
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(interface{}, string, string) error); ok {
-		r1 = rf(token, param, yearMonth)
+	if rf, ok := ret.Get(1).(func(interface{}, string, string, int) error); ok {
+		r1 = rf(token, param, yearMonth, limit)
 	} else {
 		r1 = ret.Error(1)
 	}

@@ -30,7 +30,8 @@ func ConvertToCore(data CsvRequest) user.Core {
 	}
 }
 
-func ConvertCSV(csvInput multipart.File) []user.Core {
+func ConvertCSV(fileHeader multipart.FileHeader) []user.Core {
+	csvInput, _ := fileHeader.Open()
 	csvReader := csv.NewReader(csvInput)
 	data, _ := csvReader.ReadAll()
 	if len(data) == 0 {
@@ -68,7 +69,7 @@ func ConvertCSV(csvInput multipart.File) []user.Core {
 			if j == 7 {
 				res[i-1].Password = data[i][j]
 				if len(res[i-1].Password) != 0 {
-					res[i-1].Password, _ = GeneratePassword(res[i-1].Password)
+					res[i-1].Password = GeneratePassword(res[i-1].Password)
 				}
 
 			}

@@ -43,6 +43,12 @@ type UploadResult struct {
 // UPLOAD IMAGE PROGRESS
 // ======================================================================
 func GetUrlImagesFromAWS(fileData multipart.FileHeader) (string, error) {
+	if fileData.Filename == "" {
+		return "", errors.New("file name error")
+	}
+	if fileData.Size == 0 {
+		return "", errors.New("file size error")
+	}
 	if fileData.Size > 500000 {
 		return "", errors.New("size error")
 	}

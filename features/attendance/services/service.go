@@ -132,9 +132,9 @@ func (auc *attendanceUseCase) RecordByID(employeeID uint, dateFrom string, dateT
 }
 
 // Graph implements attendance.AttendanceService
-func (auc *attendanceUseCase) Graph(token interface{}, param string, yearMonth string) (interface{}, error) {
+func (auc *attendanceUseCase) Graph(token interface{}, param string, yearMonth string, limit int) (interface{}, error) {
 	adminID := helper.ExtractToken(token)
-	res, err := auc.qry.Graph(uint(adminID), param, yearMonth)
+	res, err := auc.qry.Graph(uint(adminID), param, yearMonth, limit)
 	if err != nil {
 		if strings.Contains(err.Error(), "access") {
 			return []attendance.Core{}, errors.New("access denied")

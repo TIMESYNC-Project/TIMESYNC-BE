@@ -32,14 +32,14 @@ func (uuc *userUseCase) Register(token interface{}, newUser user.Core) (user.Cor
 			return user.Core{}, errors.New("validate: " + err.Error())
 		}
 	}
-	hashed, _ := helper.GeneratePassword(newUser.Password)
+	hashed := helper.GeneratePassword(newUser.Password)
 	newUser.Password = string(hashed)
 
 	res, err := uuc.qry.Register(uint(adminID), newUser)
 	if err != nil {
 		msg := ""
 		if strings.Contains(err.Error(), "duplicated") {
-			msg = "data already used"
+			msg = "email already registered"
 		} else if strings.Contains(err.Error(), "access denied") {
 			msg = "access denied"
 		} else {
@@ -92,31 +92,25 @@ func (uuc *userUseCase) Delete(token interface{}, employeeID uint) error {
 // Update implements user.UserService
 func (uuc *userUseCase) Update(token interface{}, fileData multipart.FileHeader, updateData user.Core) (user.Core, error) {
 	employeeID := helper.ExtractToken(token)
-	if updateData.Password != "" {
-		hashed, _ := helper.GeneratePassword(updateData.Password)
-		updateData.Password = string(hashed)
-	}
-	// log.Println("size:", fileData.Size)
+	hashed := helper.GeneratePassword(updateData.Password)
+	updateData.Password = string(hashed)
+	log.Println("size:", fileData.Size)
 	if fileData.Size != 0 {
-		if fileData.Filename != "" {
-			res, err := helper.GetUrlImagesFromAWS(fileData)
-			if err != nil {
-				return user.Core{}, err
-			}
-			updateData.ProfilePicture = res
+		res, err := helper.GetUrlImagesFromAWS(fileData)
+		if err != nil {
+			return user.Core{}, errors.New("validate: " + err.Error())
 		}
+		updateData.ProfilePicture = res
 	}
 	res, err := uuc.qry.Update(uint(employeeID), updateData)
 	if err != nil {
 		msg := ""
 		if strings.Contains(err.Error(), "not found") {
-			msg = "data not found"
+			msg = "account not registered"
 		} else if strings.Contains(err.Error(), "email") {
 			msg = "email duplicated"
-		} else if strings.Contains(err.Error(), "cannot modifed admin data") {
-			msg = "cannot modifed admin data"
-		} else {
-			msg = "account not registered"
+		} else if strings.Contains(err.Error(), "access denied") {
+			msg = "access denied"
 		}
 		return user.Core{}, errors.New(msg)
 	}
@@ -127,20 +121,11 @@ func (uuc *userUseCase) Update(token interface{}, fileData multipart.FileHeader,
 func (uuc *userUseCase) Csv(fileData multipart.FileHeader) error {
 	result := []user.Core{}
 	if fileData.Filename != "" {
-		src, err := fileData.Open()
+		err := helper.CsvTypeFile(fileData)
 		if err != nil {
-			log.Println("open file error", err.Error())
-			return errors.New("can't open file")
+			return errors.New("validate: " + err.Error())
 		}
-		err = helper.CsvTypeFile(src)
-		if err != nil {
-			return errors.New("file type error, only csv can be upload")
-		}
-
-		file, _ := fileData.Open()
-		result = helper.ConvertCSV(file)
-	} else {
-		log.Panic(result)
+		result = helper.ConvertCSV(fileData)
 	}
 	err := uuc.qry.Csv(result)
 	if err != nil {
@@ -148,8 +133,9 @@ func (uuc *userUseCase) Csv(fileData multipart.FileHeader) error {
 		if strings.Contains(err.Error(), "Duplicate") {
 			log.Println("baca")
 			return errors.New("some email already registered in data entry")
+		} else {
+			return errors.New("internal server error")
 		}
-		return errors.New("server error")
 	}
 
 	return nil
@@ -181,17 +167,15 @@ func (uuc *userUseCase) ProfileEmployee(userID uint) (user.Core, error) {
 func (uuc *userUseCase) AdminEditEmployee(token interface{}, employeeID uint, fileData multipart.FileHeader, updateData user.Core) (user.Core, error) {
 	adminID := helper.ExtractToken(token)
 	if updateData.Password != "" {
-		hashed, _ := helper.GeneratePassword(updateData.Password)
+		hashed := helper.GeneratePassword(updateData.Password)
 		updateData.Password = string(hashed)
 	}
 	if fileData.Size != 0 {
-		if fileData.Filename != "" {
-			res, err := helper.GetUrlImagesFromAWS(fileData)
-			if err != nil {
-				return user.Core{}, err
-			}
-			updateData.ProfilePicture = res
+		res, err := helper.GetUrlImagesFromAWS(fileData)
+		if err != nil {
+			return user.Core{}, errors.New("validate: " + err.Error())
 		}
+		updateData.ProfilePicture = res
 	}
 	res, err := uuc.qry.UpdateByAdmin(uint(adminID), employeeID, updateData)
 	if err != nil {

@@ -33,21 +33,31 @@ func TestRegister(t *testing.T) {
 		assert.Equal(t, resData.Phone, res.Phone)
 		repo.AssertExpectations(t)
 	})
+	t.Run("invalid validation", func(t *testing.T) {
+		inputDataSalah := user.Core{Name: "Fauzi%&*", Password: "123a#$%"}
+		// repo.On("Register", uint(1), mock.Anything).Return(user.Core{}, errors.New("email duplicated")).Once()
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.Register(pToken, inputDataSalah)
+		assert.ErrorContains(t, err, "validate")
+		assert.Equal(t, uint(0), res.ID)
+		repo.AssertExpectations(t)
 
-	// t.Run("invalid jwt token", func(t *testing.T) {
-	// 	srv := New(repo)
-
-	// 	_, token := helper.GenerateToken(0)
-	// 	pToken := token.(*jwt.Token)
-	// 	pToken.Valid = true
-
-	// 	res, err := srv.Register(pToken, inputData)
-
-	// 	assert.NotNil(t, err)
-	// 	assert.ErrorContains(t, err, "found")
-	// 	assert.NotEqual(t, resData.ID, res.ID)
-	// 	repo.AssertExpectations(t)
-	// })
+	})
+	t.Run("Duplicated", func(t *testing.T) {
+		repo.On("Register", uint(1), mock.Anything).Return(user.Core{}, errors.New("email duplicated")).Once()
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.Register(pToken, inputData)
+		assert.NotNil(t, err)
+		assert.Equal(t, uint(0), res.ID)
+		assert.ErrorContains(t, err, "email already registered")
+		repo.AssertExpectations(t)
+	})
 
 	t.Run("access denied", func(t *testing.T) {
 		repo.On("Register", uint(1), mock.Anything).Return(user.Core{}, errors.New("access denied")).Once()
@@ -74,25 +84,13 @@ func TestRegister(t *testing.T) {
 		assert.ErrorContains(t, err, "server error")
 		repo.AssertExpectations(t)
 	})
-	t.Run("Duplicated", func(t *testing.T) {
-		repo.On("Register", uint(1), mock.Anything).Return(user.Core{}, errors.New("duplicated")).Once()
-		srv := New(repo)
-		_, token := helper.GenerateToken(1)
-		pToken := token.(*jwt.Token)
-		pToken.Valid = true
-		res, err := srv.Register(pToken, inputData)
-		assert.NotNil(t, err)
-		assert.Equal(t, uint(0), res.ID)
-		assert.ErrorContains(t, err, "used")
-		repo.AssertExpectations(t)
-	})
 }
 
 func TestLogin(t *testing.T) {
 	repo := mocks.NewUserData(t)
 	inputEmail := "fauzi@gmail.com"
-	hashed, _ := helper.GeneratePassword("123")
-	resData := user.Core{ID: uint(1), Name: "Fauzi", Email: "fauzi@gmail.com", Password: hashed}
+	passwordHashed := helper.GeneratePassword("123")
+	resData := user.Core{ID: uint(1), Name: "Fauzi", Email: "fauzi@gmail.com", Password: passwordHashed}
 	t.Run("login success", func(t *testing.T) {
 		repo.On("Login", inputEmail).Return(resData, nil).Once()
 		srv := New(repo)
@@ -191,10 +189,7 @@ func TestProfileEmployee(t *testing.T) {
 func TestUpdate(t *testing.T) {
 	repo := mocks.NewUserData(t)
 	filePath := filepath.Join("..", "..", "..", "ERD.png")
-	// imageFalse, _ := os.Open(filePath)
-	// imageFalseCnv := &multipart.FileHeader{
-	// 	Filename: imageFalse.Name(),
-	// }
+	//mock file kosong agar tidak terupdate di server aws
 	imageTrue, err := os.Open(filePath)
 	if err != nil {
 		log.Println(err.Error())
@@ -203,10 +198,11 @@ func TestUpdate(t *testing.T) {
 		Filename: imageTrue.Name(),
 	}
 	// log.Panic(imageTrueCnv.Header)
-	inputData := user.Core{ID: 1, Name: "Alif", Phone: "08123", ProfilePicture: "ERD.png"}
-	resData := user.Core{ID: 1, Name: "Alif", Phone: "08123", ProfilePicture: imageTrueCnv.Filename}
+	inputData := user.Core{ID: 1, Name: "Alif", Phone: "08123"}
+	resData := user.Core{ID: 1, Name: "Alif", Phone: "08123"}
+
 	t.Run("success updating account", func(t *testing.T) {
-		repo.On("Update", uint(1), inputData).Return(resData, nil).Once()
+		repo.On("Update", uint(1), mock.Anything).Return(resData, nil).Once()
 		srv := New(repo)
 		_, token := helper.GenerateToken(1)
 		pToken := token.(*jwt.Token)
@@ -218,7 +214,7 @@ func TestUpdate(t *testing.T) {
 	})
 
 	t.Run("fail updating account", func(t *testing.T) {
-		repo.On("Update", uint(1), inputData).Return(user.Core{}, errors.New("query error,update fail")).Once()
+		repo.On("Update", uint(1), mock.Anything).Return(user.Core{}, errors.New("user not found")).Once()
 		srv := New(repo)
 		_, token := helper.GenerateToken(1)
 		pToken := token.(*jwt.Token)
@@ -228,6 +224,46 @@ func TestUpdate(t *testing.T) {
 		assert.ErrorContains(t, err, "not registered")
 		assert.Equal(t, user.Core{}, res)
 		repo.AssertExpectations(t)
+	})
+	t.Run("email duplicated", func(t *testing.T) {
+		repo.On("Update", uint(1), mock.Anything).Return(user.Core{}, errors.New("email duplicated")).Once()
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.Update(pToken, *imageTrueCnv, inputData)
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "email duplicated")
+		assert.Equal(t, user.Core{}, res)
+		repo.AssertExpectations(t)
+	})
+	t.Run("access denied", func(t *testing.T) {
+		repo.On("Update", uint(1), mock.Anything).Return(user.Core{}, errors.New("access denied")).Once()
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.Update(pToken, *imageTrueCnv, inputData)
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "access denied")
+		assert.Equal(t, user.Core{}, res)
+		repo.AssertExpectations(t)
+	})
+	t.Run("invalid file validation", func(t *testing.T) {
+		filePathFake := filepath.Join("..", "..", "..", "TimeSyncUnitTesting.csv")
+		headerFake, err := helper.UnitTestingUploadFileMock(filePathFake)
+		if err != nil {
+			log.Panic("dari file header", err.Error())
+		}
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.Update(pToken, *headerFake, inputData)
+		assert.ErrorContains(t, err, "validate")
+		assert.Equal(t, uint(0), res.ID)
+		repo.AssertExpectations(t)
+
 	})
 }
 
@@ -266,6 +302,46 @@ func TestAdminEditEmploye(t *testing.T) {
 		assert.ErrorContains(t, err, "registered")
 		assert.Equal(t, user.Core{}, res)
 		repo.AssertExpectations(t)
+	})
+	t.Run("access denied", func(t *testing.T) {
+		repo.On("UpdateByAdmin", uint(1), uint(1), inputData).Return(user.Core{}, errors.New("access denied")).Once()
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.AdminEditEmployee(pToken, uint(1), *imageTrueCnv, inputData)
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "access denied")
+		assert.Equal(t, user.Core{}, res)
+		repo.AssertExpectations(t)
+	})
+	t.Run("email duplicated", func(t *testing.T) {
+		repo.On("UpdateByAdmin", uint(1), uint(1), inputData).Return(user.Core{}, errors.New("email duplicated")).Once()
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.AdminEditEmployee(pToken, uint(1), *imageTrueCnv, inputData)
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "email duplicated")
+		assert.Equal(t, user.Core{}, res)
+		repo.AssertExpectations(t)
+	})
+	t.Run("invalid file validation", func(t *testing.T) {
+		filePathFake := filepath.Join("..", "..", "..", "TimeSyncUnitTesting.csv")
+		headerFake, err := helper.UnitTestingUploadFileMock(filePathFake)
+		if err != nil {
+			log.Panic("dari file header", err.Error())
+		}
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.AdminEditEmployee(pToken, uint(1), *headerFake, inputData)
+		assert.ErrorContains(t, err, "validate")
+		assert.Equal(t, uint(0), res.ID)
+		repo.AssertExpectations(t)
+
 	})
 }
 
@@ -390,19 +466,43 @@ func TestCsv(t *testing.T) {
 	}
 
 	if header.Filename != "" {
-		value, _ := header.Open()
-		inputData = helper.ConvertCSV(value)
+		inputData = helper.ConvertCSV(*header)
 	}
+	// MULAI TESTING
 	t.Run("success creating account from csv", func(t *testing.T) {
 		repo.On("Csv", inputData).Return(nil).Once()
 		err = srv.Csv(*header)
 		assert.Nil(t, err)
 		repo.AssertExpectations(t)
 	})
-	t.Run("cannot insert empty file", func(t *testing.T) {
-		repo.On("Csv", inputData).Return(errors.New("cannot insert empty file")).Once()
+	t.Run("Duplicate", func(t *testing.T) {
+		repo.On("Csv", inputData).Return(errors.New("Duplicate")).Once()
 		err = srv.Csv(*header)
 		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "some email already registered in data entry")
 		repo.AssertExpectations(t)
+	})
+	t.Run("Server error", func(t *testing.T) {
+		repo.On("Csv", inputData).Return(errors.New("server error")).Once()
+		err = srv.Csv(*header)
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "internal server error")
+		repo.AssertExpectations(t)
+	})
+	t.Run("invalid validation", func(t *testing.T) {
+		filePathFake := filepath.Join("..", "..", "..", "Unit_Testing.PNG")
+		headerFake, err := helper.UnitTestingUploadFileMock(filePathFake)
+		if err != nil {
+			log.Panic("dari file header", err.Error())
+		}
+		// repo.On("Register", uint(1), mock.Anything).Return(user.Core{}, errors.New("email duplicated")).Once()
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		err = srv.Csv(*headerFake)
+		assert.ErrorContains(t, err, "validate")
+		repo.AssertExpectations(t)
+
 	})
 }

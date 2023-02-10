@@ -34,13 +34,11 @@ func (cuc *companyUseCase) EditProfile(token interface{}, fileData multipart.Fil
 	adminID := helper.ExtractToken(token)
 	// kondisi dibawah dilakukan agar foto bisa kosong dan agar unit testing tidak error
 	if fileData.Size != 0 {
-		if fileData.Filename != "" {
-			res, err := helper.GetUrlImagesFromAWS(fileData)
-			if err != nil {
-				return company.Core{}, err
-			}
-			updateData.Picture = res
+		res, err := helper.GetUrlImagesFromAWS(fileData)
+		if err != nil {
+			return company.Core{}, errors.New("validate: " + err.Error())
 		}
+		updateData.Picture = res
 	}
 	res, err := cuc.qry.EditProfile(uint(adminID), updateData)
 	if err != nil {
