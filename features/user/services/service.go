@@ -166,10 +166,8 @@ func (uuc *userUseCase) ProfileEmployee(userID uint) (user.Core, error) {
 // AdminEditEmployee implements user.UserService
 func (uuc *userUseCase) AdminEditEmployee(token interface{}, employeeID uint, fileData multipart.FileHeader, updateData user.Core) (user.Core, error) {
 	adminID := helper.ExtractToken(token)
-	if updateData.Password != "" {
-		hashed := helper.GeneratePassword(updateData.Password)
-		updateData.Password = string(hashed)
-	}
+	hashed := helper.GeneratePassword(updateData.Password)
+	updateData.Password = hashed
 	if fileData.Size != 0 {
 		res, err := helper.GetUrlImagesFromAWS(fileData)
 		if err != nil {
@@ -180,14 +178,12 @@ func (uuc *userUseCase) AdminEditEmployee(token interface{}, employeeID uint, fi
 	res, err := uuc.qry.UpdateByAdmin(uint(adminID), employeeID, updateData)
 	if err != nil {
 		msg := ""
-		if strings.Contains(err.Error(), "not found") {
-			msg = "data not found"
+		if strings.Contains(err.Error(), "access") {
+			msg = "access denied"
+		} else if strings.Contains(err.Error(), "not found") {
+			msg = "account not registered"
 		} else if strings.Contains(err.Error(), "email") {
 			msg = "email duplicated"
-		} else if strings.Contains(err.Error(), "access") {
-			msg = "access denied"
-		} else {
-			msg = "account not registered"
 		}
 		return user.Core{}, errors.New(msg)
 	}

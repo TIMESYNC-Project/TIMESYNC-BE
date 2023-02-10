@@ -290,19 +290,6 @@ func TestAdminEditEmploye(t *testing.T) {
 		assert.Equal(t, resData.ID, res.ID)
 		repo.AssertExpectations(t)
 	})
-
-	t.Run("fail updating account", func(t *testing.T) {
-		repo.On("UpdateByAdmin", uint(1), uint(1), inputData).Return(user.Core{}, errors.New("query error,update fail")).Once()
-		srv := New(repo)
-		_, token := helper.GenerateToken(1)
-		pToken := token.(*jwt.Token)
-		pToken.Valid = true
-		res, err := srv.AdminEditEmployee(pToken, uint(1), *imageTrueCnv, inputData)
-		assert.NotNil(t, err)
-		assert.ErrorContains(t, err, "registered")
-		assert.Equal(t, user.Core{}, res)
-		repo.AssertExpectations(t)
-	})
 	t.Run("access denied", func(t *testing.T) {
 		repo.On("UpdateByAdmin", uint(1), uint(1), inputData).Return(user.Core{}, errors.New("access denied")).Once()
 		srv := New(repo)
@@ -315,6 +302,19 @@ func TestAdminEditEmploye(t *testing.T) {
 		assert.Equal(t, user.Core{}, res)
 		repo.AssertExpectations(t)
 	})
+	t.Run("fail updating account", func(t *testing.T) {
+		repo.On("UpdateByAdmin", uint(1), uint(1), inputData).Return(user.Core{}, errors.New("user not found")).Once()
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.AdminEditEmployee(pToken, uint(1), *imageTrueCnv, inputData)
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "account not registered")
+		assert.Equal(t, user.Core{}, res)
+		repo.AssertExpectations(t)
+	})
+
 	t.Run("email duplicated", func(t *testing.T) {
 		repo.On("UpdateByAdmin", uint(1), uint(1), inputData).Return(user.Core{}, errors.New("email duplicated")).Once()
 		srv := New(repo)
@@ -327,6 +327,7 @@ func TestAdminEditEmploye(t *testing.T) {
 		assert.Equal(t, user.Core{}, res)
 		repo.AssertExpectations(t)
 	})
+
 	t.Run("invalid file validation", func(t *testing.T) {
 		filePathFake := filepath.Join("..", "..", "..", "TimeSyncUnitTesting.csv")
 		headerFake, err := helper.UnitTestingUploadFileMock(filePathFake)
