@@ -94,7 +94,7 @@ func (aq *approvalQuery) ApprovalDetail(approvalID uint) (approval.Core, error) 
 
 func (aq *approvalQuery) EmployeeApprovalRecord(employeeID uint) ([]approval.Core, error) {
 	res := []Approval{}
-	if err := aq.db.Where("user_id = ?", employeeID).Find(&res).Error; err != nil {
+	if err := aq.db.Where("user_id = ?", employeeID).Order("created_at desc").Find(&res).Error; err != nil {
 		log.Println("get employee approval query error : ", err.Error())
 		return []approval.Core{}, err
 	}
