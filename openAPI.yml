@@ -593,7 +593,7 @@ paths:
                 $ref: "#/components/schemas/responseObject"
               example:
                 data:
-                  id: 1
+                  id : 1
                   working_hour_start: "19:00"
                   working_hour_end: "20:30"
                   tolerance: 20
@@ -669,7 +669,7 @@ paths:
                       nip: "",
                       announcement_title: "Libur",
                       announcement_description: "Karena besok ada rapat atasan mendadak, jadi kantor diliburkan",
-                      created_at: "2023-02-02",
+                      created_at: "2023-02-02"
                     },
                     {
                       id: 2,
@@ -677,7 +677,7 @@ paths:
                       nip: "23011",
                       announcement_title: "Wajib Masuk",
                       announcement_description: "Karena sabtu nanti ada agenda kerja bakti, jadi semua karyawan diharapkan untuk hadir",
-                      created_at: "2023-02-02",
+                      created_at: "2023-02-02"
                     },
                   ]
                 message: "get all announcement"
@@ -713,7 +713,7 @@ paths:
                   nip: "23010"
                   announcement_title: "Libur"
                   announcement_description: "Karena besok ada rapat atasan mendadak, jadi kantor diliburkan"
-                  created_at: "2023-02-02"
+                  created_at : "2023-02-02"
                 message: "success get announcement details"
         400:
           $ref: "#/components/responses/400"
@@ -777,34 +777,32 @@ paths:
               example:
                 data:
                   [
-                    {
-                      id: 1,
-                      attendance_date: "2023-02-08",
-                      clock_in: "01:05",
-                      clock_in_location: "Jalan Duren Sawit Baru Daerah Khusus Ibukota Jakarta,,13440,Indonesia",
-                      clock_in_map_location: "https://www.openstreetmap.org/#map=19/-6.232191/106.915202",
-                      clock_out: "01:10",
-                      clock_out_location: "Jalan 25 Daerah Khusus Ibukota Jakarta,,13440,Indonesia",
-                      clock_out_map_location: "https://www.openstreetmap.org/#map=19/-6.235400/106.919860",
-                      attendance: "present",
-                      attendance_status: "ontime",
-                      work_time: "07h 25m",
-                    },
-                    {
-                      id: 2,
-                      attendance_date: "2023-02-08",
-                      clock_in: "01:05",
-                      clock_in_location: "Jalan Duren Sawit Baru Daerah Khusus Ibukota Jakarta,,13440,Indonesia",
-                      clock_in_map_location: "https://www.openstreetmap.org/#map=19/-6.232191/106.915202",
-                      clock_out: "01:10",
-                      clock_out_location: "Jalan 25 Daerah Khusus Ibukota Jakarta,,13440,Indonesia",
-                      clock_out_map_location: "https://www.openstreetmap.org/#map=19/-6.235400/106.919860",
-                      attendance: "present",
-                      attendance_status: "ontime",
-                      work_time: "07h 25m",
-                    },
+                  {id: 1,
+                  attendance_date: "2023-02-08",
+                  clock_in: "01:05",
+                  clock_in_location: "Jalan Duren Sawit Baru Daerah Khusus Ibukota Jakarta,,13440,Indonesia",
+                  clock_in_map_location: "https://www.openstreetmap.org/#map=19/-6.232191/106.915202",
+                  clock_out: "01:10",
+                  clock_out_location: "Jalan 25 Daerah Khusus Ibukota Jakarta,,13440,Indonesia",
+                  clock_out_map_location: "https://www.openstreetmap.org/#map=19/-6.235400/106.919860",
+                  attendance: "present",
+                  attendance_status: "ontime",
+                  work_time: "07h 25m"},
+                  {
+                    id: 2,
+                  attendance_date: "2023-02-08",
+                  clock_in: "01:05",
+                  clock_in_location: "Jalan Duren Sawit Baru Daerah Khusus Ibukota Jakarta,,13440,Indonesia",
+                  clock_in_map_location: "https://www.openstreetmap.org/#map=19/-6.232191/106.915202",
+                  clock_out: "01:10",
+                  clock_out_location: "Jalan 25 Daerah Khusus Ibukota Jakarta,,13440,Indonesia",
+                  clock_out_map_location: "https://www.openstreetmap.org/#map=19/-6.235400/106.919860",
+                  attendance: "present",
+                  attendance_status: "ontime",
+                  work_time: "07h 25m"
+                  }
                   ]
-
+                  
                 message: "success show all employe presence data today"
         400:
           $ref: "#/components/responses/400"
@@ -835,7 +833,7 @@ paths:
                   clock_out: "05:00"
                   clock_out_location: "Jln.Jalan"
                   clock_out_map_location: "https://www.openstreetmap.org/#map=19/-2.8837/104.6896"
-                  attendace: "present"
+                  attendace : "present"
                   attendance_status: "ontime"
                   work_time: "00h 04m"
                 message: "success show presence data today"
@@ -847,8 +845,8 @@ paths:
     post:
       tags:
         - "Admin"
-      description: edit employee attendance status
-      summary: edit employee attendance status
+      description : edit employee attendance status
+      summary : edit employee attendance status
       security:
         - JWTAuth: []
       parameters:
@@ -925,7 +923,7 @@ paths:
                   clock_out: ""
                   clock_out_location: ""
                   clock_out_map_location: ""
-                  attendace: "present"
+                  attendace : "present"
                   attendance_status: "ontime"
                   work_time: "01h 40m"
                 message: "clock in success"
@@ -972,7 +970,7 @@ paths:
                   clock_out: "05:00"
                   clock_out_location: "Jln.Jalan"
                   clock_out_map_location: "https://www.openstreetmap.org/#map=19/-2.8837/104.6896"
-                  attendace: "present"
+                  attendace : "present"
                   attendance_status: "ontime"
                   work_time: "00h 04m"
                 message: "clock out success"
@@ -1136,7 +1134,7 @@ paths:
                       approval_description: "Cakit",
                       approval_status: "pending",
                       approval_image: "",
-                      created_at: "2023-02-1",
+                      created_at : "2023-02-1"
                     },
                     {
                       id: 2,
@@ -1147,7 +1145,7 @@ paths:
                       approval_description: "izin",
                       approval_status: "approved",
                       approval_image: "https://fauziawsbucket.s3.ap-southeast-1.amazonaws.com/50afe12c-b4f8-4e7e-a25d-217afda264edo.png",
-                      created_at: "2023-02-1",
+                      created_at : "2023-02-1"
                     },
                     {
                       id: 3,
@@ -1158,7 +1156,7 @@ paths:
                       approval_description: "Izin",
                       approval_status: "rejected",
                       approval_image: "https://fauziawsbucket.s3.ap-southeast-1.amazonaws.com/50afe12c-b4f8-4e7e-a25d-217afda264edo.png",
-                      created_at: "2023-02-1",
+                      created_at : "2023-02-1"
                     },
                     {
                       id: 4,
@@ -1169,7 +1167,7 @@ paths:
                       approval_description: "Cakit",
                       approval_status: "pending",
                       approval_image: "",
-                      created_at: "2023-02-1",
+                      created_at : "2023-02-1"
                     },
                   ]
                 message: "success show all employee approval record"
@@ -1280,7 +1278,7 @@ paths:
                       approval_description: "Saya Pusing pak, saya izin mengirim surat dari dokter sebagai bukti",
                       approval_status: "Pending",
                       approval_image: "",
-                      created_at: "2023-02-1",
+                      created_at : "2023-02-1"
                     },
                     {
                       id: 2,
@@ -1291,7 +1289,7 @@ paths:
                       approval_description: "pengen liburan pak",
                       approval_status: "Pending",
                       approval_image: "https://fauziawsbucket.s3.ap-southeast-1.amazonaws.com/c8b84b6e-ceec-4d79-86de-206a7eb5c750o.png",
-                      created_at: "2023-02-4",
+                      created_at : "2023-02-4"
                     },
                   ]
                 message: success show employee approval record
@@ -1323,7 +1321,7 @@ paths:
                       nip: "23002",
                       announcement_title: "Peringatan",
                       announcement_description: "Silahkan menghadap saya ke kantor HRD, segera",
-                      created_at: "2023-02-02",
+                       created_at: "2023-02-02",
                     },
                     {
                       id: 2,
@@ -1331,7 +1329,7 @@ paths:
                       nip: "",
                       announcement_title: "Libur",
                       announcement_description: "Karena besok ada rapat atasan mendadak, jadi kantor diliburkan",
-                      created_at: "2023-02-01",
+                       created_at: "2023-02-01",
                     },
                   ]
                 message: success show employee inbox message
@@ -1349,17 +1347,23 @@ paths:
         - JWTAuth: []
       parameters:
         - in: query
-          name: mtwh
+          name: type
           schema:
-            example: "mtwh"
+            example: "type"
             type: string
-          description: the keyword used to find employee monthly working hour graph
+          description: the keyword used to find employee monthly working hour graph and monthly late employee graph, have value mtwh or mtel
         - in: query
-          name: mtel
+          name: year_month
           schema:
-            example: "mtel"
+            example: "year_month"
             type: string
-          description: the keyword used to find monthly late employee graph
+          description: the keyword used to find year & monthly data example year_month = 2023-01
+        - in: query
+          name: limit
+          schema:
+            example: "limit"
+            type: string
+          description: the keyword used to limit query example limit=8
       responses:
         200:
           description: success show graph data for employee weekly working hour
@@ -1370,20 +1374,19 @@ paths:
               example:
                 desc: mtel
                 data:
-                  [
-                    {
-                      employee_name: "Fauzi",
-                      employee_nip: 23003,
-                      monthly_total_employee_late: 10,
-                    },
-                    {
-                      employee_name: "Alif",
-                      employee_nip: 23006,
-                      monthly_total_employee_late: 2,
-                    },
+                  [{
+                  employee_name: "Fauzi",
+                  employee_nip: 23003,
+                  monthly_total_employee_late: 10
+                  },
+                  {
+                  employee_name: "Alif",
+                  employee_nip: 23006,
+                  monthly_total_employee_late: 2
+                  }
                   ]
-                message: success show graph data
-
+                message: success show graph data 
+              
         400:
           $ref: "#/components/responses/400"
         500:
@@ -1449,59 +1452,57 @@ paths:
               schema:
                 type: object
               example:
-                data:
-                  {
-                    employee_name: "Fauzi",
-                    record:
-                      [
-                        {
-                          id: 1,
-                          attendace_date: "2023-02-01",
-                          clock_in: "07:50",
-                          clock_out: "17:00",
-                          attendance: "presence",
-                          attendance_status: "late",
-                        },
-                        {
-                          id: 2,
-                          attendace_date: "2023-02-02",
-                          clock_in: "08:00",
-                          clock_out: "17:20",
-                          attendance: "presence",
-                          attendance_status: "ontime",
-                        },
-                        {
-                          id: 3,
-                          attendace_date: "2023-02-03",
-                          clock_in: "",
-                          clock_out: "",
-                          attendance: "presence",
-                          attendance_status: "late",
-                        },
-                        {
-                          id: 4,
-                          attendace_date: "2023-02-04",
-                          clock_in: "",
-                          clock_out: "",
-                          attendance: "presence",
-                          attendance_status: "ontime",
-                        },
-                        {
-                          id: 0,
-                          attendace_date: "2023-02-05",
-                          clock_in: "",
-                          clock_out: "",
-                          attendance: "absent",
-                          attendance_status: "",
-                        },
-                      ],
-                  }
+                data: {
+                  employee_name: "Fauzi",
+                  record: [
+                      {
+                        id: 1,
+                        attendace_date: "2023-02-01",
+                        clock_in: "07:50",
+                        clock_out: "17:00",
+                        attendance: "presence",
+                        attendance_status: "late"
+                      },
+                      {
+                        id: 2,
+                        attendace_date: "2023-02-02",
+                        clock_in: "08:00",
+                        clock_out: "17:20",
+                        attendance: "presence",
+                        attendance_status: "ontime"
+                      },
+                      {
+                        id: 3,
+                        attendace_date: "2023-02-03",
+                        clock_in: "",
+                        clock_out: "",
+                        attendance: "presence",
+                        attendance_status: "late"
+                      },
+                      {
+                        id: 4,
+                        attendace_date: "2023-02-04",
+                        clock_in: "",
+                        clock_out: "",
+                        attendance: "presence",
+                        attendance_status: "ontime"
+                      },
+                      {
+                        id: 0,
+                        attendace_date: "2023-02-05",
+                        clock_in: "",
+                        clock_out: "",
+                        attendance: "absent",
+                        attendance_status: ""
+                      }
+                    ],
+                }
                 message: success show employee attendance record
         400:
           $ref: "#/components/responses/400"
         500:
           $ref: "#/components/responses/500"
-
+  
   /presences/detail/{id}:
     get:
       tags:
@@ -1530,7 +1531,7 @@ paths:
                   clock_in: "10:39"
                   clock_in_location: "Depok,Jawa Barat"
                   clock_in_map_location: "https://www.openstreetmap.org/#map=19/-5.322/104.322"
-                  clock_out: "10:55"
+                  clock_out : "10:55"
                   clock_out_location: "Depok,Jawa Barat"
                   clock_out_map_location: "https://www.openstreetmap.org/#map=19/-5.322/104.322"
                   attendance: "present"
@@ -1541,6 +1542,7 @@ paths:
           $ref: "#/components/responses/400"
         500:
           $ref: "#/components/responses/500"
+    
 
 components:
   securitySchemes:

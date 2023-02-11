@@ -4,6 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
+	"strings"
+	"time"
 	"timesync-be/features/approval"
 
 	"gorm.io/gorm"
@@ -130,6 +133,95 @@ func (aq *approvalQuery) UpdateApproval(adminID uint, approvalID uint, updatedAp
 		log.Println("Unauthorized request")
 		return approval.Core{}, errors.New("unauthorized request")
 	}
+	// get user annual leave
+	usr := User{}
+	err = aq.db.Where("id = ?", getID.UserID).First(&usr).Error
+	if err != nil {
+		log.Println("query approval find user error ", err.Error())
+		return approval.Core{}, errors.New("user not found")
+	}
+	//=============================================================
+	// PROSES CONVERSI DATE STRING TO INT
+	//=============================================================
+	yFr, _ := strconv.Atoi(getID.StartDate[:4])
+	// yTo, _ := strconv.Atoi(getID.EndDate[:4])
+	mFr, _ := strconv.Atoi(getID.StartDate[5:7])
+	m := time.Month(mFr)
+	// mTo, _ := strconv.Atoi(getID.EndDate[5:7])
+	dFr, _ := strconv.Atoi(getID.StartDate[8:])
+	// dTo, _ := strconv.Atoi(getID.EndDate[8:])
+	//=============================================================
+	// Proses menghitung annual leave request dari user dan
+	// Proses pengecekan apakah user melakukan request annual leave?
+	//=============================================================
+	titleConv := strings.ToLower(getID.Title)
+	approvStatConv := strings.ToLower(updatedApproval.Status)
+	if titleConv == "annual leave" && approvStatConv == "approved" {
+		fD := time.Date(yFr, m, dFr, 0, 0, 0, 0, time.UTC)
+		x := 1
+		date := getID.StartDate
+		isfalse := true
+		i := 0
+		for isfalse {
+			createAt := date
+			// fmt.Println(createAt)
+			if createAt == getID.EndDate {
+				isfalse = false
+			}
+			tomorrow := fD.AddDate(0, 0, x)
+			year := strconv.Itoa(tomorrow.Year())
+			monthCnv := int(tomorrow.Month())
+			month := strconv.Itoa(monthCnv)
+			day := strconv.Itoa(tomorrow.Day())
+			if len(month) == 1 {
+				month = "0" + month
+			}
+			if len(day) == 1 {
+				day = "0" + day
+			}
+			date = fmt.Sprintf("%s-%s-%s", year, month, day)
+			x++
+			i++
+		}
+		//=============================================================
+		// Proses mengecek annual leave user memenuhi syarat atau tidak
+		//=============================================================
+		if usr.AnnualLeave < i {
+			log.Println("invalid approval request")
+			return approval.Core{}, errors.New("employee annual leave lower than employee annual leave request")
+		}
+		userAnnualLeave := usr.AnnualLeave - i
+		// log.Println(userAnnualLeave)
+		// log.Println(i)
+		//=============================================================
+		// PROSES UPDATE Annual leave user & Status Approval
+		//=============================================================
+		usrALUpd := User{}
+		usrALUpd.AnnualLeave = userAnnualLeave
+		if usrALUpd.AnnualLeave == 0 {
+			qry := aq.db.Raw("UPDATE users SET annual_leave = NULL WHERE id = ? ", usr.ID).Scan(&usrALUpd)
+			if qry.RowsAffected <= 0 {
+				log.Println("no data updated")
+				// return approval.Core{}, errors.New("no rows affected")
+			}
+			if err := qry.Error; err != nil {
+				log.Println("update approval query error : ", err.Error())
+				return approval.Core{}, errors.New("user annual leave update error")
+			}
+		} else {
+			qry := aq.db.Where("id = ?", usr.ID).Updates(&usrALUpd)
+			if qry.RowsAffected <= 0 {
+				log.Println("no data updated")
+				// return approval.Core{}, errors.New("no rows affected")
+			}
+			if err := qry.Error; err != nil {
+				log.Println("update approval query error : ", err.Error())
+				return approval.Core{}, errors.New("user annual leave update error")
+			}
+
+		}
+
+	}
 
 	cnv := CoreToData(updatedApproval)
 	qry := aq.db.Where("id = ?", approvalID).Updates(&cnv)
@@ -137,9 +229,9 @@ func (aq *approvalQuery) UpdateApproval(adminID uint, approvalID uint, updatedAp
 		log.Println("update approval query error : data not found")
 		return approval.Core{}, errors.New("not found")
 	}
-
 	if err := qry.Error; err != nil {
 		log.Println("update approval query error : ", err.Error())
+		return approval.Core{}, errors.New("update failed")
 	}
 
 	updatedApproval.ID = getID.ID

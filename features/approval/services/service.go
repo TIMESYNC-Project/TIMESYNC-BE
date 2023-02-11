@@ -100,6 +100,8 @@ func (auc *approvalUseCase) UpdateApproval(token interface{}, approvalID uint, u
 			msg = "failed to update, no new record or data not found"
 		} else if strings.Contains(err.Error(), "unauthorized") {
 			msg = "unauthorized request"
+		} else if strings.Contains(err.Error(), "annual leave") {
+			return approval.Core{}, err
 		} else {
 			msg = "unable to process the data"
 		}
