@@ -30,13 +30,11 @@ func (auc *approvalUseCase) PostApproval(token interface{}, fileData multipart.F
 
 	// kondisi dibawah dilakukan agar foto bisa kosong dan agar unit testing tidak error
 	if fileData.Size != 0 {
-		if fileData.Filename != "" {
-			res, err := helper.GetUrlImagesFromAWS(fileData)
-			if err != nil {
-				return approval.Core{}, errors.New("validate: " + err.Error())
-			}
-			newApproval.ApprovalImage = res
+		res, err := helper.GetUrlImagesFromAWS(fileData)
+		if err != nil {
+			return approval.Core{}, errors.New("validate: " + err.Error())
 		}
+		newApproval.ApprovalImage = res
 	}
 	res, err := auc.qry.PostApproval(uint(employeeID), newApproval)
 	if err != nil {
