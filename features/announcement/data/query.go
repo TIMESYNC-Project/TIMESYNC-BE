@@ -57,7 +57,7 @@ func (aq *announcementQuery) PostAnnouncement(adminID uint, newAnnouncement anno
 
 func (aq *announcementQuery) GetAnnouncement() ([]announcement.Core, error) {
 	res := []Announcement{}
-	if err := aq.db.Find(&res).Error; err != nil {
+	if err := aq.db.Order("created_at desc").Find(&res).Error; err != nil {
 		log.Println("get all announcement query error : ", err.Error())
 		return []announcement.Core{}, err
 	}

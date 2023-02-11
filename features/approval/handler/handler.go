@@ -142,11 +142,14 @@ func (ac *approvalControll) UpdateApproval() echo.HandlerFunc {
 		res, err := ac.srv.UpdateApproval(token, uint(approvalID), *ReqToCore(input))
 
 		if err != nil {
-			log.Println("error update approval : ", err.Error())
-			return c.JSON(http.StatusInternalServerError, "unable to process the data")
+			if strings.Contains(err.Error(), "annual leave") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
+			} else {
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "unable to process data"})
+			}
 		}
 
-		return c.JSON(http.StatusCreated, map[string]interface{}{
+		return c.JSON(http.StatusOK, map[string]interface{}{
 			"data":    ToPostApprovalResponse(res),
 			"message": "success approve employee permission",
 		})

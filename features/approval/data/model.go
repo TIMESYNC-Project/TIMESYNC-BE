@@ -26,6 +26,7 @@ type User struct {
 	Nip            string
 	Position       string
 	Role           string
+	AnnualLeave    int
 }
 
 func ToCore(data Approval) approval.Core {
