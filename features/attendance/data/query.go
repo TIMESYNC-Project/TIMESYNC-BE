@@ -508,8 +508,13 @@ func (aq *attendanceQuery) Record(employeeID uint, dateFrom string, dateTo strin
 		val++
 	}
 	// log.Println(response)
+	// LAKUKAN PROSES DESCENDING
+	responseResult := []attendance.Core{}
+	for i := len(response) - 1; i >= 0; i-- {
+		responseResult = append(responseResult, response[i])
+	}
 
-	return response, usrName.Name, nil
+	return responseResult, usrName.Name, nil
 }
 
 // GetPresenceToday implements attendance.AttendanceData
