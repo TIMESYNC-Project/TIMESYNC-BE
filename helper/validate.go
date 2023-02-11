@@ -69,30 +69,25 @@ func CoreToRegVal(data user.Core) UserValidate {
 		Password:    data.Password,
 	}
 }
-
-// func RegValToCore(data UserValidate) user.Core {
-// 	return user.Core{
-// 		Name:        data.Name,
-// 		BirthOfDate: data.BirthOfDate,
-// 		Email:       data.Email,
-// 		Gender:      data.Gender,
-// 		Position:    data.Position,
-// 		Phone:       data.Phone,
-// 		Address:     data.Address,
-// 		Password:    data.Password,
-// 	}
-// }
-
 func RegistrationValidate(data user.Core) error {
 	validate := validator.New()
 	val := CoreToRegVal(data)
 	if err := validate.Struct(val); err != nil {
 		for _, e := range err.(validator.ValidationErrors) {
-			vlderror := fmt.Sprintf("%s is %s", e.Field(), e.Tag())
-			return errors.New(vlderror)
+			vlderror := ""
+			if e.Field() == "Password" && e.Value() != "" {
+				vlderror = fmt.Sprintf("%s is %s", e.Field(), e.Tag())
+				return errors.New(vlderror)
+			}
+			if e.Value() == "" {
+				vlderror = fmt.Sprintf("%s is %s", e.Field(), e.Tag())
+				return errors.New(vlderror)
+			} else {
+				vlderror = fmt.Sprintf("%s is not %s", e.Value(), e.Tag())
+				return errors.New(vlderror)
+			}
 		}
 	}
-
 	return nil
 }
 
@@ -118,6 +113,39 @@ func ApprovalValidation(data approval.Core) error {
 	if err := validate.Struct(val); err != nil {
 		for _, e := range err.(validator.ValidationErrors) {
 			vlderror := fmt.Sprintf("%s is %s", e.Field(), e.Tag())
+			return errors.New(vlderror)
+		}
+	}
+
+	return nil
+}
+
+func UpdateUserCheckValidation(data user.Core) error {
+	validate := validator.New()
+	if data.Password == "" && data.Phone == "" && data.Gender == "" && data.Email == "" {
+		return nil
+	}
+	if data.Email != "" {
+		err := validate.Var(data.Email, "email")
+		if err != nil {
+			e := err.(validator.ValidationErrors)[0]
+			vlderror := fmt.Sprintf("%s is not %s", data.Email, e.Tag())
+			return errors.New(vlderror)
+		}
+	}
+	if data.Phone != "" {
+		err := validate.Var(data.Phone, "numeric")
+		if err != nil {
+			e := err.(validator.ValidationErrors)[0]
+			vlderror := fmt.Sprintf("%s is not %s", data.Phone, e.Tag())
+			return errors.New(vlderror)
+		}
+	}
+	if data.Password != "" {
+		err := validate.Var(data.Password, "min=3,alphanum")
+		if err != nil {
+			e := err.(validator.ValidationErrors)[0]
+			vlderror := fmt.Sprintf("%s is not %s", data.Password, e.Tag())
 			return errors.New(vlderror)
 		}
 	}

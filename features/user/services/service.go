@@ -166,6 +166,10 @@ func (uuc *userUseCase) ProfileEmployee(userID uint) (user.Core, error) {
 // AdminEditEmployee implements user.UserService
 func (uuc *userUseCase) AdminEditEmployee(token interface{}, employeeID uint, fileData multipart.FileHeader, updateData user.Core) (user.Core, error) {
 	adminID := helper.ExtractToken(token)
+	err := helper.UpdateUserCheckValidation(updateData)
+	if err != nil {
+		return user.Core{}, errors.New("validate: " + err.Error())
+	}
 	hashed := helper.GeneratePassword(updateData.Password)
 	updateData.Password = hashed
 	if fileData.Size != 0 {

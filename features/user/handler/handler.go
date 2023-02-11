@@ -222,13 +222,17 @@ func (uc *userControll) AdminEditEmployee() echo.HandlerFunc {
 		}
 		res, err := uc.srv.AdminEditEmployee(c.Get("user"), uint(employeeID), input.FileHeader, *ReqToCore(input))
 		if err != nil {
-			if strings.Contains(err.Error(), "email") {
+			if strings.Contains(err.Error(), "email duplicated") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "email already used"})
 			} else if strings.Contains(err.Error(), "type") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
+			} else if strings.Contains(err.Error(), "validate: Password length alphanum") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "validate: Password can be fill by alphanum only"})
 			} else if strings.Contains(err.Error(), "access") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
 			} else if strings.Contains(err.Error(), "size") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
+			} else if strings.Contains(err.Error(), "validate") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
 			} else {
 				return c.JSON(http.StatusNotFound, map[string]interface{}{"message": "account not registered"})
