@@ -32,8 +32,8 @@ func (sq *settingQuery) GetSetting() (setting.Core, error) {
 // EditSetting implements setting.SettingData
 func (sq *settingQuery) EditSetting(userID uint, updateSetting setting.Core) (setting.Core, error) {
 	if userID != 1 {
-		log.Println("cannot modifed admin data")
-		return setting.Core{}, errors.New("cannot modifed admin data")
+		log.Println("access denied")
+		return setting.Core{}, errors.New("access denied")
 	}
 	upd := CoreToData(updateSetting)
 	err := sq.db.Where("id = ?", 1).Updates(&upd).Error

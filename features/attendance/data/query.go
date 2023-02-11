@@ -124,7 +124,8 @@ func (aq *attendanceQuery) ClockIn(employeeID uint, latitudeData string, longitu
 	log.Println(hr, mnt)
 	if hr < (workStart - 1) {
 		log.Println("time not match")
-		return attendance.Core{}, errors.New("you cannot clock in now")
+		errMsg := fmt.Sprintf("you only can clock in at %d:00 - %s", workStart-1, stg.End)
+		return attendance.Core{}, errors.New(errMsg)
 	} else if hr == (workStart - 1) {
 		input.AttendanceStatus = "ontime"
 	} else if hr == workStart {
