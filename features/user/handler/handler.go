@@ -285,7 +285,7 @@ func (uc *userControll) Search() echo.HandlerFunc {
 			result = append(result, SearchResponse(res[i]))
 		}
 
-		return c.JSON(http.StatusCreated, map[string]interface{}{
+		return c.JSON(http.StatusOK, map[string]interface{}{
 			"data":    result,
 			"message": "searching success",
 		})

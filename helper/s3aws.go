@@ -47,10 +47,10 @@ func GetUrlImagesFromAWS(fileData multipart.FileHeader) (string, error) {
 		return "", errors.New("file name error")
 	}
 	if fileData.Size == 0 {
-		return "", errors.New("file size error")
+		return "", errors.New("cannot insert empty file")
 	}
 	if fileData.Size > 500000 {
-		return "", errors.New("size error")
+		return "", errors.New("file size max 500kb")
 	}
 	file, err := fileData.Open()
 	if err != nil {
