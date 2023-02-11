@@ -38,7 +38,7 @@ func (aq *approvalQuery) PostApproval(employeeID uint, newApproval approval.Core
 // GetApproval implements approval.ApprovalData
 func (aq *approvalQuery) GetApproval() ([]approval.Core, error) {
 	res := []Approval{}
-	if err := aq.db.Order("create_at DESC").Find(&res).Error; err != nil {
+	if err := aq.db.Order("created_at desc").Find(&res).Error; err != nil {
 		log.Println("get all approvals record query error : ", err.Error())
 		return []approval.Core{}, errors.New("get all approval query error")
 	}
