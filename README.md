@@ -64,7 +64,7 @@
 | GET         | /approvals          | -           |-                   | YES         | Get all employees approval records      |
 | GET        | /approvals/{id}     | approval_id          |-                   | YES         | Get approval details                    |
 | PUT       | /approvals/{id}     | approval_id         |-                   | YES         | Update employee approval status         |
-| GET         | /graph              | -           |mtwh or mtel        | YES         | Get data for graph                      |
+| GET         | /graph              | -           |type,year_month,limit        | YES         | Get data for graph                      |
 | GET         | /search             | -           |q| YES         | Search for employee name or employee nip|
 | GET         | /record/{id}            | employee_id          |-                   | YES         | Get employee attendance record          |
 | GET         | /presences/detail/{id}   | presence_id          |-                   | YES         | Get employee presences detail           |
