@@ -32,6 +32,8 @@ func (uc *userControll) Register() echo.HandlerFunc {
 		if err != nil {
 			if strings.Contains(err.Error(), "already") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "email already registered"})
+			} else if strings.Contains(err.Error(), "is not min") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "validate: password length minimum 3 character"})
 			} else if strings.Contains(err.Error(), "access") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
 			} else if strings.Contains(err.Error(), "validate") {
@@ -117,14 +119,20 @@ func (uc *userControll) Update() echo.HandlerFunc {
 		if err != nil {
 			if strings.Contains(err.Error(), "email") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "email already used"})
+			} else if strings.Contains(err.Error(), "is not min") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "validate: password length minimum 3 character"})
 			} else if strings.Contains(err.Error(), "type") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
 			} else if strings.Contains(err.Error(), "access denied") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "access denied"})
 			} else if strings.Contains(err.Error(), "size") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "file size max 500kb"})
+			} else if strings.Contains(err.Error(), "validate") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
+			} else if strings.Contains(err.Error(), "not registered") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
 			} else {
-				return c.JSON(http.StatusNotFound, map[string]interface{}{"message": "account not registered"})
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "unable to process data"})
 			}
 		}
 
@@ -226,8 +234,8 @@ func (uc *userControll) AdminEditEmployee() echo.HandlerFunc {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "email already used"})
 			} else if strings.Contains(err.Error(), "type") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
-			} else if strings.Contains(err.Error(), "validate: Password length alphanum") {
-				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "validate: Password can be fill by alphanum only"})
+			} else if strings.Contains(err.Error(), "is not min") {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "validate: password length minimum 3 character"})
 			} else if strings.Contains(err.Error(), "access") {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
 			} else if strings.Contains(err.Error(), "size") {

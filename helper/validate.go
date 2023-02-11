@@ -76,7 +76,7 @@ func RegistrationValidate(data user.Core) error {
 		for _, e := range err.(validator.ValidationErrors) {
 			vlderror := ""
 			if e.Field() == "Password" && e.Value() != "" {
-				vlderror = fmt.Sprintf("%s is %s", e.Field(), e.Tag())
+				vlderror = fmt.Sprintf("%s is not %s", e.Value(), e.Tag())
 				return errors.New(vlderror)
 			}
 			if e.Value() == "" {

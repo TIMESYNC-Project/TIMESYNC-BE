@@ -92,6 +92,10 @@ func (uuc *userUseCase) Delete(token interface{}, employeeID uint) error {
 // Update implements user.UserService
 func (uuc *userUseCase) Update(token interface{}, fileData multipart.FileHeader, updateData user.Core) (user.Core, error) {
 	employeeID := helper.ExtractToken(token)
+	err := helper.UpdateUserCheckValidation(updateData)
+	if err != nil {
+		return user.Core{}, errors.New("validate: " + err.Error())
+	}
 	hashed := helper.GeneratePassword(updateData.Password)
 	updateData.Password = string(hashed)
 	log.Println("size:", fileData.Size)
