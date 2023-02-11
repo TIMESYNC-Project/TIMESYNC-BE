@@ -282,6 +282,9 @@ func (uc *userControll) GetAllEmployee() echo.HandlerFunc {
 func (uc *userControll) Search() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		quotes := c.QueryParam("q")
+		if quotes == "" {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "nothing to search"})
+		}
 		res, err := uc.srv.Search(c.Get("user"), quotes)
 		if err != nil {
 			if strings.Contains(err.Error(), "access denied") {
