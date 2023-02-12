@@ -161,19 +161,26 @@ func SettingValidate(data setting.Core) error {
 	if data.Start == "" && data.End == "" && data.Tolerance == 0 && data.AnnualLeave == 0 {
 		return nil
 	}
-	if len(data.Start) > 5 || len(data.End) > 5 || len(data.Start) < 5 || len(data.End) < 5 {
+	if len(data.Start) < 5 && len(data.Start) > 0 {
+		return errors.New("wrong input format hour or minute, you should write like '22:30' or '02:09'")
+	}
+	if len(data.End) < 5 && len(data.End) > 0 {
+		return errors.New("wrong input format hour or minute, you should write like '22:30' or '02:09'")
+	}
+
+	if len(data.Start) > 5 || len(data.End) > 5 {
 		return errors.New("wrong input format hour or minute, you should write like '22:30' or '02:09'")
 	}
 	if data.Start != "" {
 		m, _ := strconv.Atoi(data.Start[3:])
 		h, _ := strconv.Atoi(data.Start[:2])
-		if m >= 59 {
+		if m >= 59 || m < 0 {
 			return errors.New("time start minute max 59")
 		}
 		if h >= 24 {
 			return errors.New("time start hour max 23")
 		}
-		log.Println(h, m)
+		log.Println(h, m < 0)
 		cekStart := strings.Replace(data.Start, ":", "", -1)
 		err := validate.Var(cekStart, "numeric")
 		if err != nil {
