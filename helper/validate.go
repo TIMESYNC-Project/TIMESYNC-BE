@@ -7,7 +7,10 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
+	"strconv"
+	"strings"
 	"timesync-be/features/approval"
+	"timesync-be/features/setting"
 	"timesync-be/features/user"
 
 	"github.com/go-playground/validator/v10"
@@ -150,5 +153,71 @@ func UpdateUserCheckValidation(data user.Core) error {
 		}
 	}
 
+	return nil
+}
+
+func SettingValidate(data setting.Core) error {
+	validate := validator.New()
+	if data.Start == "" && data.End == "" && data.Tolerance == 0 && data.AnnualLeave == 0 {
+		return nil
+	}
+	if len(data.Start) > 5 || len(data.End) > 5 || len(data.Start) < 5 || len(data.End) < 5 {
+		return errors.New("wrong input format hour or minute, you should write like '22:30' or '02:09'")
+	}
+	if data.Start != "" {
+		m, _ := strconv.Atoi(data.Start[3:])
+		h, _ := strconv.Atoi(data.Start[:2])
+		if m >= 59 {
+			return errors.New("time start minute max 59")
+		}
+		if h >= 24 {
+			return errors.New("time start hour max 23")
+		}
+		log.Println(h, m)
+		cekStart := strings.Replace(data.Start, ":", "", -1)
+		err := validate.Var(cekStart, "numeric")
+		if err != nil {
+			e := err.(validator.ValidationErrors)[0]
+			vlderror := fmt.Sprintf("%s is not %s", data.Start, e.Tag())
+			return errors.New(vlderror)
+		}
+	}
+	if data.End != "" {
+		m, _ := strconv.Atoi(data.End[3:])
+		h, _ := strconv.Atoi(data.End[:2])
+		if m >= 59 {
+			return errors.New("time end minute max 59")
+		}
+		if h >= 24 {
+			return errors.New("time end hour max 23")
+		}
+		cekEnd := strings.Replace(data.End, ":", "", -1) // untuk memishkan char ":" <--
+		log.Println(cekEnd)
+		err := validate.Var(cekEnd, "numeric")
+		if err != nil {
+			e := err.(validator.ValidationErrors)[0]
+			vlderror := fmt.Sprintf("%s is not %s", data.End, e.Tag())
+			return errors.New(vlderror)
+		}
+	}
+	if data.Tolerance != 0 {
+		if data.Tolerance > 59 {
+			return errors.New("tolerance max 60")
+		}
+		err := validate.Var(data.Tolerance, "numeric")
+		if err != nil {
+			e := err.(validator.ValidationErrors)[0]
+			vlderror := fmt.Sprintf("%d is not %s", data.Tolerance, e.Tag())
+			return errors.New(vlderror)
+		}
+	}
+	if data.AnnualLeave != 0 {
+		err := validate.Var(data.AnnualLeave, "numeric")
+		if err != nil {
+			e := err.(validator.ValidationErrors)[0]
+			vlderror := fmt.Sprintf("%d is not %s", data.AnnualLeave, e.Tag())
+			return errors.New(vlderror)
+		}
+	}
 	return nil
 }

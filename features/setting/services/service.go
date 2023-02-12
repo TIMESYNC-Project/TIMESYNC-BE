@@ -31,6 +31,10 @@ func (suc *settingUseCase) GetSetting() (setting.Core, error) {
 // EditSetting implements setting.SettingService
 func (suc *settingUseCase) EditSetting(token interface{}, updateSetting setting.Core) (setting.Core, error) {
 	userID := helper.ExtractToken(token)
+	err := helper.SettingValidate(updateSetting)
+	if err != nil {
+		return setting.Core{}, errors.New("validate: " + err.Error())
+	}
 	res, err := suc.qry.EditSetting(uint(userID), updateSetting)
 	if err != nil {
 		if strings.Contains(err.Error(), "access denied") {

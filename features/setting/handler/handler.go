@@ -38,14 +38,16 @@ func (sc *settingController) EditSetting() echo.HandlerFunc {
 		input := EditSetting{}
 		err := c.Bind(&input)
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "internal server error"})
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "wrong input format"})
 		}
 		res, err := sc.srv.EditSetting(c.Get("user"), *ReqToCore(input))
 		if err != nil {
 			if strings.Contains(err.Error(), "access denied") {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": err.Error()})
+			} else if strings.Contains(err.Error(), "validate") {
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": err.Error()})
 			} else {
-				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": err.Error()})
 			}
 		}
 		return c.JSON(http.StatusOK, map[string]interface{}{
