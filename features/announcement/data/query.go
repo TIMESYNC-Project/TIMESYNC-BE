@@ -116,7 +116,7 @@ func (aq *announcementQuery) GetAnnouncementDetail(adminID uint, announcementID 
 
 func (aq *announcementQuery) EmployeeInbox(employeeID uint) ([]announcement.Core, error) {
 	res := []Announcement{}
-	if err := aq.db.Where("user_id = ? OR type = ?", employeeID, "public").Find(&res).Error; err != nil {
+	if err := aq.db.Where("user_id = ? OR type = ?", employeeID, "public").Order("created_at desc").Find(&res).Error; err != nil {
 		log.Println("get employee inbox query error : ", err.Error())
 		return []announcement.Core{}, err
 	}
