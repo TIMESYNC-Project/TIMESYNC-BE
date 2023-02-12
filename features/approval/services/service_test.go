@@ -104,6 +104,20 @@ func TestPostApproval(t *testing.T) {
 		repo.AssertExpectations(t)
 
 	})
+
+	t.Run("can't create approval", func(t *testing.T) {
+		repo.On("PostApproval", uint(1), mock.Anything).Return(approval.Core{}, errors.New("server error"))
+		srv := New(repo)
+
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.PostApproval(pToken, *imageTrueCnv, inputData)
+		assert.NotNil(t, err)
+		assert.Equal(t, uint(0), res.ID)
+		assert.ErrorContains(t, err, "server")
+		repo.AssertExpectations(t)
+	})
 }
 
 func TestGetApproval(t *testing.T) {
@@ -339,6 +353,20 @@ func TestUpdateApproval(t *testing.T) {
 		assert.NotNil(t, err)
 		assert.Equal(t, uint(0), res.ID)
 		assert.ErrorContains(t, err, "unauthorized")
+		repo.AssertExpectations(t)
+	})
+
+	t.Run("annual leave", func(t *testing.T) {
+		repo.On("UpdateApproval", uint(1), uint(1), inputData).Return(approval.Core{}, errors.New("annual leave")).Once()
+		srv := New(repo)
+
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.UpdateApproval(pToken, uint(1), inputData)
+		assert.NotNil(t, err)
+		assert.Equal(t, uint(0), res.ID)
+		assert.ErrorContains(t, err, "annual leave")
 		repo.AssertExpectations(t)
 	})
 

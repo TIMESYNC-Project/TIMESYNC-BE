@@ -42,6 +42,19 @@ func TestEditSetting(t *testing.T) {
 		data.AssertExpectations(t)
 	})
 
+	t.Run("access denied", func(t *testing.T) {
+		data.On("EditSetting", uint(1), inputData).Return(setting.Core{}, errors.New("access denied")).Once()
+		srv := New(data)
+		_, token := helper.GenerateToken(1)
+		mockToken := token.(*jwt.Token)
+		mockToken.Valid = true
+		res, err := srv.EditSetting(mockToken, inputData)
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "access denied")
+		assert.Equal(t, uint(0), res.ID)
+		data.AssertExpectations(t)
+	})
+
 }
 
 func TestGetSetting(t *testing.T) {
