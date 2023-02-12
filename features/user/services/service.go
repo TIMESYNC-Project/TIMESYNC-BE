@@ -192,6 +192,8 @@ func (uuc *userUseCase) AdminEditEmployee(token interface{}, employeeID uint, fi
 			msg = "account not registered"
 		} else if strings.Contains(err.Error(), "email") {
 			msg = "email duplicated"
+		} else {
+			msg = err.Error()
 		}
 		return user.Core{}, errors.New(msg)
 	}

@@ -265,6 +265,19 @@ func TestUpdate(t *testing.T) {
 		repo.AssertExpectations(t)
 
 	})
+
+	t.Run("invalid input validation", func(t *testing.T) {
+		inputDataFake := user.Core{Password: "08123##"}
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.Update(pToken, *imageTrueCnv, inputDataFake)
+		assert.ErrorContains(t, err, "validate")
+		assert.Equal(t, uint(0), res.ID)
+		repo.AssertExpectations(t)
+
+	})
 }
 
 func TestAdminEditEmploye(t *testing.T) {
@@ -343,6 +356,32 @@ func TestAdminEditEmploye(t *testing.T) {
 		assert.Equal(t, uint(0), res.ID)
 		repo.AssertExpectations(t)
 
+	})
+
+	t.Run("invalid input validation", func(t *testing.T) {
+		inputDataFake := user.Core{Name: "Alif", Phone: "08123##"}
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.AdminEditEmployee(pToken, uint(1), *imageTrueCnv, inputDataFake)
+		assert.ErrorContains(t, err, "validate")
+		assert.Equal(t, uint(0), res.ID)
+		repo.AssertExpectations(t)
+
+	})
+
+	t.Run("no data updated", func(t *testing.T) {
+		repo.On("UpdateByAdmin", uint(1), uint(1), inputData).Return(user.Core{}, errors.New("no data updated")).Once()
+		srv := New(repo)
+		_, token := helper.GenerateToken(1)
+		pToken := token.(*jwt.Token)
+		pToken.Valid = true
+		res, err := srv.AdminEditEmployee(pToken, uint(1), *imageTrueCnv, inputData)
+		assert.NotNil(t, err)
+		assert.Error(t, err)
+		assert.Equal(t, user.Core{}, res)
+		repo.AssertExpectations(t)
 	})
 }
 
