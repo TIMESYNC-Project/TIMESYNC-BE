@@ -39,7 +39,7 @@
 # 🔗 ERD
 <img src="ERD.png">
 
-# 🔥 Open API
+# ⚡ Features
 
 <details>
   <summary>👶 Admin</summary>
