@@ -562,7 +562,7 @@ func (aq *attendanceQuery) GetPresenceTotalToday(adminID uint) ([]attendance.Cor
 	}
 	dates := fmt.Sprintf("%s-%s-%s", year, month, day)
 	prs := []Attendance{}
-	err := aq.db.Where("attendance_date = ? ", dates).Find(&prs).Error
+	err := aq.db.Where("attendance_date = ? && attendance = ?", dates, "present").Find(&prs).Error
 	if err != nil {
 		log.Println("query error")
 		return []attendance.Core{}, errors.New("data not found")
