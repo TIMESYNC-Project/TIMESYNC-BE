@@ -209,7 +209,7 @@ func SettingValidate(data setting.Core) error {
 	}
 	if data.Tolerance != 0 {
 		if data.Tolerance > 59 {
-			return errors.New("tolerance max 60")
+			return errors.New("tolerance max 59")
 		}
 		err := validate.Var(data.Tolerance, "numeric")
 		if err != nil {
