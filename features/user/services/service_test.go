@@ -290,8 +290,8 @@ func TestAdminEditEmploye(t *testing.T) {
 	imageTrueCnv := &multipart.FileHeader{
 		Filename: imageTrue.Name(),
 	}
-	inputData := user.Core{ID: 1, Name: "Alif", Phone: "08123", ProfilePicture: "ERD.png"}
-	resData := user.Core{ID: 1, Name: "Alif", Phone: "08123", ProfilePicture: imageTrueCnv.Filename}
+	inputData := user.Core{ID: 1, Name: "Alif", Phone: "08123"}
+	resData := user.Core{ID: 1, Name: "Alif", Phone: "08123"}
 	t.Run("success updating account", func(t *testing.T) {
 		repo.On("UpdateByAdmin", uint(1), uint(1), inputData).Return(resData, nil).Once()
 		srv := New(repo)
@@ -352,7 +352,7 @@ func TestAdminEditEmploye(t *testing.T) {
 		pToken := token.(*jwt.Token)
 		pToken.Valid = true
 		res, err := srv.AdminEditEmployee(pToken, uint(1), *headerFake, inputData)
-		assert.ErrorContains(t, err, "validate")
+		assert.ErrorContains(t, err, "type")
 		assert.Equal(t, uint(0), res.ID)
 		repo.AssertExpectations(t)
 

@@ -34,7 +34,7 @@ func (cq *companyQuery) EditProfile(adminID uint, updateData company.Core) (comp
 	err := qry.Error
 	if err != nil {
 		log.Println("update user query error", err.Error())
-		return company.Core{}, err
+		return company.Core{}, errors.New("server error")
 	}
 	result := DataToCore(cnv)
 	return result, nil

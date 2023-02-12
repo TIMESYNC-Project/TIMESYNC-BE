@@ -54,6 +54,18 @@ func TestEditSetting(t *testing.T) {
 		assert.Equal(t, uint(0), res.ID)
 		data.AssertExpectations(t)
 	})
+	t.Run("validate", func(t *testing.T) {
+		inputDataFake := setting.Core{ID: 1, Start: "08:3", End: "16:30", Tolerance: 70, AnnualLeave: 14}
+		srv := New(data)
+		_, token := helper.GenerateToken(1)
+		mockToken := token.(*jwt.Token)
+		mockToken.Valid = true
+		res, err := srv.EditSetting(mockToken, inputDataFake)
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "validate")
+		assert.Equal(t, uint(0), res.ID)
+		data.AssertExpectations(t)
+	})
 
 }
 

@@ -33,20 +33,22 @@ func (cuc *companyUseCase) GetProfile() (company.Core, error) {
 func (cuc *companyUseCase) EditProfile(token interface{}, fileData multipart.FileHeader, updateData company.Core) (company.Core, error) {
 	adminID := helper.ExtractToken(token)
 	// kondisi dibawah dilakukan agar foto bisa kosong dan agar unit testing tidak error
-	if fileData.Size != 0 {
-		res, err := helper.GetUrlImagesFromAWS(fileData)
-		if err != nil {
-			return company.Core{}, errors.New("validate: " + err.Error())
-		}
-		updateData.Picture = res
+	url, err := helper.GetUrlImagesFromAWS(fileData)
+	if err != nil {
+		return company.Core{}, errors.New("validate: " + err.Error())
 	}
+	updateData.Picture = url
+	// if fileData.Size != 0 {
+	// }
 	res, err := cuc.qry.EditProfile(uint(adminID), updateData)
 	if err != nil {
 		log.Println("query error")
 		if strings.Contains(err.Error(), "access") {
 			return company.Core{}, errors.New("access denied")
+		} else if strings.Contains(err.Error(), "no data") {
+			return company.Core{}, errors.New("no data updated")
 		} else {
-			return company.Core{}, errors.New("query error, problem with server")
+			return company.Core{}, err
 		}
 	}
 	return res, nil

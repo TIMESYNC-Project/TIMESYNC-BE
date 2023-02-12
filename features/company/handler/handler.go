@@ -42,7 +42,7 @@ func (cc *companyController) EditProfile() echo.HandlerFunc {
 			} else if strings.Contains(err.Error(), "access") {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": err.Error()})
 			} else {
-				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "internal server error"})
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": err.Error()})
 			}
 
 		}

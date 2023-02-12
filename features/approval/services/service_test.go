@@ -81,7 +81,7 @@ func TestPostApproval(t *testing.T) {
 		pToken := token.(*jwt.Token)
 		pToken.Valid = true
 		res, err := srv.PostApproval(pToken, *headerFake, inputData)
-		assert.ErrorContains(t, err, "validate")
+		assert.ErrorContains(t, err, "type")
 		assert.Equal(t, uint(0), res.ID)
 		repo.AssertExpectations(t)
 

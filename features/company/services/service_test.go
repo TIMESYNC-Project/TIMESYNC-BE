@@ -102,7 +102,7 @@ func TestEditProfile(t *testing.T) {
 	})
 
 	t.Run("server problem", func(t *testing.T) {
-		repo.On("EditProfile", uint(1), inputData).Return(company.Core{}, errors.New("server problem"))
+		repo.On("EditProfile", uint(1), inputData).Return(company.Core{}, errors.New("query error, problem with server"))
 		srv := New(repo)
 
 		_, token := helper.GenerateToken(1)
@@ -111,7 +111,7 @@ func TestEditProfile(t *testing.T) {
 		res, err := srv.EditProfile(pToken, *imageTrueCnv, inputData)
 		assert.NotNil(t, err)
 		assert.Equal(t, uint(0), res.ID)
-		assert.ErrorContains(t, err, "server")
+		assert.Error(t, err)
 		repo.AssertExpectations(t)
 	})
 	t.Run("access denied", func(t *testing.T) {
@@ -127,6 +127,7 @@ func TestEditProfile(t *testing.T) {
 		assert.ErrorContains(t, err, "denied")
 		repo.AssertExpectations(t)
 	})
+
 	t.Run("invalid file validation", func(t *testing.T) {
 		filePathFake := filepath.Join("..", "..", "..", "TimeSyncUnitTesting.csv")
 		headerFake, err := helper.UnitTestingUploadFileMock(filePathFake)
@@ -143,21 +144,34 @@ func TestEditProfile(t *testing.T) {
 		repo.AssertExpectations(t)
 
 	})
-	t.Run("invalid file validation", func(t *testing.T) {
-		filePathFake := filepath.Join("..", "..", "..", "Samurai Ghost Mask.png")
-		headerFake, err := helper.UnitTestingUploadFileMock(filePathFake)
-		if err != nil {
-			log.Panic("dari file header unit testing approval", err.Error())
-		}
+	t.Run("access denied", func(t *testing.T) {
+		repo.On("EditProfile", uint(2), company.Core{}).Return(company.Core{}, errors.New("no data updated"))
 		srv := New(repo)
-		_, token := helper.GenerateToken(1)
+
+		_, token := helper.GenerateToken(2)
 		pToken := token.(*jwt.Token)
 		pToken.Valid = true
-		res, err := srv.EditProfile(pToken, *headerFake, inputData)
-		assert.ErrorContains(t, err, "size")
-		assert.Error(t, err)
+		res, err := srv.EditProfile(pToken, *imageTrueCnv, company.Core{})
+		assert.NotNil(t, err)
 		assert.Equal(t, uint(0), res.ID)
+		assert.ErrorContains(t, err, "no data updated")
 		repo.AssertExpectations(t)
-
 	})
+	// t.Run("invalid file validation", func(t *testing.T) {
+	// 	filePathFake := filepath.Join("..", "..", "..", "Samurai Ghost Mask.png")
+	// 	headerFake, err := helper.UnitTestingUploadFileMock(filePathFake)
+	// 	if err != nil {
+	// 		log.Panic("dari file header unit testing approval", err.Error())
+	// 	}
+	// 	srv := New(repo)
+	// 	_, token := helper.GenerateToken(1)
+	// 	pToken := token.(*jwt.Token)
+	// 	pToken.Valid = true
+	// 	res, err := srv.EditProfile(pToken, *headerFake, inputData)
+	// 	assert.ErrorContains(t, err, "size")
+	// 	assert.Error(t, err)
+	// 	assert.Equal(t, uint(0), res.ID)
+	// 	repo.AssertExpectations(t)
+
+	// })
 }

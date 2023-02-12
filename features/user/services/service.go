@@ -99,13 +99,12 @@ func (uuc *userUseCase) Update(token interface{}, fileData multipart.FileHeader,
 	hashed := helper.GeneratePassword(updateData.Password)
 	updateData.Password = string(hashed)
 	log.Println("size:", fileData.Size)
-	if fileData.Size != 0 {
-		res, err := helper.GetUrlImagesFromAWS(fileData)
-		if err != nil {
-			return user.Core{}, errors.New("validate: " + err.Error())
-		}
-		updateData.ProfilePicture = res
+
+	url, err := helper.GetUrlImagesFromAWS(fileData)
+	if err != nil {
+		return user.Core{}, errors.New("validate: " + err.Error())
 	}
+	updateData.ProfilePicture = url
 	res, err := uuc.qry.Update(uint(employeeID), updateData)
 	if err != nil {
 		msg := ""
@@ -176,13 +175,13 @@ func (uuc *userUseCase) AdminEditEmployee(token interface{}, employeeID uint, fi
 	}
 	hashed := helper.GeneratePassword(updateData.Password)
 	updateData.Password = hashed
-	if fileData.Size != 0 {
-		res, err := helper.GetUrlImagesFromAWS(fileData)
-		if err != nil {
-			return user.Core{}, errors.New("validate: " + err.Error())
-		}
-		updateData.ProfilePicture = res
+	url, err := helper.GetUrlImagesFromAWS(fileData)
+	if err != nil {
+		return user.Core{}, errors.New("validate: " + err.Error())
 	}
+	updateData.ProfilePicture = url
+	// if fileData.Size != 0 {
+	// }
 	res, err := uuc.qry.UpdateByAdmin(uint(adminID), employeeID, updateData)
 	if err != nil {
 		msg := ""

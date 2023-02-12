@@ -43,38 +43,36 @@ type UploadResult struct {
 // UPLOAD IMAGE PROGRESS
 // ======================================================================
 func GetUrlImagesFromAWS(fileData multipart.FileHeader) (string, error) {
-	if fileData.Filename == "" {
-		return "", errors.New("file name error")
-	}
-	if fileData.Size == 0 {
-		return "", errors.New("cannot insert empty file")
-	}
-	if fileData.Size > 500000 {
-		return "", errors.New("file size max 500kb")
-	}
-	file, err := fileData.Open()
-	if err != nil {
-		return "", errors.New("error open fileData")
-	}
-	// Validasi Type
-	tipeNameFile, err := TypeFile(file)
-	if err != nil {
-		return "", errors.New("file type error only jpg or png file can be upload")
-	}
-	defer file.Close()
 
-	log.Println("size:", fileData.Filename, file)
-	namaFile := GenerateRandomString()
-	namaFile = namaFile + tipeNameFile
-	fileData.Filename = namaFile
-	log.Println(namaFile)
-	file2, _ := fileData.Open()
-	defer file2.Close()
-	uploadURL, err := UploadToS3(fileData.Filename, file2)
-	if err != nil {
-		return "", errors.New("cannot upload to s3 server error")
+	if fileData.Filename != "" && fileData.Size != 0 {
+		if fileData.Size > 500000 {
+			return "", errors.New("file size max 500kb")
+		}
+		file, err := fileData.Open()
+		if err != nil {
+			return "", errors.New("error open fileData")
+		}
+		// Validasi Type
+		tipeNameFile, err := TypeFile(file)
+		if err != nil {
+			return "", errors.New("file type error only jpg or png file can be upload")
+		}
+		defer file.Close()
+
+		log.Println("size:", fileData.Filename, file)
+		namaFile := GenerateRandomString()
+		namaFile = namaFile + tipeNameFile
+		fileData.Filename = namaFile
+		log.Println(namaFile)
+		file2, _ := fileData.Open()
+		defer file2.Close()
+		uploadURL, err := UploadToS3(fileData.Filename, file2)
+		if err != nil {
+			return "", errors.New("cannot upload to s3 server error")
+		}
+		return uploadURL, nil
 	}
-	return uploadURL, nil
+	return "", nil
 }
 
 // ======================================================================
