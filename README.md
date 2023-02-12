@@ -1,3 +1,4 @@
+# TIMESYNC
 <div align="center">
   <a href="https://github.com/orgs/TIMESYNC-Project/repositories">
     <img src="sample/images/logo.png" width="304" height="297">
@@ -13,7 +14,7 @@
 </div>
 
 ## 📑 About the Project
-<p align="justify">TIMESYNC is an attendance web-app that used by employee to clock-in and clock-out. In this web-app employee can do an approval request for them if they can't attend to office. In order to make sure our app works well and following the requirements, We as a backend engineer build efficient and tested our systems.</p>
+<p align="justify">TIMESYNC is an attendance web-app that used by employee to clock-in and clock-out. In this web-app employee can do an approval request for them if they can't attend to office. In order to make sure our app works well and following the requirements. We as a backend engineer build efficient and tested our systems.</p>
 
 ## 🛠 Tools
 **Backend:** <br>
