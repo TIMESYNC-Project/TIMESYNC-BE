@@ -174,11 +174,11 @@ func SettingValidate(data setting.Core) error {
 	if data.Start != "" {
 		m, _ := strconv.Atoi(data.Start[3:])
 		h, _ := strconv.Atoi(data.Start[:2])
-		if m >= 59 || m < 0 {
-			return errors.New("time start minute max 59")
+		if m > 59 || m < 0 {
+			return errors.New("time start minute min 00 max 59")
 		}
-		if h >= 24 {
-			return errors.New("time start hour max 23")
+		if h >= 24 || h < 0 {
+			return errors.New("time start hour min 00 max 23")
 		}
 		log.Println(h, m < 0)
 		cekStart := strings.Replace(data.Start, ":", "", -1)
@@ -192,11 +192,11 @@ func SettingValidate(data setting.Core) error {
 	if data.End != "" {
 		m, _ := strconv.Atoi(data.End[3:])
 		h, _ := strconv.Atoi(data.End[:2])
-		if m >= 59 {
-			return errors.New("time end minute max 59")
+		if m > 59 || m < 0 {
+			return errors.New("time end minute min 00 max 59")
 		}
-		if h >= 24 {
-			return errors.New("time end hour max 23")
+		if h >= 24 || h < 0 {
+			return errors.New("time end hour min 00 max 23")
 		}
 		cekEnd := strings.Replace(data.End, ":", "", -1) // untuk memishkan char ":" <--
 		log.Println(cekEnd)
@@ -208,8 +208,8 @@ func SettingValidate(data setting.Core) error {
 		}
 	}
 	if data.Tolerance != 0 {
-		if data.Tolerance > 59 {
-			return errors.New("tolerance max 59 min")
+		if data.Tolerance > 59 || data.Tolerance < 0 {
+			return errors.New("tolerance minimum 0 minute and max 59 minute")
 		}
 		err := validate.Var(data.Tolerance, "numeric")
 		if err != nil {
@@ -219,6 +219,9 @@ func SettingValidate(data setting.Core) error {
 		}
 	}
 	if data.AnnualLeave != 0 {
+		if data.AnnualLeave < 0 {
+			return errors.New("annual leave cannot less than 0")
+		}
 		err := validate.Var(data.AnnualLeave, "numeric")
 		if err != nil {
 			e := err.(validator.ValidationErrors)[0]
